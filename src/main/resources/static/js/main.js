@@ -4,6 +4,24 @@
    activate(CanvasState)
    deactivate() */
 
+var ResizeTool = (function () {
+	var _this = this;
+	
+	var activate = function () {
+		$(_this).bind("resize", function () {
+			
+		});
+	};
+	
+	var deactivate = function () {
+		
+	};
+	
+	return {
+		activate: activate,
+		deactivate: deactivate
+	};
+});
 
 var PageEditor = (function () {
 	
