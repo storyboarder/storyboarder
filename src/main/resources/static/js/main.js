@@ -1,10 +1,22 @@
+/* canvas state object that is passed when tools are initialized */
+
+/* tools will be modules containing:
+   activate(CanvasState)
+   deactivate() */
+
+
 var PageEditor = (function () {
+	
+	var toolset = {
+		//dictionary of all tool modules
+	}
+
 	var init = function () {
 
 	};
 
 	var toggle = function (toolName) {
-
+		//retrieves new tool from toolset using toolName as the key	
 	};
 
 	// Public API
