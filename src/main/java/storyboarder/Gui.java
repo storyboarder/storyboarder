@@ -35,7 +35,8 @@ public final class Gui {
     Spark.setPort(port);
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
-    Spark.post("/results", new ResultsHandler());
+    Spark.post("/load", new LoadHandler());
+    Spark.post("/save", new SaveHandler());
 
   }
 
@@ -54,7 +55,17 @@ public final class Gui {
     }
   }
 
-  private static class ResultsHandler implements Route {
+  private static class LoadHandler implements Route {
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      String[] results = {};
+      return GSON.toJson(results);
+    }
+
+  }
+
+  private static class SaveHandler implements Route {
 
     @Override
     public Object handle(Request req, Response res) {
