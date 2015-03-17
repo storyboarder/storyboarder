@@ -45,6 +45,24 @@ var PageEditor = (function () {
 })();
 
 
+function Model (PageEditor) {
+	var init = (function () {
+		
+	})();
+
+	var save = function () {
+		$.post("url", {
+			state: PageEditor.getState()
+		});
+	};
+
+	return {
+		save: save
+	};	
+};
+
+new Model(new PageEditor());
+
 var Model = (function (PageEditor) {
 	var init = function () {
 
