@@ -66,6 +66,14 @@ function Model (PageEditor) {
 	};	
 };
 
+Model.prototype.nonStaticMethod = function () {
+	// ...
+};
+
+Model.staticMethodName = function () {
+	// ...	
+};
+
 new Model(new PageEditor());
 
 var Model = (function (PageEditor) {
