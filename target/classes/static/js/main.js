@@ -1,19 +1,72 @@
+/* canvas state object that is passed when tools are initialized */
+
+/* tools will be modules containing:
+   activate(CanvasState)
+   deactivate() */
+
+var ResizeTool = (function () {
+	var _this = this;
+	
+	var activate = function () {
+		$(_this).bind("resize", function () {
+			
+		});
+	};
+	
+	var deactivate = function () {
+		
+	};
+	
+	return {
+		activate: activate,
+		deactivate: deactivate
+	};
+});
+
 var PageEditor = (function () {
+	
+	var toolset = {
+		//dictionary of all tool modules
+	}
+
 	var init = function () {
 
 	};
 
 	var toggle = function (toolName) {
+		//retrieves new tool from toolset using toolName as the key	
+	};
 
+	var getState = function () {
+		// ...
 	};
 
 	// Public API
 	return {
 		toggle: toggle,
-		init: init
+		init: init,
+		getState: getState
 	};
 })();
 
+
+function Model (PageEditor) {
+	var init = (function () {
+		
+	})();
+
+	var save = function () {
+		$.post("url", {
+			state: PageEditor.getState()
+		});
+	};
+
+	return {
+		save: save
+	};	
+};
+
+new Model(new PageEditor());
 
 var Model = (function (PageEditor) {
 	var init = function () {

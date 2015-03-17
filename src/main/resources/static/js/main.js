@@ -49,7 +49,6 @@ var PageEditor = (function () {
 	};
 })();
 
-
 function Model (PageEditor) {
 	var init = (function () {
 		
