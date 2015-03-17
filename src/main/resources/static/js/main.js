@@ -37,10 +37,15 @@ var PageEditor = (function () {
 		//retrieves new tool from toolset using toolName as the key	
 	};
 
+	var getState = function () {
+		// ...
+	};
+
 	// Public API
 	return {
 		toggle: toggle,
-		init: init
+		init: init,
+		getState: getState
 	};
 })();
 
