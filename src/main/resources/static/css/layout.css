@@ -1,0 +1,61 @@
+
+body {
+	min-width:400px;
+	height:100vh;
+}
+
+#container {
+	padding:0 200px;
+	height:100%;
+	outline:2px solid black;
+}
+
+#container>div {
+	position:relative;
+	float:left;
+	height:100%;
+}
+
+div {
+	outline:1px solid black;
+}
+
+.toolbar {
+	width:200px;
+}
+
+.menu {
+	float:left;
+	margin-right:-200px;
+}
+
+.toolset {
+	margin:5px;
+	padding-left:0;
+}
+
+.toolset h3 {
+	margin:0;
+}
+
+.menu li {
+	list-style-type:none;
+}
+
+.menu ul {
+	text-indent:0;
+}
+
+.menu input[type="number"] {
+	width:30px;
+}
+
+.page {
+	float:left;
+	margin-left:-200px;
+}
+
+.editor {
+	width:100%;
+}
+

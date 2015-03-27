@@ -1,0 +1,63 @@
+<!--This is a static HTML page, to be used for developing the JS tools. Later we can involve the server and templating./-->
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Storyboarder</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script data-main="../static/js/main.js" src="../static/js/require.js"></script>
+		<!--<script src="../static/js/main.js"></script>/-->
+		<link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+		<link rel="stylesheet" type="text/css" href="../static/css/layout.css">
+	</head>
+
+	<body>
+
+		<div id="container">
+		<div class="page toolbar">
+			<h2>Pages</h2>
+		</div>
+
+		<div class="editor">
+			<h2>Editor</h2>
+			<canvas id="canvas"></canvas>
+		</div>
+
+		<div class="menu toolbar">
+			<h2>Tools</h2>
+			<ul class="toolset"><h3>Main</h3>
+				<li><a class="select">Select</a></li>
+				<li><a class="undo">Undo</a></li>
+				<li><a class="redo">Redo</a></li>
+				<li>Grid: <input type="number" /> <input type="number" /></li>
+			</ul>
+			<ul class="toolset"><h3>Panel</h3>
+				<li><a class="split">Split</a></li>
+				<li><a class="join">Join</a></li>
+				<li>Margin size: <input type="number" /></li>
+				<li>Snap to grid: <input type="checkbox" /></li>
+			</ul>
+			<ul class="toolset"><h3>Image</h3>
+				<li><a class="add">Add</a></li>
+				<li><a class="brush">Brush</a></li>
+				<li><a class="fill">Fill</a></li>
+				<li><a class="eyedropper">Eyedropper</a></li>
+				<li><a class="colorpicker">Color Picker</a></li>
+				<li>Snap to grid: <input type="checkbox" /></li>
+			</ul>
+			<ul class="toolset"><h3>Text</h3>
+				<li><a class="text">Text</a></li>
+				<li>Borders: <input type="radio" name="text-borders"/>ellipse <input type="radio" name="text-borders"/>rectangle <input type="radio" name="text-borders" checked="true"/>none</li>
+				<li>Snap to grid: <input type="checkbox" /></li>
+			</ul>
+			<ul class="toolset"><h3>Save/Export</h3>
+				<li><a class="save">Save</a></li>
+				<li><a class="export">Export</a></li>
+				<li><a class="load">Load</a></li>
+			</ul>
+		</div>
+	</div>
+	</body>
+
+</html>
