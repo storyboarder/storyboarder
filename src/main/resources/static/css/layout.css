@@ -1,23 +1,23 @@
-
-body {
-	min-width:400px;
-	height:100vh;
+html, body {
+	padding:0;
+	margin:0;
 }
 
 #container {
-	padding:0 200px;
-	height:100%;
-	outline:2px solid black;
+	padding:0;
+	margin:0;
+	padding-left:200px;
+	padding-right:200px;
+	height:100vh;
+	overflow:hide;
 }
 
 #container>div {
 	position:relative;
+	margin-top:0;
+	margin-bottom:0;
 	float:left;
 	height:100%;
-}
-
-div {
-	outline:1px solid black;
 }
 
 .toolbar {
@@ -57,5 +57,11 @@ div {
 
 .editor {
 	width:100%;
+	text-align:center;
+	background:#eee;
 }
 
+canvas {
+	outline:1px solid #ccc;
+	background:#fff;
+}
