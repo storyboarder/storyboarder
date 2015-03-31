@@ -1,100 +1,30 @@
-/* canvas state object that is passed when tools are initialized */
-
-/* tools will be modules containing:
-   activate(CanvasState)
-   deactivate() */
-
-var ResizeTool = (function () {
-	var _this = this;
-	
-	var activate = function () {
-		$(_this).bind("resize", function () {
-			
-		});
-	};
-	
-	var deactivate = function () {
-		
-	};
-	
-	return {
-		activate: activate,
-		deactivate: deactivate
-	};
+require.config({
+	baseUrl: "../static/js",
+	paths: {
+		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
+	}
 });
 
-var PageEditor = (function () {
-	
-	var toolset = {
-		//dictionary of all tool modules
-	}
+var dependencies = [
+	"CanvasState",
+	"Editor",
+	"view/Menu"
+];
 
-	var init = function () {
+$(document).ready(function() {
 
-	};
+	// should prompt user for project initialization
+	// but for the moment values are hard-coded
 
-	var toggle = function (toolName) {
-		//retrieves new tool from toolset using toolName as the key	
-	};
+	var canvas = document.getElementById("canvas");
+	canvas.height = 700;
+	canvas.width = 400;
 
-	var getState = function () {
-		// ...
-	};
-
-	// Public API
-	return {
-		toggle: toggle,
-		init: init,
-		getState: getState
-	};
-})();
-
-
-function Model (PageEditor) {
-	var init = (function () {
-		
-	})();
-
-	var save = function () {
-		$.post("url", {
-			state: PageEditor.getState()
-		});
-	};
-
-	return {
-		save: save
-	};	
-};
-
-new Model(new PageEditor());
-
-var Model = (function (PageEditor) {
-	var init = function () {
-
-	};
-
-	var save = function () {
-		$.post("url", {
-			state: PageEditor.getState()
-		});
-	};
-
-	return {
-		init: init,
-		save: save
-	};
-})(PageEditor);
-
-
-var UserInterface = (function (PageEditor, Model) {
-	var init = function () {
-		$("#snap-to-grid").click(PageEditor.toggle("snapToGrid"));
-		$("#resize-panel").click(PageEditor.toggle("resizePanel"));
-		$("#save").click(Model.save());
-		// ...
-	};
-
-	return {
-		init: init
-	};
-})(PageEditor, Model);
+	require(dependencies, function(util) {
+		var canvasState = new CanvasState(canvas);
+		canvasState.setPageMargin(15);
+		canvasState.setGridSpacing(20);
+		canvasState.setPanelMargin(10);
+		console.log(canvasState);
+	});
+});
