@@ -13,5 +13,8 @@ var dependencies = [
 	"Text",
 	"Split",
 	"Join",
+	"Save",
+	"Load"
 
 ];
+
