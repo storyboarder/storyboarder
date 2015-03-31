@@ -14,18 +14,19 @@ var dependencies = [
 
 var Selector = {
 
-	var _helperFunction() {
-	
-	};
-
 	var activate(CanvasState) {
-		// knows the elements (array)
-		// event listener to click + drag?
+		var canvas = CanvasState.canvas; 
+		canvas.selection = true; // enable group selection
 
-		
+		canvas.on('object:scaling', function(options)){
+			// snap to grid functionality here
+		};
+
 	};
 
 	var deactivate() {
+
+	canvas.selection = false; // disable group selection
 
 	};
 };
