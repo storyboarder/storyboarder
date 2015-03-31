@@ -49,7 +49,6 @@ var PageEditor = (function () {
 	};
 })();
 
-
 function Model (PageEditor) {
 	var init = (function () {
 		
@@ -64,6 +63,14 @@ function Model (PageEditor) {
 	return {
 		save: save
 	};	
+};
+
+Model.prototype.nonStaticMethod = function () {
+	// ...
+};
+
+Model.staticMethodName = function () {
+	// ...	
 };
 
 new Model(new PageEditor());
