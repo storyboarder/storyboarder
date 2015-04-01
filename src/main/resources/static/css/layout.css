@@ -65,3 +65,7 @@ canvas {
 	outline:1px solid #ccc;
 	background:#fff;
 }
+
+.canvas-container {
+	margin:0 auto;
+}

@@ -2,17 +2,15 @@
 define(["../../CanvasState"], function (CanvasState) {
 
 		var helper_function = function() {
-			console.log("helper function");
 
 		};
 
 		var activate = function(CanvasState) {
-			console.log("activate");
-
+			console.log("select activated");
 		};
 
 		var deactivate = function() {
-			console.log("deactivate");
+			console.log("select deactivated");
 
 
 		};

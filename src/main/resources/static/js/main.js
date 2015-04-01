@@ -2,7 +2,7 @@ require.config({
 	baseUrl: "../static/js",
 	paths: {
 		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
-		fabricjs: "http://fabricjs.com/lib/fabric.js",
+		fabricjs: "http://fabricjs.com/lib/fabric",
 		tools: "tools",
 	}
 });
@@ -24,13 +24,24 @@ $(document).ready(function() {
 
 	require(dependencies, function(canvasState, editor, menu) {
 
-		canvasState.setCanvas(canvas);
+		console.log("canvas");
 		canvasState.setPageMargin(15);
 		canvasState.setGridSpacing(20);
 		canvasState.setPanelMargin(10);
+		canvasState.setCanvas(canvas);
 
 		console.log(canvasState);
-		
+
+		var fCanvas = new fabric.Canvas(canvas.id, {selection:false}); 
+		fCanvas.width = canvas.width;
+		fCanvas.height = canvas.height;
+		elements = [];
+		var circle = new fabric.Circle({
+			  radius: 20, fill: 'green', left: 100, top: 100
+		});
+		fCanvas.add(circle);
+		console.log(fCanvas);
+
 
 		console.log(editor);
 		editor.test();
