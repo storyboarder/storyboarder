@@ -1,6 +1,7 @@
 define(["./CanvasState", "./tools/panel/Split"], function(CanvasState, Split) {
 	var toolset = {
-		"split": Split
+		"split": Split,
+		"text": Text
 	};
 
 	return {
