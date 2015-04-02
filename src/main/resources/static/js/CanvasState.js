@@ -32,7 +32,6 @@ CanvasState.prototype.setGridSpacing = function(gridSpacing) {
 
 define(["fabricjs"], function () {
 
-	var canvas;
 	var fCanvas;
 	var pageMargin = 20;
 	var panelMargin = 10;
@@ -63,24 +62,15 @@ define(["fabricjs"], function () {
 	}
 
 	return {
-		setCanvas: function(c) {
-			canvas = c;
-			fCanvas = new fabric.Canvas(canvas.id, {selection:false}); 
-			fCanvas.width = canvas.width;
-			fCanvas.height = canvas.height;
+    getCanvas: function () {
+      return fCanvas;
+    },
+
+		init: function(canvasId) {
+			fCanvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
-      
-			var circle = new fabric.Circle({
-				  radius: 20, fill: 'green', left: 100, top: 100
-			});
-			fCanvas.add(circle);
+
 			var firstPanel = new fabric.Rect({
-				/*
-				left:pageMargin,
-				top:pageMargin,
-				width:canvas.width - 2 * pageMargin,
-				height: canvas.height - 2 * pageMargin,
-				*/
 				left: 20,
 				top: 20,
 				width: 50,
@@ -91,19 +81,22 @@ define(["fabricjs"], function () {
 				lockMovementX: true,
 				lockMovementY: true
 			});
+
 			addElement(firstPanel, "panel");
-			console.log("canvas:");
-			console.log(fCanvas);
-			//console.log(fCanvas);
-				console.log("canvas:");
+
 			addPanel(pageMargin, pageMargin, 
-					canvas.width -  pageMargin,
-					canvas.height - pageMargin);
-	    },
+					fCanvas.getWidth()  - pageMargin,
+					fCanvas.getHeight() - pageMargin);
+
+      var circle = new fabric.Circle({
+          radius: 20, fill: 'green', left: 100, top: 100
+      });
+      fCanvas.add(circle);
+    },
 		addElement: addElement,
 		setPageMargin: function(p) {
 			pageMargin = p;
-	    },
+	  },
 		setPanelMargin: function(p) {
 			panelMargin = p;
 		},

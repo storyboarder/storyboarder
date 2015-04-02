@@ -1,16 +1,8 @@
-var tools = [
-	"tools/page/select",
-	"tools/panel/split"
-	];
-
-define(tools, function() {
-	console.log("toolset called");
-
+define(function() {
 	return {
-		"select" : require("tools/page/select"),
-		"split" : require("tools/panel/split")
-		// other tools go here
-	}
+		// "select" : require("tools/page/select"),
+		"Split" : require("./panel/Split")
+	};
 });
 
 

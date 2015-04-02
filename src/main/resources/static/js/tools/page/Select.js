@@ -1,4 +1,3 @@
-
 define(["../../CanvasState"], function (CanvasState) {
 
 		var helper_function = function() {
