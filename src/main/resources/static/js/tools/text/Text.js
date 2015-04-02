@@ -1,7 +1,8 @@
 
 define(["../../CanvasState"], function (CanvasState) {
 
-		var activate = function(CanvasState) {
+		
+		var activate = function() {
 			console.log("text activate");
 			var canvas = CanvasState.canvas; 
 
@@ -34,16 +35,16 @@ define(["../../CanvasState"], function (CanvasState) {
 			canvas.on('mouse:down', function(coor) {
 				console.log('down');
 				initialPos = {
-					x: coor.e.clientX,
-					y: coor.e.clientY
+					pos: coor.e.offsetX,
+					y: coor.e.offsetY
 				}
 			});
 
 			canvas.on('mouse:up', function(coor){
 				console.log('up');
 				finalPos = {
-					x: coor.e.clientX,
-					y: coor.e.clientY
+					x: coor.e.offsetX,
+					y: coor.e.offsetY
 				}
 
 				if(coor.target && coor.target.type === 'text') {
@@ -92,8 +93,19 @@ define(["../../CanvasState"], function (CanvasState) {
 			console.log("text deactivate");
 		};
 
+	
+	return {
+		init: function (canvasState) {
+			canvasState = canvasState;
+			fCanvas = canvasState.getCanvas();
+		},
+		activate: activate(),
+		deactivate: deactivate()
+	}
+	
+	/*
 	return {
 		activate: activate(CanvasState),
 		deactivate: deactivate()
-	}
+	} */
 });
