@@ -34,7 +34,7 @@ define(["fabricjs"], function () {
 
 	var canvas;
 	var fCanvas;
-	var pageMargin = 20;
+	var pageMargin;
 	var panelMargin = 10;
 	var gridSpacing = 50;
 	var elements;

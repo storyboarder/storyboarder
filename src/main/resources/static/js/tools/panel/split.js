@@ -6,6 +6,7 @@ define(["../../CanvasState"], function (CanvasState) {
 
 		var activate = function(CanvasState) {
 			console.log("split activated");
+			console.log(CanvasState.getPageMargin());
 
 		};
 
