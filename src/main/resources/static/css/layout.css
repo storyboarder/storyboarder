@@ -61,9 +61,12 @@ html, body {
 	background:#eee;
 }
 
-canvas {
+.canvas-bg {
+	display:inline-block;
 	outline:1px solid #ccc;
 	background:#fff;
+	padding:0;
+	margin:0;
 }
 
 .canvas-container {

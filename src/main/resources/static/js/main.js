@@ -32,16 +32,6 @@ $(document).ready(function() {
 
 		console.log(canvasState);
 
-		var fCanvas = new fabric.Canvas(canvas.id, {selection:false}); 
-		fCanvas.width = canvas.width;
-		fCanvas.height = canvas.height;
-		elements = [];
-		var circle = new fabric.Circle({
-			  radius: 20, fill: 'green', left: 100, top: 100
-		});
-		fCanvas.add(circle);
-		console.log(fCanvas);
-
 
 		console.log(editor);
 		editor.test();

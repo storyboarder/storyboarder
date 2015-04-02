@@ -3,6 +3,5 @@ define(["./Editor"], function(editor) {
 		editor.activate("split");
 	});
 	
-
 	return {};
 });
