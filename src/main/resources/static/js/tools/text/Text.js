@@ -1,13 +1,8 @@
 
 define(["../../CanvasState"], function (CanvasState) {
 
-		var helper_function = function() {
-			console.log("helper function");
-
-		};
-
 		var activate = function(CanvasState) {
-			console.log("activate");
+			console.log("text activate");
 			var canvas = CanvasState.canvas; 
 
 			// adding text boxes and editing inside them, basically rect with label
@@ -94,7 +89,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		};
 
 		var deactivate = function() {
-			console.log("deactivate");
+			console.log("text deactivate");
 		};
 
 	return {
