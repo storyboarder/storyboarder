@@ -1,4 +1,4 @@
-define(["./Editor"], function(editor) {
+define(["../Editor"], function(editor) {
 	$("#toolbar .split").click(function () {
 		editor.activate("split");
 	});

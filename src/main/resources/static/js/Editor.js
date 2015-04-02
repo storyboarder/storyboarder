@@ -1,9 +1,23 @@
-define(["./tools/Toolset"], function(toolset) {
-	
-	//console.log("editor");
-	//console.log("toolset is ");
-	//console.log(toolset);
+define(["./CanvasState", "./tools/panel/Split"], function(CanvasState, Split) {
+	var toolset = {
+		"split": Split
+	};
+
 	return {
+		init: function () {
+			CanvasState.init("canvas");
+			CanvasState.setPageMargin(15);
+			CanvasState.setGridSpacing(20);
+			CanvasState.setPanelMargin(10);
+
+			for (var toolname in toolset) {
+				if (toolset.hasOwnProperty(toolname)) {
+					toolset[toolname].init(CanvasState);
+				}
+			}
+
+			this.activate("split");
+		},
 
 		activate: function (toolname) {
 			toolset[toolname].activate();
