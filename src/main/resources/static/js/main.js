@@ -27,20 +27,35 @@ $(document).ready(function() {
 	var canvas = document.getElementById('canvas');
 	canvas.width = 400;
 	canvas.height = 600;
-	
-	console.log("test");
-	require(dependencies, function(canvasState, editor, menu) {
-
-		console.log("canvas");
-		canvasState.setPageMargin(15);
+	require(['CanvasState'], function(CanvasState) {
+		console.log(CanvasState);
+		canvasState = CanvasState.getCanvasState();
+		canvasState.setPageMargin(0);
 		canvasState.setGridSpacing(20);
-		canvasState.setPanelMargin(10);
-		canvasState.setCanvas(canvas);
+		canvasState.setPanelMargin(5);
+		canvasState.init(canvas);
+		console.log("done calling init canvas state");
 
 		console.log(canvasState);
+		console.log(canvasState.getPageMargin());
+		
+		console.log("test");
+		require(dependencies, function(editor, menu) {
+			//console.log("main getting canvas state...");
+			//console.log("done getting canvas state");
+
+			// console.log(canvasState);
+			// canvasState.setPageMargin(17);
+			// canvasState.setGridSpacing(20);
+			// canvasState.setPanelMargin(10);
+			// canvasState.init(canvas);
+
+			console.log(canvasState);
 
 
-		console.log(editor);
-		editor.test();
+			console.log(editor);
+			editor.init("canvas");
+			editor.test();
+		});
 	});
 });

@@ -1,102 +1,86 @@
-/*canvasState contains:
-  canvas
-  gridSpacing (width of grid squares)
-  pageMargin
-  panelMargin
-  elements (array)
-  snapOptions (object of string/boolean)
-  history (History object)
-  delete (function)
-  add (function)
-  */
-
-/*
-var CanvasState = function(canvas) {
-
-	this.canvas = canvas;
-
-};
-
-CanvasState.prototype.setPageMargin = function(pageMargin) {
-	this.pageMargin = pageMargin;
-};
-
-CanvasState.prototype.setPanelMargin = function(panelMargin) {
-	this.panelMargin = panelMargin;
-};
-
-CanvasState.prototype.setGridSpacing = function(gridSpacing) {
-	this.gridSpacing = gridSpacing;
-};
-*/
-
 define(["fabricjs"], function () {
 
 	var fCanvas;
 	var pageMargin;
-	var panelMargin = 10;
-	var gridSpacing = 50;
+	var panelMargin;
+	var gridSpacing;
 	var elements;
+	var snapToGrid = false;
 
 	var addElement = function(e, type) {
-		if (type == "panel" || type == "image" || type == "text") {
-			elements.push({type:type, element: e});
-			fCanvas.add(e);
-			console.log(elements);
-		}
+		console.log("add element called");
+		elements.push({type:type, element: e});
+		fCanvas.add(e);
+		console.log(elements);
 	}
 
 	var addPanel = function(x1, y1, x2, y2) {
+		console.log("adding panel...");
 		var panel = new fabric.Rect({
-			left:x1,
-			top:y1,
-			width:x2 - x1,
-			height: y2 - y1,
-			fill:"white",
+			left:x1 + panelMargin,
+			top:y1 + panelMargin,
+			width:x2 - x1 - 2 * panelMargin,
+			height: y2 - y1 - 2 * panelMargin,
+			fill:"rgba(0, 0, 0, 0)",
 			stroke:"black",
 			strokeWeight:1,
 			lockMovementX:true,
-			lockMovementY:true
+			lockMovementY:true,
+			lockScalingX:true,
+			lockScalingY:true
 		});
+		panel.corners = {left: x1,
+			top: y1,
+			right: x2,
+			bottom: y2};
+		console.log(panel);
 		addElement(panel, "panel");
 	}
 
-	return {
-    getCanvas: function () {
-      return fCanvas;
-    },
+	//return {
+	var CanvasState = {
+		getCanvas: function () {
+		  return fCanvas;
+		},
+
+		getSnapToGrid: function() {
+			return snapToGrid;
+		},
+
+		getWidth: function() {
+			return fCanvas.width;
+		},
+
+		addPanel: addPanel,
+
+		makeSelectable: function(type) {
+			for (var i = 0; i < elements.length; i++) {
+				if (elements[i].type == type) {
+					elements[i].element.set({"selectable": true});
+				}
+			}
+		}, 
 
 		init: function(canvasId) {
 			fCanvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
 
-			var firstPanel = new fabric.Rect({
-				left: 20,
-				top: 20,
-				width: 50,
-				height: 50,
-				fill: "red",
-				stroke: "black",
-				strokeWeight: 5,
-				lockMovementX: true,
-				lockMovementY: true
-			});
-
-			addElement(firstPanel, "panel");
-
 			addPanel(pageMargin, pageMargin, 
-					fCanvas.getWidth()  - pageMargin,
-					fCanvas.getHeight() - pageMargin);
+					fCanvas.getWidth()  - 2 * pageMargin,
+					fCanvas.getHeight() - 2 * pageMargin);
 
-      var circle = new fabric.Circle({
-          radius: 20, fill: 'green', left: 100, top: 100
-      });
-      fCanvas.add(circle);
-    },
+		  var circle = new fabric.Circle({
+			  radius: 20, fill: 'green', left: 100, top: 100
+		  });
+		  fCanvas.add(circle);
+		  console.log("canvas initialized.");
+		},
+
 		addElement: addElement,
+
 		setPageMargin: function(p) {
 			pageMargin = p;
-	  },
+		},
 		setPanelMargin: function(p) {
 			panelMargin = p;
 		},
@@ -105,6 +89,16 @@ define(["fabricjs"], function () {
 		},
 		getPageMargin: function() {
 		   return pageMargin;
+	    },
+		getPanelMargin: function() {
+		   return panelMargin;
 	    }
+	};
+
+	return {
+		getCanvasState: function() { 
+			console.log("getting canvas state");
+			return CanvasState; 
+		}
 	};
 });
