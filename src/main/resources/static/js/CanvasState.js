@@ -65,15 +65,15 @@ define(["fabricjs"], function () {
 				width:canvas.width - 2 * pageMargin,
 				height: canvas.height - 2 * pageMargin,
 				*/
-				left:20,
-				top:20,
-				width:50,
-				height:50,
-				fill:"red",
-				stroke:"black",
-				strokeWeight:5,
-				lockMovementX:true,
-				lockMovementY:true
+				left: 20,
+				top: 20,
+				width: 50,
+				height: 50,
+				fill: "red",
+				stroke: "black",
+				strokeWeight: 5,
+				lockMovementX: true,
+				lockMovementY: true
 			});
 			addElement(firstPanel, "panel");
 			console.log("canvas:");

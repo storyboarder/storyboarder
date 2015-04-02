@@ -5,6 +5,10 @@ define(["./tools/Toolset"], function(toolset) {
 	//console.log(toolset);
 	return {
 
+		activate: function (toolname) {
+			toolset[toolname].activate();
+		},
+
 		test: function() {
 		  console.log("editor tested");
 		  console.log("toolset is now " + toolset);
