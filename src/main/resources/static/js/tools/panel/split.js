@@ -23,7 +23,7 @@ define(function () {
 			y2: y
 		};
 
-		canvas.add(new fabric.Line(coords, {
+		fCanvas.add(new fabric.Line(coords, {
 			fill: 'black',
 			stroke: 'black',
 			strokeWidth: 1,

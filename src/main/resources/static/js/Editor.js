@@ -4,8 +4,8 @@ define(["./CanvasState", "./tools/panel/Split"], function(CanvasState, Split) {
 	};
 
 	return {
-		init: function () {
-			CanvasState.init("canvas");
+		init: function (canvasId) {
+			CanvasState.init(canvasId);
 			CanvasState.setPageMargin(15);
 			CanvasState.setGridSpacing(20);
 			CanvasState.setPanelMargin(10);
