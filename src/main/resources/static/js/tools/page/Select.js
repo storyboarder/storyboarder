@@ -7,7 +7,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		};
 
 		var activate = function(CanvasState) {
-			console.log("activate");
+			console.log("select activated");
 
 
 		var canvas = CanvasState.canvas; 
@@ -37,7 +37,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		};
 
 		var deactivate = function() {
-			console.log("deactivate");
+			console.log("select deactivated");
 
 			canvas.selection = false; // disable group selection
 

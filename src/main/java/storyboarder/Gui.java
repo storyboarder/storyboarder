@@ -1,8 +1,6 @@
 package storyboarder;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -82,8 +80,6 @@ public final class Gui {
    *
    */
   private static class LoadHandler implements Route {
-    private static final BufferedReader READER = new BufferedReader(
-        new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
     /**
      * @param req
@@ -98,6 +94,7 @@ public final class Gui {
       QueryParamsMap qm = req.queryMap();
       String path = qm.value("path");
       try {
+        // Apparently this uses buffering so it is good even for large projects.
         List<String> pages = Files.readAllLines(Paths.get(path), CHARSET);
         return GSON.toJson(pages);
       } catch (IOException e) {
@@ -139,6 +136,9 @@ public final class Gui {
         String Json = qm.value("pages");
 
         List<String> pages = Arrays.asList(GSON.fromJson(Json, String[].class));
+
+        // TODO: It is unclear if this uses buffering, so saving huge files may
+        // be problematic.
         Files.write(path, pages, CHARSET);
 
         result = ImmutableMap.of("result", "Success!");
@@ -147,7 +147,5 @@ public final class Gui {
       }
       return new ModelAndView(result, "main.ftl");
     }
-
   }
-
 }
