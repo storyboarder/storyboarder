@@ -21,6 +21,10 @@ $(document).ready(function() {
 	var canvas = document.getElementById("canvas");
 	canvas.height = 600;
 	canvas.width = 400;
+	$('#canvas').click(function() {
+		console.log("HI");
+		alert("HEY");
+	});
 
 	require(dependencies, function(canvasState, editor, menu) {
 
