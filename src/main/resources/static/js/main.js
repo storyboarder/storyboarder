@@ -8,7 +8,6 @@ require.config({
 });
 
 var dependencies = [
-	"CanvasState",
 	"Editor",
 	"view/Menu"
 ];
@@ -18,10 +17,18 @@ $(document).ready(function() {
 	// should prompt user for project initialization
 	// but for the moment values are hard-coded
 
-	var canvas = document.getElementById("canvas");
-	canvas.height = 600;
+	/* fabric is not being recognized for some reason
+	var canvas = new fabric.Canvas('canvas');
+	canvas.setHeight(600);
+	canvas.setWidth(400);
+	canvas.renderAll();
+	*/
+	
+	var canvas = document.getElementById('canvas');
 	canvas.width = 400;
-
+	canvas.height = 600;
+	
+	console.log("test");
 	require(dependencies, function(canvasState, editor, menu) {
 
 		console.log("canvas");
