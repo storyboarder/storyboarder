@@ -25,7 +25,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			// if click again onto an textbox + text object, allow for resize?
 
 			// toggling? 
-
+			var toRegroup;
 			var initialPos;
 			var finalPos;
 			var selected;
@@ -48,8 +48,12 @@ define(["../../CanvasState"], function (CanvasState) {
 					y: coor.e.offsetY
 				}
 
-				if(selected && selected.type === 'group') {  //i-text
+				if(selected && selected.type === 'group' || selected.type === 'i-text') {  //i-text
 					console.log("group!!");
+					var pos = {
+						left : selected.left,
+						top : selected.top
+					}
 					var items = selected._objects;
 					var isText = false;
 					var iText;
@@ -70,13 +74,17 @@ define(["../../CanvasState"], function (CanvasState) {
 				          //canvas.item(canvas.size()-1).hasControls = true;
 				        }
 
-				        if(iText.hasStateChanged()) {
-				        	console.log("changed");
-							var group = new fabric.Group([ items(0), items(1) ], {
-							  left: items(1).left,
-							  top: items(1).top
-							});				        	
-				        }
+				        canvas.on("text:editing:exited", function(e) {
+    						console.log('finished editing');
+				        	var group = new fabric.Group([ items[0], items[1] ], {
+				        		left : pos.left,
+				        		top : pos.top
+				        	});	
+
+							canvasState.deleteElement(items[0]);
+							canvasState.deleteElement(items[1]);
+							canvasState.addElement(group);
+						});
 
 						document.onkeydown = function (e) {
 							console.log("pressed");
@@ -102,9 +110,7 @@ define(["../../CanvasState"], function (CanvasState) {
 
 					var input = new fabric.IText('Text', { 
 				  		fontFamily: 'arial black',
-				  		fontSize: 14,
-				  		width: width - TEXT_PADDING,
-				  		height: height - TEXT_PADDING
+				  		fontSize: 14
 					});
 
 					var textBox = new fabric.Rect({
