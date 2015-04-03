@@ -3,5 +3,9 @@ define(["../Editor"], function(editor) {
 		editor.activate("split");
 	});
 	
+	$("#toolbar .text").click(function () {
+		editor.activate("text");
+	});
+
 	return {};
 });

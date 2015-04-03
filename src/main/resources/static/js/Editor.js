@@ -11,7 +11,7 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 		toolset.init();
 
 		/* activate a tool to start with (esp. helpful for testing) */
-		this.activate("Split");
+		//this.activate("Split");
 	};
 
 	var activate = function(toolname) {
