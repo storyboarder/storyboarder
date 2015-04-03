@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>Storyboarder</title>
-	<link rel="stylesheet/less" type="text/css" href="styles.less">
+	<link rel="stylesheet/less" type="text/css" href="css/styles.less">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.10.3/components/popup.min.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.10.3/components/transition.min.css" />
