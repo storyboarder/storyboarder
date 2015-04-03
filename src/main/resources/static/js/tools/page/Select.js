@@ -1,18 +1,14 @@
 define(["../../CanvasState"], function (CanvasState) {
-		var helper_function = function() {
-			console.log("helper function");
 
-		};
+		var canvasState;
+		var canvas;
 
 		var activate = function() {
 			console.log("select activated");
-			var canvasState = CanvasState.getCanvasState();
-			var canvas = canvasState.getCanvas();
+			canvasState = CanvasState.getCanvasState();
+			canvas = canvasState.getCanvas();
 
-			// console.log(canvasState);
-			// console.log(canvasState.getPageMargin());
-
-			//canvas.selection = true; // enable group selection
+			//canvas.selection = true; // enable group selection //
 
 			// for resizing and snap to grid functionality
 			if(canvasState.getSnapToGrid()) {
@@ -39,10 +35,17 @@ define(["../../CanvasState"], function (CanvasState) {
 		var deactivate = function() {
 			console.log("select deactivated");
 			canvas.selection = false; // disable group selection
-
-
 		};
+
 	return {
+		init: function () {
+			console.log("init");
+			canvasState = CanvasState.getCanvasState();
+			canvas = canvasState.getCanvas();
+			console.log(canvasState);
+			console.log(canvas);
+		},
+
 		activate: activate(CanvasState),
 		deactivate: deactivate()
 	}

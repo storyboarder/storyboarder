@@ -1,6 +1,6 @@
 define(["fabricjs"], function () {
 
-	var fCanvas;
+	var canvas;
 	var pageMargin;
 	var panelMargin;
 	var gridSpacing;
@@ -8,20 +8,17 @@ define(["fabricjs"], function () {
 	var snapToGrid = false;
 
 	var addElement = function(e, type) {
-		console.log("add element called");
 		elements.push({type:type, element: e});
-		fCanvas.add(e);
-		console.log(elements);
+		canvas.add(e);
 	}
 
 	var addPanel = function(x1, y1, x2, y2) {
-		console.log("adding panel...");
 		var panel = new fabric.Rect({
 			left:x1 + panelMargin,
 			top:y1 + panelMargin,
 			width:x2 - x1 - 2 * panelMargin,
 			height: y2 - y1 - 2 * panelMargin,
-			fill:"rgba(0, 0, 0, 0)",
+			fill:"rgba(0, 0, 0, 0)", // transparent
 			stroke:"black",
 			strokeWeight:1,
 			lockMovementX:true,
@@ -33,14 +30,12 @@ define(["fabricjs"], function () {
 			top: y1,
 			right: x2,
 			bottom: y2};
-		console.log(panel);
 		addElement(panel, "panel");
 	}
 
-	//return {
 	var CanvasState = {
 		getCanvas: function () {
-		  return fCanvas;
+		  return canvas;
 		},
 
 		getSnapToGrid: function() {
@@ -48,32 +43,34 @@ define(["fabricjs"], function () {
 		},
 
 		getWidth: function() {
-			return fCanvas.width;
+			return canvas.width;
 		},
 
 		addPanel: addPanel,
 
-		makeSelectable: function(type) {
+		setSelectable: function(type, b) {
 			for (var i = 0; i < elements.length; i++) {
 				if (elements[i].type == type) {
-					elements[i].element.set({"selectable": true});
+					elements[i].element.set({"selectable": b});
 				}
 			}
 		}, 
 
 		init: function(canvasId) {
-			fCanvas = new fabric.Canvas(canvasId, {selection:false});
+			console.log("state init called");
+			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
 
+			/* add the first panel */
 			addPanel(pageMargin, pageMargin, 
-					fCanvas.getWidth()  - 2 * pageMargin,
-					fCanvas.getHeight() - 2 * pageMargin);
+					canvas.getWidth()  - pageMargin,
+					canvas.getHeight() - pageMargin);
 
-		  var circle = new fabric.Circle({
-			  radius: 20, fill: 'green', left: 100, top: 100
-		  });
-		  fCanvas.add(circle);
-		  console.log("canvas initialized.");
+			/* adding a circle because why not */
+		 	var circle = new fabric.Circle({
+				radius: 20, fill: 'green', left: 100, top: 100
+		 	});
+		 	canvas.add(circle);
 		},
 
 		addElement: addElement,
@@ -97,7 +94,6 @@ define(["fabricjs"], function () {
 
 	return {
 		getCanvasState: function() { 
-			console.log("getting canvas state");
 			return CanvasState; 
 		}
 	};

@@ -1,61 +1,47 @@
-/* partial functionality: only splits horizontally, and ends up with weird panels */
-
 define(["../../CanvasState"], function (CanvasState) {
-	var direction = "vertical";
 	var previewDivideLine;
-	var CanvasState;
+	var canvasState;
 	var canvas;
 
-	// function setVerticalLine(x) {
-	// 	var midptY = (obj.corners.top + obj.corners.bottom) / 2;
-	// 	var coords = {
-	// 		x1: obj.corners.left + 5, 
-	// 		y1: y, 
-	// 		x2: obj.corners.right - 5,
-	// 		y2: y
-	// 	};
-	// 	previewDivideLine.set(coords);
-	// 	canvas.add(previewDivideLine);
-	// }
-
-
-	function previewDivideY(obj, y) {
+	var previewDivideY = function(obj, y) {
 		if (obj && obj.corners) {
-		  var midptY = (obj.corners.top + obj.corners.bottom) / 2;
-		  var coords = {x1: obj.corners.left + 5, 
+		  var coords = {x1: obj.corners.left + canvasState.getPanelMargin(), 
 		    y1: y, 
-		    x2: obj.corners.right - 5,
+		    x2: obj.corners.right - canvasState.getPanelMargin(),
 		    y2: y};
 		  previewDivideLine.set(coords);
-		  canvas.add(previewDivideLine);
+		  canvas.renderAll();
 		}
 	}
 
-	function divideY(obj, y) {
-		var oldBottom = obj.corners.bottom;
-		console.log("splitting panel...");
+	var previewDivideX = function(obj, x) {
+		if (obj && obj.corners) {
+			var coords = {x1: x, 
+		    	y1: obj.corners.top + canvasState.getPanelMargin(), 
+		    	x2: x,
+		    	y2: obj.corners.bottom - canvasState.getPanelMargin()};
+		  previewDivideLine.set(coords);
+		  canvas.renderAll();
+		}
+	}
+
+	/* creates horizontal split */
+	var divideY = function(obj, y) {
+		var old = obj.corners.bottom;
 		obj.corners.bottom = y;
-		console.log("y is " + y);
-		console.log(obj.corners.top, obj.corners.bottom);
-		console.log(obj.corners.bottom - obj.corners.top - 2 * canvasState.getPanelMargin());
 		obj.set({height: obj.corners.bottom - obj.corners.top - 2 * canvasState.getPanelMargin()});
-		console.log(obj);
-
-		canvasState.addPanel(obj.corners.left, obj.corners.bottom, obj.corners.right, oldBottom, "rgba(255, 0, 0, 0.2)");
+		canvasState.addPanel(obj.corners.left, obj.corners.bottom, obj.corners.right, old);
 	}
 
-	function previewDivideX(obj, x) {
-	  var midptX = (obj.corners.left + obj.corners.right) / 2;
-	  var coords = {x1: x, 
-	    y1: obj.corners.top + 5, 
-	    x2: x,
-	    y2: obj.corners.bottom - 5};
-	  previewDivideLine.set(coords);
-	  previewDivideLine.setCoords();
-	  canvas.add(previewDivideLine);
+	/* creates vertical split */
+	var divideX = function(obj, x) {
+		var old = obj.corners.right;
+		obj.corners.right = x;
+		obj.set({width: obj.corners.right - obj.corners.left - 2 * canvasState.getPanelMargin()});
+		canvasState.addPanel(obj.corners.right, obj.corners.top, old, obj.corners.bottom);
 	}
 
-	function initPreviewLine(y) {
+	var initPreviewLine = function(y) {
 		var coords = [0, y, canvas.getWidth(), y];
 	
 		previewDivideLine = new fabric.Line(coords, {
@@ -64,32 +50,44 @@ define(["../../CanvasState"], function (CanvasState) {
 			strokeWidth: 1,
 			selectable: false
 		});
-		console.log(previewDivideLine);
 		canvas.add(previewDivideLine); /* does not add to elements array */
+		previewDivideLine.sendToBack();
 	}
 
-	var activate = function () {
+	var activate = function() {
 		console.log("split activated");
-		canvasState = CanvasState.getCanvasState();
-		canvas = canvasState.getCanvas();
-		canvasState.makeSelectable("panel");
+		canvasState.setSelectable("panel", true);
 
-		initPreviewLine(-1);
-		console.log(canvasState);
-		console.log(canvas);
+		initPreviewLine(-1); /* init line outside canvas */
 
-
+		var vertical = true;
 		canvas.on("mouse:move", function(options) {
-			//console.log(options);
-			//previewDivideY(options.target, options.e.offsetY);
+			if (Math.abs(options.e.movementX) < Math.abs(options.e.movementY)) {
+				previewDivideY(options.target, options.e.offsetY);
+				vertical = false;
+			} else {
+				previewDivideX(options.target, options.e.offsetX);
+				vertical = true;
+			}
 		});
 
 		canvas.on("object:selected", function(options) {
 			var obj = options.target;
+			var x = options.e.offsetX;
 			var y = options.e.offsetY;
-			console.log(obj);
 			if (obj && obj.corners) {
-				divideY(obj, y);
+
+				if (!vertical &&
+					Math.abs(obj.corners.bottom - y) > canvasState.getPanelMargin() &&
+					Math.abs(obj.corners.top - y) > canvasState.getPanelMargin()) {
+					divideY(obj, y);
+					canvas.deactivateAll();
+				} else if (vertical &&
+					Math.abs(obj.corners.right - x) > canvasState.getPanelMargin() &&
+					Math.abs(obj.corners.left - x) > canvasState.getPanelMargin()) {
+					divideX(obj, x);
+					canvas.deactivateAll();
+				}
 			}
 		});
 	};
@@ -100,9 +98,11 @@ define(["../../CanvasState"], function (CanvasState) {
 	};
 
 	return {
-		init: function (canvasState) {
-			canvasState = canvasState;
-			fCanvas = canvasState.getCanvas();
+		init: function () {
+			console.log("init");
+			canvasState = CanvasState.getCanvasState();
+			canvas = canvasState.getCanvas();
+			console.log(canvas);
 		},
 		activate: activate,
 		deactivate: deactivate()
