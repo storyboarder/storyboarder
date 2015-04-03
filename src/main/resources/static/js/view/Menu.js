@@ -2,9 +2,11 @@ define(["../Editor"], function(editor) {
 	$("#toolbar .split").click(function () {
 		editor.activate("split");
 	});
+
+	cosole.log("#toolbar .tool");
 	
-	$("#toolbar .text").click(function () {
-		editor.activate("text");
+	$("#toolbar .tool").click(function () {
+		editor.activate($(this).id);
 	});
 
 	return {};
