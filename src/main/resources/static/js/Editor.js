@@ -16,7 +16,7 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 
 	var activate = function(toolname) {
 		if (currentTool) {
-			currentTool.deactivate();
+			toolset.deactivate();
 		}
 	  	currentTool = toolset.activateTool(toolname);
 	  	console.log("set currentTool to", currentTool)

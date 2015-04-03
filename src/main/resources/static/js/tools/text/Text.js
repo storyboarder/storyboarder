@@ -54,7 +54,9 @@ define(["../../CanvasState"], function (CanvasState) {
 				  		top: initialPos.y,
 				  		fontSize: Math.floor(height / 2),
 				  		width: width - TEXT_PADDING,
-				  		height: height - TEXT_PADDING
+				  		height: height - TEXT_PADDING,
+				  		stroke: '#C0C0C0',
+				  		strokeDashArray: [5, 5]
 					});
 
 					canvasState.addElement(input, 'text');
