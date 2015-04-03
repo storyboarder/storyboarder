@@ -4,7 +4,6 @@ define(["../../CanvasState"], function (CanvasState) {
 		
 		var activate = function() {
 			console.log("text activate");
-			var canvas = CanvasState.canvas; 
 
 			// adding text boxes and editing inside them, basically rect with label
 			//-- can allow for stroke
@@ -17,72 +16,49 @@ define(["../../CanvasState"], function (CanvasState) {
 
 			// toggling? 
 
-			/*
-			canvas.on('mouse:over', function(e) {
-			    if(e.target && e.target.type === 'text') {
-
-			    }
-		  	});
-
-		  	canvas.on('mouse:out', function(e) {
-		  	});
-
-		  	*/
-
 			var initialPos;
 			var finalPos;
+			var selected;
+			TEXT_PADDING = 20;
 
 			canvas.on('mouse:down', function(coor) {
-				console.log('down');
+				
 				initialPos = {
-					pos: coor.e.offsetX,
-					y: coor.e.offsetY
-				}
-			});
-
-			canvas.on('mouse:up', function(coor){
-				console.log('up');
-				finalPos = {
 					x: coor.e.offsetX,
 					y: coor.e.offsetY
 				}
 
-				if(coor.target && coor.target.type === 'text') {
-					// allow for editing
-				} else {
-					var width;
-					var height;
-					if(Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPs.y) > 20) {
+				selected = coor.target;
+			});
+
+			canvas.on('mouse:up', function(coor){
+				
+				finalPos = {
+					x: coor.e.offsetX,
+					y: coor.e.offsetY
+				}
+				console.log('up ' + finalPos.x + ' ' + finalPos.y);
+
+				if(selected && selected.type !== 'i-text') {
+					console.log('editing');
+
+					if(Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
+						console.log('creating text box');
 						width = Math.abs(initialPos.x - finalPos.x);
-						height = Math.abs(initialPos.y - finalPs.y);
-					} else {
-						width = 150;
-						height = 50;
+						height = Math.abs(initialPos.y - finalPos.y);
+
+
+					var input = new fabric.IText('Text', { 
+				  		fontFamily: 'arial black',
+				  		left: initialPos.x, 
+				  		top: initialPos.y,
+				  		fontSize: Math.floor(height / 2),
+				  		width: width - TEXT_PADDING,
+				  		height: height - TEXT_PADDING
+					});
+
+					canvasState.addElement(input, 'text');
 					}
-
-					var textBox = new fabric.Rect({
-						width: width,
-						height: height,
-						left: initialPos.x,
-						top: initialPos.y,
-						fill: '#FFFFFF',
-						originX: 'center',
-						originY: 'center'
-					});
-
-					var text = new fabric.Text('hello world', {
-					  	fontSize: Math.floor(height / 2),
-				  		originX: 'center',
-				  		originY: 'center'
-					});
-
-					var group = new fabric.Group([ textBox, text ], {
-					 	left: initialPos.x,
-					 	top: initialPos.y
-					});
-
-					canvas.add(group);
-
 				}
 				
 			});
@@ -95,17 +71,13 @@ define(["../../CanvasState"], function (CanvasState) {
 
 	
 	return {
-		init: function (canvasState) {
-			canvasState = canvasState;
-			fCanvas = canvasState.getCanvas();
+		init: function () {
+			console.log("init text");
+			canvasState = CanvasState.getCanvasState();
+			canvas = canvasState.getCanvas();
 		},
-		activate: activate(),
+		activate: activate,
 		deactivate: deactivate()
 	}
 	
-	/*
-	return {
-		activate: activate(CanvasState),
-		deactivate: deactivate()
-	} */
 });
