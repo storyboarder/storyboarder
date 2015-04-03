@@ -105,6 +105,16 @@ define(["fabricjs"], function () {
 	    },
 		getPanelMargin: function() {
 		   return panelMargin;
+	    },
+
+	    saveCanvas: function() {
+	    	return JSON.stringify(canvas);
+	    },
+
+	    loadCanvas: function(json) {
+	    	canvas.loadFromJson(json, function(){
+	    		canvas.renderAll();
+	    	});
 	    }
 	};
 
