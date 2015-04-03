@@ -3,17 +3,10 @@ define(["../Editor"], function(editor) {
 		editor.activate("split");
 	});
 
-	tools = document.getElementsByClassName('tool');
-	console.log(tools);
-
-	for (var i = 0; i < tools.length; i++) {
-		tools[i].addEventListener("click", function() {
-			editor.activate(tools[i].id);
-		});
-	}
+	cosole.log("#toolbar .tool");
 	
-	$("#toolbar .text").click(function () {
-		editor.activate("text");
+	$("#toolbar .tool").click(function () {
+		editor.activate($(this).id);
 	});
 
 	return {};
