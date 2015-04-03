@@ -117,7 +117,9 @@ define(["../../CanvasState"], function (CanvasState) {
 	var deactivate = function() {
 		console.log("split deactivated");
 		canvas.remove(previewDivideLine);
-		console.log(canvas);
+		canvas.__eventListeners["mouse:move"] = [];
+		canvas.__eventListeners["object:selected"] = [];
+		console.log(canvas.__eventListeners);
 	};
 
 	/* the following code should probably be the same for all tools */
@@ -135,7 +137,6 @@ define(["../../CanvasState"], function (CanvasState) {
 			divideY(canvas._objects[3], 450);
 			divideX(canvas._objects[1], 100);
 			divideX(canvas._objects[1], 300);
-
 		}
 	}
 });

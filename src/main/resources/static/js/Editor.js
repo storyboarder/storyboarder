@@ -1,6 +1,5 @@
 define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 
-	var currentTool;
 
 	var init = function(canvasId) {
 		/* ideally the CanvasState will be initialized from here instead of from Main. */
@@ -15,17 +14,11 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
-		if (currentTool) {
-			currentTool.deactivate();
-		}
-	  	currentTool = toolset.activateTool(toolname);
-	  	console.log("set currentTool to", currentTool)
+	  	toolset.activate(toolname);
 	};
 
 	var test = function() {
-		// activate("Split");
-		// currentTool.test();
-		// activate("Select");
+		toolset.test();
 	  // console.log("editor tested");
 	  // console.log("toolset is now " + toolset);
 	  // console.log("test activating Split...");
