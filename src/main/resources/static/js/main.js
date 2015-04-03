@@ -32,7 +32,7 @@ $(document).ready(function() {
 		
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");
-			editor.test();
+			//editor.test();
 		});
 	});
 });
