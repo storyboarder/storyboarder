@@ -8,7 +8,7 @@ define(function(require) {
 	var activateTool = function(toolname) {
 		if (toolname in toolset) {
 			console.log("activating from toolset");
-			toolset[toolname].activate();
+			return toolset[toolname].activate();
 		} else {
 			throw "Tool not found: " + toolname;
 		}

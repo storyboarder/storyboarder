@@ -24,7 +24,8 @@ define(["fabricjs"], function () {
 			lockMovementX:true,
 			lockMovementY:true,
 			lockScalingX:true,
-			lockScalingY:true
+			lockScalingY:true,
+			hasRotatingPoint:false
 		});
 		panel.corners = {left: x1,
 			top: y1,
@@ -46,8 +47,15 @@ define(["fabricjs"], function () {
 			return canvas.width;
 		},
 
+		getHeight: function() {
+			return canvas.height;
+		},
+
 		addPanel: addPanel,
 
+		/* b should be a boolean to set selectable to (for all elements of a certain type) */
+		/* if we need to make all elements selectable, maybe we could change type to be a 
+			predicate that takes a type/element object and returns whether it should be modified */
 		setSelectable: function(type, b) {
 			for (var i = 0; i < elements.length; i++) {
 				if (elements[i].type == type) {
@@ -57,7 +65,6 @@ define(["fabricjs"], function () {
 		}, 
 
 		init: function(canvasId) {
-			console.log("state init called");
 			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
 
@@ -93,6 +100,7 @@ define(["fabricjs"], function () {
 	};
 
 	return {
+		/* this ensures all tools will get the same object */
 		getCanvasState: function() { 
 			return CanvasState; 
 		}

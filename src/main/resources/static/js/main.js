@@ -22,7 +22,6 @@ $(document).ready(function() {
 	canvas.width = 400;
 	canvas.height = 600;
 	require(['CanvasState'], function(CanvasState) {
-		console.log(CanvasState);
 		canvasState = CanvasState.getCanvasState();
 		canvasState.setPageMargin(20);
 		canvasState.setGridSpacing(20);
@@ -30,7 +29,6 @@ $(document).ready(function() {
 		canvasState.init(canvas);
 
 		console.log(canvasState);
-		console.log(canvasState.getPageMargin());
 		
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");

@@ -3,6 +3,7 @@ define(["../../CanvasState"], function (CanvasState) {
 	var canvasState;
 	var canvas;
 
+	/* previews horizontal split */
 	var previewDivideY = function(obj, y) {
 		if (obj && obj.corners) {
 		  var coords = {x1: obj.corners.left + canvasState.getPanelMargin(), 
@@ -12,8 +13,9 @@ define(["../../CanvasState"], function (CanvasState) {
 		  previewDivideLine.set(coords);
 		  canvas.renderAll();
 		}
-	}
+	};
 
+	/* previews vertical split */
 	var previewDivideX = function(obj, x) {
 		if (obj && obj.corners) {
 			var coords = {x1: x, 
@@ -23,7 +25,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		  previewDivideLine.set(coords);
 		  canvas.renderAll();
 		}
-	}
+	};
 
 	/* creates horizontal split */
 	var divideY = function(obj, y) {
@@ -31,7 +33,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		obj.corners.bottom = y;
 		obj.set({height: obj.corners.bottom - obj.corners.top - 2 * canvasState.getPanelMargin()});
 		canvasState.addPanel(obj.corners.left, obj.corners.bottom, obj.corners.right, old);
-	}
+	};
 
 	/* creates vertical split */
 	var divideX = function(obj, x) {
@@ -39,7 +41,7 @@ define(["../../CanvasState"], function (CanvasState) {
 		obj.corners.right = x;
 		obj.set({width: obj.corners.right - obj.corners.left - 2 * canvasState.getPanelMargin()});
 		canvasState.addPanel(obj.corners.right, obj.corners.top, old, obj.corners.bottom);
-	}
+	};
 
 	var initPreviewLine = function(y) {
 		var coords = [0, y, canvas.getWidth(), y];
@@ -50,10 +52,11 @@ define(["../../CanvasState"], function (CanvasState) {
 			strokeWidth: 1,
 			selectable: false
 		});
-		canvas.add(previewDivideLine); /* does not add to elements array */
+		canvas.add(previewDivideLine); /* do not add to elements array */
 		previewDivideLine.sendToBack();
-	}
+	};
 
+	/* activate returns this (the tool) */
 	var activate = function() {
 		console.log("split activated");
 		canvasState.setSelectable("panel", true);
@@ -90,6 +93,7 @@ define(["../../CanvasState"], function (CanvasState) {
 				}
 			}
 		});
+		return this;
 	};
 
 
@@ -97,14 +101,13 @@ define(["../../CanvasState"], function (CanvasState) {
 		console.log("split deactivated");
 	};
 
+	/* the following code should probably be the same for all tools */
 	return {
 		init: function () {
-			console.log("init");
 			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
-			console.log(canvas);
 		},
 		activate: activate,
-		deactivate: deactivate()
+		deactivate: deactivate
 	}
 });
