@@ -33,6 +33,10 @@ define(["fabricjs"], function () {
 		addElement(panel, "panel");
 	}
 
+	var deleteElement = function(e) {
+		canvas.remove(e);
+	}
+
 	var CanvasState = {
 		getCanvas: function () {
 		  return canvas;
@@ -59,6 +63,8 @@ define(["fabricjs"], function () {
 		},
 
 		addPanel: addPanel,
+
+		deleteElement: deleteElement,
 
 		/* b should be a boolean to set selectable to (for all elements of a certain type) */
 		// setSelectable: function(type, b) {
