@@ -4,6 +4,7 @@ define(["fabricjs"], function () {
 	var pageMargin;
 	var panelMargin;
 	var gridSpacing;
+	var edges; // edges of panel area
 	var elements;
 	var snapToGrid = false;
 
@@ -12,25 +13,23 @@ define(["fabricjs"], function () {
 		canvas.add(e);
 	}
 
-	var addPanel = function(x1, y1, x2, y2) {
+	/* edges should be an object with left, top, right, and bottom keys */
+	var addPanel = function(edges) {
 		var panel = new fabric.Rect({
-			left:x1 + panelMargin,
-			top:y1 + panelMargin,
-			width:x2 - x1 - 2 * panelMargin,
-			height: y2 - y1 - 2 * panelMargin,
-			fill:"rgba(0, 0, 0, 0)", // transparent
-			stroke:"black",
-			strokeWeight:1,
-			lockMovementX:true,
-			lockMovementY:true,
-			lockScalingX:true,
-			lockScalingY:true,
-			hasRotatingPoint:false
+			left: edges.left + panelMargin,
+			top: edges.top + panelMargin,
+			width: edges.right - edges.left - 2 * panelMargin,
+			height: edges.bottom - edges.top - 2 * panelMargin,
+			fill: "rgba(0, 0, 0, 0)", // transparent
+			stroke: "black",
+			strokeWeight: 1,
+			lockMovementX: true,
+			lockMovementY: true,
+			lockScalingX: true,
+			lockScalingY: true,
+			hasRotatingPoint: false
 		});
-		panel.corners = {left: x1,
-			top: y1,
-			right: x2,
-			bottom: y2};
+		panel.edges = edges;
 		addElement(panel, "panel");
 	}
 
@@ -51,27 +50,37 @@ define(["fabricjs"], function () {
 			return canvas.height;
 		},
 
+		/* f is a filter function (takes in type/element pair, returns boolean),
+			m is a map function (modifies type/element pair) */
+		filterMapElements: function(f, m) {
+			for (e in elements.filter(f)) {
+				m(elements[e]);
+			}
+		},
+
 		addPanel: addPanel,
 
 		/* b should be a boolean to set selectable to (for all elements of a certain type) */
-		/* if we need to make all elements selectable, maybe we could change type to be a 
-			predicate that takes a type/element object and returns whether it should be modified */
-		setSelectable: function(type, b) {
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].type == type) {
-					elements[i].element.set({"selectable": b});
-				}
-			}
-		}, 
+		// setSelectable: function(type, b) {
+		// 	for (var i = 0; i < elements.length; i++) {
+		// 		if (elements[i].type == type) {
+		// 			elements[i].element.set({"selectable": b});
+		// 		}
+		// 	}
+		// }, 
 
 		init: function(canvasId) {
 			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
+			edges = {
+				left: pageMargin,
+				top: pageMargin,
+				right: canvas.getWidth() - pageMargin,
+				bottom: canvas.getHeight() - pageMargin
+			};
 
 			/* add the first panel */
-			addPanel(pageMargin, pageMargin, 
-					canvas.getWidth()  - pageMargin,
-					canvas.getHeight() - pageMargin);
+			addPanel(edges);
 
 			/* adding a circle because why not */
 		 	var circle = new fabric.Circle({

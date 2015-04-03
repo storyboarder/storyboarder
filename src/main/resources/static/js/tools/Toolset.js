@@ -1,14 +1,20 @@
 define(function(require) {
 
+	var currentTool;
+
 	var toolset = {
 		"Split" : require("./panel/Split"),
 		"Select" : require("./page/Select")
 	};
 
-	var activateTool = function(toolname) {
+	var activate = function(toolname) {
 		if (toolname in toolset) {
-			console.log("activating from toolset");
-			return toolset[toolname].activate();
+			if (currentTool) {
+				currentTool.deactivate();
+				console.log("deactivating from toolset:", currentTool.name)
+			}
+			console.log("activating from toolset:", toolname);
+			currentTool = toolset[toolname].activate();
 		} else {
 			throw "Tool not found: " + toolname;
 		}
@@ -22,7 +28,12 @@ define(function(require) {
 			}
 		},
 		toolset: toolset,
-		activateTool: activateTool
+		activate: activate,
+		test: function() {
+			activate("Split");
+			currentTool.test();
+			activate("Select");
+		}
 	};
 });
 
