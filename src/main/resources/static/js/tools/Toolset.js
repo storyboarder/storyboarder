@@ -4,7 +4,8 @@ define(function(require) {
 
 	var toolset = {
 		"Split" : require("./panel/Split"),
-		"Select" : require("./page/Select")
+		"Select" : require("./page/Select"),
+		"Text" : require("./text/Text")
 	};
 
 	var activate = function(toolname) {

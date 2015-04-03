@@ -2,6 +2,7 @@ define(["../Editor"], function(editor) {
 	$("#toolbar .split").click(function () {
 		editor.activate("split");
 	});
+
 	tools = document.getElementsByClassName('tool');
 	console.log(tools);
 
@@ -10,5 +11,10 @@ define(["../Editor"], function(editor) {
 			editor.activate(tools[i].id);
 		});
 	}
+	
+	$("#toolbar .text").click(function () {
+		editor.activate("text");
+	});
+
 	return {};
 });
