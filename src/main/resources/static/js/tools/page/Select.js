@@ -8,9 +8,23 @@ define(["../../CanvasState"], function (CanvasState) {
 		console.log("select activated");
 		canvas.selection = true; // enable group selection
 
+		canvasState.filterMapElements(
+			function(e) { // filter
+				return e.type == "panel";
+			},
+			function(found) { // map
+				found.element.set({
+					selectable: true,
+					lockScalingX: false,
+					lockScalingY: false
+				});
+			}
+		);
+
 		// for resizing and snap to grid functionality
 		if(canvasState.getSnapToGrid()) {
 			canvas.on('object:scaling', function(options) {
+				console.log(options);
 				if(options.e.clientX < distanceToClosestX) {
 					// snap or display snap line
 				}
@@ -36,6 +50,7 @@ define(["../../CanvasState"], function (CanvasState) {
 	};
 
 	return {
+		name: "Select",
 		init: function () {
 			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
