@@ -136,6 +136,16 @@ define(["../../CanvasState"], function (CanvasState) {
 	var deactivate = function() {
 		console.log("select deactivated");
 		canvas.selection = false; // disable group selection
+		canvas.deactivateAll();
+		canvasState.filterMapElements(
+			function(e) { // filter
+				return true;
+			},
+			function(found) { // map
+				found.element.set({selectable: false});
+			}
+		);
+		canvas.__eventListeners["object:scaling"] = [];
 	};
 
 	return {

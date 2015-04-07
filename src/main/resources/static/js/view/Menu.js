@@ -1,12 +1,9 @@
 define(["../Editor"], function(editor) {
-	$("#toolbar .split").click(function () {
-		editor.activate("split");
-	});
-
-	cosole.log("#toolbar .tool");
 	
-	$("#toolbar .tool").click(function () {
-		editor.activate($(this).id);
+	$(".toolbar .tool").click(function () {
+		console.log($(this));
+		console.log($(this).attr('id'));
+		editor.activate($(this).attr('id'));
 	});
 
 	return {};

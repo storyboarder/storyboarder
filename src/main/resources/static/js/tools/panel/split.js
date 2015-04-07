@@ -129,7 +129,6 @@ define(["../../CanvasState"], function (CanvasState) {
 		canvas.remove(previewDivideLine);
 		canvas.__eventListeners["mouse:move"] = [];
 		canvas.__eventListeners["object:selected"] = [];
-		console.log(canvas.__eventListeners);
 	};
 
 	/* the following code should probably be the same for all tools */
