@@ -101,6 +101,10 @@ define(["fabricjs"], function () {
 		return between(min, x, max);
 	};
 
+	var deleteElement = function(e) {
+		canvas.remove(e);
+	}
+
 	var CanvasState = {
 		getCanvas: function () {
 		  return canvas;
@@ -136,6 +140,8 @@ define(["fabricjs"], function () {
 		addPanel: addPanel,
 
 		setControls: setControls,
+
+		deleteElement: deleteElement,
 
 		/* b should be a boolean to set selectable to (for all elements of a certain type) */
 		// setSelectable: function(type, b) {
@@ -183,6 +189,16 @@ define(["fabricjs"], function () {
 		getPanelMargin: function() {
 		   return panelMargin;
 	    },
+
+	    saveCanvas: function() {
+	    	return JSON.stringify(canvas);
+	    },
+
+	    loadCanvas: function(json) {
+	    	canvas.loadFromJson(json, function(){
+	    		canvas.renderAll();
+	    	});
+	    }
 	};
 
 	return {
