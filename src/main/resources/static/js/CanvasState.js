@@ -7,11 +7,32 @@ define(["fabricjs"], function () {
 	var edges; // edges of panel area
 	var elements;
 	var snapToGrid = false;
+	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
+	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	var addElement = function(e, type) {
 		elements.push({type:type, element: e});
 		canvas.add(e);
-	}
+	};
+
+	var setControls = function(panel) {
+		var bounds = [];
+		var options = {};
+		for (var e in edgeDirections) {
+			if (edges[edgeDirections[e]] == panel.edges[edgeDirections[e]]) {
+				bounds.push(edgeDirections[e].substring(0, 1));
+			}
+		}
+		for (var c in controls) {
+			options[controls[c]] = true;
+			for (var b in bounds) {
+				if (controls[c].indexOf(bounds[b]) >= 0) {
+					options[controls[c]] = false;
+				}
+			}
+		}
+		panel.setControlsVisibility(options);
+	};
 
 	/* edges should be an object with left, top, right, and bottom keys */
 	var addPanel = function(edges) {
@@ -29,9 +50,56 @@ define(["fabricjs"], function () {
 			lockScalingY: true,
 			hasRotatingPoint: false
 		});
-		panel.edges = edges;
+		panel.edges = $.extend({}, edges);
+		setControls(panel);
 		addElement(panel, "panel");
-	}
+	};
+
+	var getOppositeDirection = function(edgeDir) {
+		switch (edgeDir) {
+			case "top":
+				return "bottom";
+				break;
+			case "bottom":
+				return "top";
+				break;
+			case "left":
+				return "right";
+				break;
+			case "right":
+				return "left";
+				break;
+			default:
+				throw "Invalid edge direction " + edgeDir;
+				break;
+		}
+	};
+
+	var getDimension = function(edgeDir) {
+		switch (edgeDir) {
+			case "top":
+			case "bottom":
+				return "height";
+				break;
+			case "left":
+			case "right":
+				return "width";
+				break;
+			default:
+				throw "Invalid edge direction " + edgeDir;
+				break;
+		}
+	};
+
+	var between = function(lower, val, upper) {
+		return (lower <= val && val <= upper);
+	};
+
+	var contains = function(d, x) {
+		var min = pageMargin + panelMargin;
+		var max = canvas[getDimension(d)] - min;
+		return between(min, x, max);
+	};
 
 	var CanvasState = {
 		getCanvas: function () {
@@ -53,12 +121,21 @@ define(["fabricjs"], function () {
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
 		filterMapElements: function(f, m) {
-			for (e in elements.filter(f)) {
-				m(elements[e]);
-			}
+			var filtered = elements.filter(f);
+			for (e in filtered) {
+				m(filtered[e]);
+			};
 		},
 
+		getOppositeDirection: getOppositeDirection,
+
+		getDimension: getDimension,
+
+		contains: contains,
+
 		addPanel: addPanel,
+
+		setControls: setControls,
 
 		/* b should be a boolean to set selectable to (for all elements of a certain type) */
 		// setSelectable: function(type, b) {
@@ -105,7 +182,7 @@ define(["fabricjs"], function () {
 	    },
 		getPanelMargin: function() {
 		   return panelMargin;
-	    }
+	    },
 	};
 
 	return {
