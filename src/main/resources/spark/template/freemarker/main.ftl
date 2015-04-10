@@ -52,8 +52,8 @@
       <div class="title">Main</div>
       <div class="tools">
         <a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>
-        <a href="#" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
-        <a href="#" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
+        <a href="#" class="tool" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
+        <a href="#" class="tool" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
         <br>Grid: <input type="number" /> <input type="number" />
 
       </div>
@@ -63,7 +63,7 @@
       <div class="title">Panel</div>
       <div class="tools">
         <a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>
-        <a class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>
+        <a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>
         <br>Margin size: <input type="number" />
         <br>Snap to grid: <input type="checkbox" />
       </div>
@@ -72,10 +72,10 @@
     <div class="toolset">
       <div class="title">Image</div>
       <div class="tools">
-        <a href="#" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
-        <a href="#" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
-        <a href="#" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
-        <a href="#" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+        <a href="#" class="tool" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+        <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
+        <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
+        <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
         <br>Snap to grid: <input type="checkbox" />
       </div>
     </div>
@@ -92,9 +92,9 @@
     <div class="toolset">
       <div class="title">Save/Export</div>
       <div class="tools">
-        <a href="#" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-        <a href="#" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
-        <a href="#" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
+        <a href="#" class="tool" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+        <a href="#" class="tool" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+        <a href="#" class="tool" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
       </div>
     </div>
   </div>
