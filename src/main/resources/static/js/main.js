@@ -1,5 +1,5 @@
 require.config({
-	baseUrl: "../static/js",
+	baseUrl: "js",
 	paths: {
 		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
 		fabricjs: "http://fabricjs.com/lib/fabric",
@@ -29,10 +29,12 @@ $(document).ready(function() {
 		canvasState.init(canvas);
 
 		console.log(canvasState);
-		
+
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");
+			console.log(menu);
 			//editor.test(); /* */
+			menu.init();
 		});
 	});
 });

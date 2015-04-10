@@ -1,157 +1,214 @@
+/*@link-color:        #428bca; // sea blue
+@link-color-hover:  darken(@link-color, 10%);*/
+@canvas-width:      400px;
+@canvas-height:     600px;
+@bg-color:          #ddd;
+@bg-tint:            lighten(@bg-color, 10%);
+@bg-color-darker:         darken(@bg-color, 10%);
+@bg-color-darkest:         darken(@bg-color, 40%);
+@corner-radius:     5px;
+@outset-shadow:     -1px 0px 1px @bg-color-darkest;
+@inset-shadow:      inset 0px 0px 1px @bg-color-darkest;
+@icon-color:        #444;
+@icon-color-darker: darken(@icon-color, 40%);
+@font-color:        #222;
+
+
 html, body {
-    display: table;
-    height: 100%;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    font-family: Tahoma;
+	padding:0;
+	margin:0;
+  font-family: 'PT Sans', sans-serif;
+  font-size:95%;
+  color:@font-color;
 }
 
-a {
-	color: black;
+#container {
+	position: relative;
+	padding:0;
+	margin:0;
+	padding-left:200px;
+	padding-right:200px;
+	height:100vh;
+	overflow:hide;
+
+	> div {
+  	margin-top:0;
+  	margin-bottom:0;
+  	float:left;
+  	height:100%;
+  }
+
+  #navigator, #toolbar {
+  	width:200px;
+	  height:100vh;
+  }
 }
 
 #navigator {
-	display: table-cell;
-	width: 150px;
-	height: 100%;
+	float:left;
+	margin-left:-200px;
 
 	> div {
 		overflow-y: scroll;
-	}
-	
-	.page-thumb {
-		width: 120px;
-		height: 180px;
-		background-color: black;
-		margin: 5px;
-	}
-}
+		position:relative;
+	  text-align:center;
+		height:100%;
 
-#editor {
-    display: table-cell;
-	box-sizing: border-box;
-	position: relative;
-    height: 100%;
-    padding: 5px;
-    vertical-align: middle;
+    .page-thumb {
+      width: 120px;
+      height: 180px;
+      background-color: @bg-tint;
+      margin: 15px auto;
+      outline:1px solid @bg-color-darker;
+      position:relative;
 
-    #pages {
-		position: absolute;
-		height: 95%;
-		width: 80%;
-		top: 2.5%;
-		left: 10%;
-		background-color: white;
-		box-shadow: 0px 0px 3px #AAA;
-
-		#page {
-			width: 100px;
-		}
-
-		.previous-page,
-		.next-page {
-			position: absolute;
-			letter-spacing: -6px;
-			vertical-align: middle;
-			right: -60px;
-			top: 50%;
-			margin-top: -50px;
-			width: 60px;
-			height: 120px;
-			line-height: 130px;
-			text-align: center;
-			color: #666;
-		}
-
-		.previous-page {
-			left: -60px;
-
-			box-shadow: -1px 0px 1px #AAA;
-			background-color: white;
-			border-top-left-radius: 5px;
-			border-bottom-left-radius: 5px;
-		}
-
-		.previous-page:hover {
-			cursor: pointer;
-			width: 70px;
-			left: -70px;
-			color: rgb(33, 96, 142);
-		}
-
-		.next-page {
-			right: -60px;
-
-			box-shadow: 1px 0px 1px #AAA;
-			background-color: white;
-			border-top-right-radius: 5px;
-			border-bottom-right-radius: 5px;
-		}
-
-		.next-page:hover {
-			cursor: pointer;
-			width: 70px;
-			right: -70px;
-			color: rgb(33, 96, 142);
-		}
+      a.remove-page {
+        display:none;
+        position:absolute;
+        top:2px;
+        right:3px;
+      }
+    }
+    .page-thumb:hover a.remove-page {
+      display:inline-block;
     }
 
+
     .add-page-button {
-		position: absolute;
-		color: #666;
-		bottom: 15px;
-		right: 15px;
-		background-color: white;
-		padding: 5px 10px;
-		border-radius: 5px;
-		box-shadow: 0px 0px 3px #999;
+      position: absolute;
+      color: #666;
+      bottom: 15px;
+      left: 15px;
+      background-color: white;
+      padding: 5px 10px;
+      border-radius: @corner-radius;
+      box-shadow: 0px 0px 3px @bg-color-darkest;
     }
 
     .add-page-button:hover {
-		color: rgb(33, 96, 142);
-		box-shadow: 0px 0px 5px #999;
+      box-shadow: 0px 0px 5px @bg-color-darkest;
     }
+	}
+
+}
+
+#editor {
+	width:100%;
+	text-align:center;
+	background:@bg-color;
+	position:relative;
+
+  #page {
+	  margin-top:20px;
+	  vertical-align:middle;
+    display:inline-block;
+    width:@canvas-width;
+    height:@canvas-height;
+
+    canvas {
+      width:100%;
+      height:100%;
+    }
+  }
+
+  .canvas-bg {
+    background:#fff;
+    padding:0;
+    margin:0;
+    width:100%;
+    height:100%;
+    outline:1px solid @bg-color-darker;
+  }
+
+  .canvas-container {
+    margin:0 auto;
+  }
+
+  .previous-page ,
+  .next-page {
+	  vertical-align:middle;
+    top: 50%;
+    margin-top: -50px;
+    display:inline-block;
+
+    a {
+      line-height: 30px;
+      display:inline-block;
+      width: 20px;
+      text-align: center;
+      color: #666;
+      box-shadow: @outset-shadow;
+      background-color: white;
+    }
+  }
+
+  .previous-page a {
+    border-top-left-radius: @corner-radius;
+    border-bottom-left-radius: @corner-radius;
+    margin-right:10px;
+  }
+
+  .previous-page a:hover {
+  }
+
+  .next-page a {
+    border-top-right-radius: @corner-radius;
+    border-bottom-right-radius: @corner-radius;
+    margin-left:10px;
+  }
+
+  .next-page a:hover {
+  }
 }
 
 #toolbar {
-	display: table-cell;
-	width: 200px;
-	border-left: 1px solid #999;
-	box-shadow: -1px 0px 0px #EEE;
-	background-color: #EEE;
-	vertical-align: top;
+	width:200px;
+	float:left;
+	margin-right:-200px;
 
 	> .title {
-		font-size: 20px;
-		font-weight: bold;
-		padding: 10px;
-	}
+  		font-size: 20px;
+  		padding: 10px;
+  	}
 
-	.toolset {
-		> .title {
-			font-family: Arial;
-			padding: 5px 10px;
-			border-bottom: 1px solid #AAA;
-			box-shadow: 0px 1px 1px #CCC;
-			font-size: 14px;
-			font-weight: bold;
-		}
+  	.toolset {
+      box-shadow: 0px 1px 1px @bg-color-darker;
+      margin-bottom:2px;
+  		> .title {
+  			padding: 5px 10px;
+  			/*border-top: 2px solid @bg-color-darker;*/
+  		  background-color:@bg-tint;
+  		}
 
-		.tools {
-			padding: 5px 10px;
-		}
+  		.tools {
+  			padding: 5px 10px;
 
-		.tools a {
-			display: inline-block;
-			padding: 10px 12px;
-			border-radius: 5px;
-		}
 
-		.tools a:hover {
-			background-color: white;
-			box-shadow: inset 0px 0px 5px #333;
-			color: rgb(33, 96, 142);
-		}
-	}
+  			input[type="number"] {
+        	width:30px;
+        }
+  		}
+
+  		.tools a {
+  			display: inline-block;
+  			padding: 4px;
+  			margin:3px;
+  			border-radius: @corner-radius;
+  			color: @icon-color;
+  		}
+
+  		.tools a:hover {
+  			background-color: white;
+  			box-shadow: @inset-shadow;
+  			color: @icon-color-darker;
+  		}
+
+  		.tools a.current {
+  		  background-color:@bg-tint;
+  		}
+  	}
+}
+
+div.ui.popup {
+  padding:3px 7px 3px 3px;
 }

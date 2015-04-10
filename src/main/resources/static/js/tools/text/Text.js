@@ -150,11 +150,9 @@ define(["../../CanvasState"], function (CanvasState) {
 			console.log("init text");
 			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
-
-
 		},
 		activate: activate,
-		deactivate: deactivate()
+		deactivate: deactivate
 	}
 	
 });

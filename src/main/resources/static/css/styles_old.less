@@ -1,0 +1,174 @@
+html, body {
+    display: table;
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    font-family: Tahoma;
+}
+
+
+#container {
+	position: relative;
+	padding:0;
+	margin:0;
+	padding-left:200px;
+	padding-right:200px;
+	height:100vh;
+	overflow:hide;
+
+	> div {
+  	margin-top:0;
+  	margin-bottom:0;
+  	float:left;
+  	height:100%;
+  }
+}
+
+a {
+	color: black;
+}
+
+#navigator {
+	width: 150px;
+	height: 100%;
+
+	> div {
+		overflow-y: scroll;
+	}
+	
+	.page-thumb {
+		width: 120px;
+		height: 180px;
+		background-color: black;
+		margin: 5px;
+	}
+}
+
+#editor {
+    display: table-cell;
+	box-sizing: border-box;
+	position: relative;
+    height: 100%;
+    padding: 5px;
+    vertical-align: middle;
+
+    #pages {
+		position: absolute;
+		height: 95%;
+		width: 80%;
+		top: 2.5%;
+		left: 10%;
+		background-color: white;
+		box-shadow: 0px 0px 3px #AAA;
+
+		#page {
+			width: 100px;
+		}
+
+		.previous-page,
+		.next-page {
+			position: absolute;
+			letter-spacing: -6px;
+			vertical-align: middle;
+			right: -60px;
+			top: 50%;
+			margin-top: -50px;
+			width: 60px;
+			height: 120px;
+			line-height: 130px;
+			text-align: center;
+			color: #666;
+		}
+
+		.previous-page {
+			left: -60px;
+
+			box-shadow: -1px 0px 1px #AAA;
+			background-color: white;
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+		}
+
+		.previous-page:hover {
+			cursor: pointer;
+			width: 70px;
+			left: -70px;
+			color: rgb(33, 96, 142);
+		}
+
+		.next-page {
+			right: -60px;
+
+			box-shadow: 1px 0px 1px #AAA;
+			background-color: white;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+		}
+
+		.next-page:hover {
+			cursor: pointer;
+			width: 70px;
+			right: -70px;
+			color: rgb(33, 96, 142);
+		}
+    }
+
+    .add-page-button {
+		position: absolute;
+		color: #666;
+		bottom: 15px;
+		right: 15px;
+		background-color: white;
+		padding: 5px 10px;
+		border-radius: 5px;
+		box-shadow: 0px 0px 3px #999;
+    }
+
+    .add-page-button:hover {
+		color: rgb(33, 96, 142);
+		box-shadow: 0px 0px 5px #999;
+    }
+}
+
+#toolbar {
+	display: table-cell;
+	width: 200px;
+	border-left: 1px solid #999;
+	box-shadow: -1px 0px 0px #EEE;
+	background-color: #EEE;
+	vertical-align: top;
+
+	> .title {
+		font-size: 20px;
+		font-weight: bold;
+		padding: 10px;
+	}
+
+	.toolset {
+		> .title {
+			font-family: Arial;
+			padding: 5px 10px;
+			border-bottom: 1px solid #AAA;
+			box-shadow: 0px 1px 1px #CCC;
+			font-size: 14px;
+			font-weight: bold;
+		}
+
+		.tools {
+			padding: 5px 10px;
+		}
+
+		.tools a {
+			display: inline-block;
+			padding: 10px 12px;
+			border-radius: 5px;
+		}
+
+		.tools a:hover {
+			background-color: white;
+			box-shadow: inset 0px 0px 5px #333;
+			color: rgb(33, 96, 142);
+		}
+	}
+}
