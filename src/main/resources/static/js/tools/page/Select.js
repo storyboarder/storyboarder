@@ -29,21 +29,19 @@ define(["../../CanvasState"], function (CanvasState) {
 	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
 		var opposite = canvasState.getOppositeDirection(dir);
 		var oldEdges = obj.edges;
-		canvasState.filterMapElements(
-			function(e) {
-				if (e.type == "panel") {
-					return ((e.element.edges[isOpposite? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]);
-				}
-			},
+		canvasState.mapElements(
 			function(found) {
-				var e = found.element;
-				var size = canvasState.getDimension(dir);
-				e.edges[isOpposite? opposite : dir] = newEdges[dir];
-				e[isOpposite? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();	
-				if (dir == "bottom" || dir == "right") {
-					e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
-				} else {
-					e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
+				if (found.type == "panel" &&
+				    (found.edges[isOpposite? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
+          var e = found;
+          var size = canvasState.getDimension(dir);
+          e.edges[isOpposite? opposite : dir] = newEdges[dir];
+          e[isOpposite? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();
+          if (dir == "bottom" || dir == "right") {
+            e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
+          } else {
+            e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
+          }
 				}
 			});
 	};
@@ -62,16 +60,15 @@ define(["../../CanvasState"], function (CanvasState) {
 		//console.log("select activated");
 		canvas.selection = true; // enable group selection
 
-		canvasState.filterMapElements(
-			function(e) { // filter
-				return e.type == "panel";
-			},
+		canvasState.mapElements(
 			function(found) { // map
-				found.element.set({
-					selectable: true,
-					lockScalingX: false,
-					lockScalingY: false
-				});
+				if (found.type == "panel") {
+          found.set({
+            selectable: true,
+            lockScalingX: false,
+            lockScalingY: false
+          });
+        }
 			}
 		);
 
@@ -137,12 +134,9 @@ define(["../../CanvasState"], function (CanvasState) {
 		console.log("select deactivated");
 		canvas.selection = false; // disable group selection
 		canvas.deactivateAll();
-		canvasState.filterMapElements(
-			function(e) { // filter
-				return true;
-			},
+		canvasState.mapElements(
 			function(found) { // map
-				found.element.set({selectable: false});
+				found.set({selectable: false});
 			}
 		);
 		canvas.__eventListeners["object:scaling"] = [];

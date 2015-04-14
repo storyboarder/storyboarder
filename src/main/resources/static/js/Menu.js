@@ -4,6 +4,8 @@ define(["jquery", "./Editor"], function(jquery, editor) {
     $("a.tool").click(function () {
       console.log($(this).attr('id'));
       editor.activate($(this).attr('id'));
+      $( this ).addClass("current");
+      console.log("current", $( this ));
     });
 
     $(".toolset .title").click(function() {

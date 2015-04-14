@@ -33,8 +33,9 @@ $(document).ready(function() {
 
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");
+			console.log("GAH");
 			console.log(menu);
-			//editor.test(); /* */
+			editor.test(); /* */
 			menu.init();
 		});
 	});

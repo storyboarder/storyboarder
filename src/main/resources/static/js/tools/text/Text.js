@@ -4,14 +4,11 @@ define(["../../CanvasState"], function (CanvasState) {
 
 			// nothing should be moving
 			canvasState.filterMapElements(
-				function(e) { // filter
-					return true;
-				},
 				function(found) { // map
 					if(found.type === "group") {
-						found.element.set({selectable: true});
+						found.set({selectable: true});
 					} else {
-						found.element.set({selectable: false});
+						found.set({selectable: false});
 					}
 				}
 			);

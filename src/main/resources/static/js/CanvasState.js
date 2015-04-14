@@ -4,22 +4,52 @@ define(["fabricjs"], function () {
 	var pageMargin;
 	var panelMargin;
 	var gridSpacing;
-	var edges; // edges of panel area
+	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
+	var panelEdges; // borders between panels
 	var elements;
 	var snapToGrid = false;
 	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
 	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	var addElement = function(e, type) {
-		elements.push({type:type, element: e});
+	  e.type = type;
+		elements.push(e);
 		canvas.add(e);
+	};
+
+	var addPanelEdge = function(e) {
+	  // e should be {left: <panel>, right: <panel>} or {top: <panel>, bottom: <panel>}
+	  e.type = (e.leftPanel ? "vertical" : "horizontal");
+    panelEdges.push(e);
+    return e;
+	};
+
+	var mapPanelEdges = function(f) {
+	  panelEdges.map(f);
+	};
+
+	var removePanelEdge = function(e) {
+	  var idx = -1;
+	  for (var p in panelEdges) {
+	    if (panelEdges[p].topPanel == e.topPanel && panelEdges[p].bottomPanel == e.bottomPanel) {
+	      idx = p;
+      }
+	  }
+	  if (idx < 0) {
+      console.log("tried deleting: ", e);
+      console.log("real edges", panelEdges);
+	    throw "Panel edge not found";
+	  }
+	  var el = panelEdges.splice(idx, 1);
+	  canvas.remove(el[0]);
+
 	};
 
 	var setControls = function(panel) {
 		var bounds = [];
 		var options = {};
 		for (var e in edgeDirections) {
-			if (edges[edgeDirections[e]] == panel.edges[edgeDirections[e]]) {
+			if (pageEdges[edgeDirections[e]] == panel.edges[edgeDirections[e]]) {
 				bounds.push(edgeDirections[e].substring(0, 1));
 			}
 		}
@@ -50,9 +80,10 @@ define(["fabricjs"], function () {
 			lockScalingY: true,
 			hasRotatingPoint: false
 		});
-		panel.edges = $.extend({}, edges);
+		panel.edges = edges;
 		setControls(panel);
 		addElement(panel, "panel");
+		return panel;
 	};
 
 	var getOppositeDirection = function(edgeDir) {
@@ -102,7 +133,17 @@ define(["fabricjs"], function () {
 	};
 
 	var deleteElement = function(e) {
-		canvas.remove(e);
+//	  console.log(e);
+		var idx = elements.indexOf(e);
+//		console.log(idx, elements);
+		if (idx >= 0) {
+		  el = elements.splice(idx, 1);
+//	    console.log(el);
+		  canvas.remove(el[0]);
+		} else {
+		  throw "couldn't find element:" + e;
+		}
+//		console.log(elements.length);
 	}
 
 	var CanvasState = {
@@ -124,11 +165,8 @@ define(["fabricjs"], function () {
 
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
-		filterMapElements: function(f, m) {
-			var filtered = elements.filter(f);
-			for (e in filtered) {
-				m(filtered[e]);
-			};
+		mapElements: function(m) {
+		  elements.map(m);
 		},
 
 		getOppositeDirection: getOppositeDirection,
@@ -143,6 +181,12 @@ define(["fabricjs"], function () {
 
 		deleteElement: deleteElement,
 
+		mapPanelEdges: mapPanelEdges,
+
+		addPanelEdge: addPanelEdge,
+
+		removePanelEdge: removePanelEdge,
+
 		/* b should be a boolean to set selectable to (for all elements of a certain type) */
 		// setSelectable: function(type, b) {
 		// 	for (var i = 0; i < elements.length; i++) {
@@ -155,7 +199,8 @@ define(["fabricjs"], function () {
 		init: function(canvasId) {
 			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
-			edges = {
+			panelEdges = [];
+			pageEdges = {
 				left: pageMargin,
 				top: pageMargin,
 				right: canvas.getWidth() - pageMargin,
@@ -163,7 +208,7 @@ define(["fabricjs"], function () {
 			};
 
 			/* add the first panel */
-			addPanel(edges);
+			addPanel($.extend({}, pageEdges));
 
 			/* adding a circle because why not */
 		 	var circle = new fabric.Circle({

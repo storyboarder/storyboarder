@@ -36,12 +36,21 @@ define(["../../CanvasState"], function (CanvasState) {
 		obj.edges.bottom = y;
 		obj.set({height: obj.edges.bottom - obj.edges.top - 2 * canvasState.getPanelMargin()});
 		canvasState.setControls(obj);
-		canvasState.addPanel({
-			left: obj.edges.left, 
-			top: obj.edges.bottom, 
-			right: obj.edges.right, 
+		var newPanel = canvasState.addPanel({
+			left: obj.edges.left,
+			top: y,
+			right: obj.edges.right,
 			bottom: old
 		});
+
+		var prevEdges = canvasState.mapPanelEdges(
+		  function (e) {
+		    if (e.topPanel.edges == obj.edges) {
+          e.topPanel = newPanel;
+        }
+      }
+    );
+		canvasState.addPanelEdge({topPanel: obj, bottomPanel: newPanel});
 	};
 
 	/* creates vertical split */
@@ -53,12 +62,21 @@ define(["../../CanvasState"], function (CanvasState) {
 		obj.edges.right = x;
 		obj.set({width: obj.edges.right - obj.edges.left - 2 * canvasState.getPanelMargin()});
 		canvasState.setControls(obj);
-		canvasState.addPanel({
-			left: obj.edges.right, 
-			top: obj.edges.top, 
-			right: old, 
+		var newPanel = canvasState.addPanel({
+			left: obj.edges.right,
+			top: obj.edges.top,
+			right: old,
 			bottom: obj.edges.bottom
 		});
+
+		var prevEdges = canvasState.mapPanelEdges(
+		  function (e) {
+		    if (e.leftPanel.edges == obj.edges) {
+          e.leftPanel = newPanel;
+        }
+      }
+    );
+		canvasState.addPanelEdge({leftPanel: obj, rightPanel: newPanel});
 	};
 
 	var initPreviewLine = function(y) {
@@ -78,12 +96,11 @@ define(["../../CanvasState"], function (CanvasState) {
 	var activate = function() {
 		console.log("split activated");
 		//canvasState.setSelectable("panel", true);
-		canvasState.filterMapElements(
-			function(e) { // filter
-				return e.type == "panel";
-			},
-			function(found) { // map
-				found.element.set({selectable: true});
+		canvasState.mapElements(
+			function(e) { // map
+				if (e.type == "panel") {
+				  e.set({selectable: true});
+        }
 			}
 		);
 
@@ -142,10 +159,11 @@ define(["../../CanvasState"], function (CanvasState) {
 		deactivate: deactivate,
 		test: function() {
 			console.log(canvas._objects[1]);
-			divideY(canvas._objects[1], 250);
-			divideY(canvas._objects[3], 450);
-			divideX(canvas._objects[1], 300);
-			divideX(canvas._objects[1], 100);
+			divideY(canvas._objects[1], 450);
+			divideY(canvas._objects[1], 150);
+//			divideX(canvas._objects[1], 300);
+//			divideX(canvas._objects[1], 100);
+			canvasState.mapPanelEdges(function (e) { console.log(e); });
 		}
 	}
 });
