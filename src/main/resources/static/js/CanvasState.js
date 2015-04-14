@@ -103,6 +103,10 @@ define(["fabricjs"], function () {
 
 	var deleteElement = function(e) {
 		canvas.remove(e);
+		var idx = elements.indexOf(e);
+		if(idx >= 0) {
+		    elements.splice(idx, 1);
+		}
 	}
 
 	var CanvasState = {

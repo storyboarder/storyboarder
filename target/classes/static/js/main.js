@@ -1,15 +1,16 @@
 require.config({
-	baseUrl: "../static/js",
+	baseUrl: "js",
 	paths: {
-		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
+		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min",
 		fabricjs: "http://fabricjs.com/lib/fabric",
 		tools: "tools",
+		view: "view",
 	}
 });
 
 var dependencies = [
 	"Editor",
-	"view/Menu"
+	"Menu"
 ];
 
 $(document).ready(function() {
@@ -29,10 +30,12 @@ $(document).ready(function() {
 		canvasState.init(canvas);
 
 		console.log(canvasState);
-		
+
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");
-			//editor.test();
+			console.log(menu);
+			//editor.test(); /* */
+			menu.init();
 		});
 	});
 });
