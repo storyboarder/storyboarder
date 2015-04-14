@@ -53,7 +53,7 @@ define(["../../CanvasState"], function (CanvasState) {
 				// phantom group box....?
 				if(selected && selected.type === 'group') {
 					if(edit) {
-						console.log("group!!");
+						console.log("GROUP!!");
 						var pos = {
 							left : selected.left,
 							top : selected.top
