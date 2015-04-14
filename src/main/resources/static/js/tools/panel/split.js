@@ -42,15 +42,6 @@ define(["../../CanvasState"], function (CanvasState) {
 			right: obj.edges.right,
 			bottom: old
 		});
-
-		var prevEdges = canvasState.mapPanelEdges(
-		  function (e) {
-		    if (e.topPanel.edges == obj.edges) {
-          e.topPanel = newPanel;
-        }
-      }
-    );
-		canvasState.addPanelEdge({topPanel: obj, bottomPanel: newPanel});
 	};
 
 	/* creates vertical split */
@@ -68,15 +59,6 @@ define(["../../CanvasState"], function (CanvasState) {
 			right: old,
 			bottom: obj.edges.bottom
 		});
-
-		var prevEdges = canvasState.mapPanelEdges(
-		  function (e) {
-		    if (e.leftPanel.edges == obj.edges) {
-          e.leftPanel = newPanel;
-        }
-      }
-    );
-		canvasState.addPanelEdge({leftPanel: obj, rightPanel: newPanel});
 	};
 
 	var initPreviewLine = function(y) {
@@ -161,9 +143,8 @@ define(["../../CanvasState"], function (CanvasState) {
 			console.log(canvas._objects[1]);
 			divideY(canvas._objects[1], 450);
 			divideY(canvas._objects[1], 150);
-//			divideX(canvas._objects[1], 300);
-//			divideX(canvas._objects[1], 100);
-			canvasState.mapPanelEdges(function (e) { console.log(e); });
+			divideX(canvas._objects[1], 300);
+			divideX(canvas._objects[1], 100);
 		}
 	}
 });

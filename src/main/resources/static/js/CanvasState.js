@@ -5,7 +5,6 @@ define(["fabricjs"], function () {
 	var panelMargin;
 	var gridSpacing;
 	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
-	var panelEdges; // borders between panels
 	var elements;
 	var snapToGrid = false;
 	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
@@ -15,34 +14,6 @@ define(["fabricjs"], function () {
 	  e.type = type;
 		elements.push(e);
 		canvas.add(e);
-	};
-
-	var addPanelEdge = function(e) {
-	  // e should be {left: <panel>, right: <panel>} or {top: <panel>, bottom: <panel>}
-	  e.type = (e.leftPanel ? "vertical" : "horizontal");
-    panelEdges.push(e);
-    return e;
-	};
-
-	var mapPanelEdges = function(f) {
-	  panelEdges.map(f);
-	};
-
-	var removePanelEdge = function(e) {
-	  var idx = -1;
-	  for (var p in panelEdges) {
-	    if (panelEdges[p].topPanel == e.topPanel && panelEdges[p].bottomPanel == e.bottomPanel) {
-	      idx = p;
-      }
-	  }
-	  if (idx < 0) {
-      console.log("tried deleting: ", e);
-      console.log("real edges", panelEdges);
-	    throw "Panel edge not found";
-	  }
-	  var el = panelEdges.splice(idx, 1);
-	  canvas.remove(el[0]);
-
 	};
 
 	var setControls = function(panel) {
@@ -181,25 +152,10 @@ define(["fabricjs"], function () {
 
 		deleteElement: deleteElement,
 
-		mapPanelEdges: mapPanelEdges,
-
-		addPanelEdge: addPanelEdge,
-
-		removePanelEdge: removePanelEdge,
-
-		/* b should be a boolean to set selectable to (for all elements of a certain type) */
-		// setSelectable: function(type, b) {
-		// 	for (var i = 0; i < elements.length; i++) {
-		// 		if (elements[i].type == type) {
-		// 			elements[i].element.set({"selectable": b});
-		// 		}
-		// 	}
-		// }, 
-
 		init: function(canvasId) {
 			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
-			panelEdges = [];
+//			panelEdges = [];
 			pageEdges = {
 				left: pageMargin,
 				top: pageMargin,
