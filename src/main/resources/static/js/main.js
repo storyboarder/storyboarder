@@ -34,8 +34,8 @@ $(document).ready(function() {
 		require(dependencies, function(editor, menu) {
 			editor.init("canvas");
 			console.log(menu);
-//			editor.test(); /* */
 			menu.init();
+			editor.test(); /* */
 		});
 	});
 });

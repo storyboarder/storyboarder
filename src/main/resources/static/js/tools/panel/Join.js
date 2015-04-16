@@ -87,11 +87,9 @@ define(["../../CanvasState"], function (CanvasState) {
     switch (p.type) {
       case "horizontal":
         var topPanel = p.topPanel;
-//        console.log("top pane starting", topPanel);
         var bottomPanel = p.bottomPanel;
         topPanel.edges.bottom = bottomPanel.edges.bottom;
         topPanel.height = topPanel.edges.bottom - topPanel.edges.top - 2 * canvasState.getPanelMargin();
-//        console.log("topPanel ending", topPanel);
         toDelete = bottomPanel;
         toKeep = topPanel;
         break;
@@ -99,7 +97,7 @@ define(["../../CanvasState"], function (CanvasState) {
         var leftPanel = p.leftPanel;
         var rightPanel = p.rightPanel;
         leftPanel.edges.right = rightPanel.edges.right;
-        leftPanel.width = leftPanel.edges.right - leftPanel.edges.top - 2 * canvasState.getPanelMargin();
+        leftPanel.width = leftPanel.edges.right - leftPanel.edges.left - 2 * canvasState.getPanelMargin();
         toDelete = rightPanel;
         toKeep = leftPanel;
         break;
@@ -108,6 +106,7 @@ define(["../../CanvasState"], function (CanvasState) {
         break;
     }
     console.log("p", p);
+    toKeep.setCoords();
     canvas.remove(p);
     canvasState.deleteElement(toDelete);
   };
@@ -141,7 +140,6 @@ define(["../../CanvasState"], function (CanvasState) {
 		  canvas.remove(panelEdges[line]);
 		}
 		panelEdges = [];
-		canvas.__eventListeners["mouse:move"] = [];
 		canvas.__eventListeners["object:selected"] = [];
 	};
 

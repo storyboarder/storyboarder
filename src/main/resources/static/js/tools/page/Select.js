@@ -33,6 +33,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			function(found) {
 				if (found.type == "panel" &&
 				    (found.edges[isOpposite? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
+				  console.log(found.edges, dir);
           var e = found;
           var size = canvasState.getDimension(dir);
           e.edges[isOpposite? opposite : dir] = newEdges[dir];
@@ -42,6 +43,7 @@ define(["../../CanvasState"], function (CanvasState) {
           } else {
             e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
           }
+          found.setCoords();
 				}
 			});
 	};
@@ -49,7 +51,7 @@ define(["../../CanvasState"], function (CanvasState) {
 	var resizePanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
-				resizeOneDirection(n, obj, newEdges, true);
+				//resizeOneDirection(n, obj, newEdges, true);
 				resizeOneDirection(n, obj, newEdges, false);
 			}
 		}

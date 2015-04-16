@@ -1,17 +1,24 @@
 define(["jquery", "./Editor"], function(jquery, editor) {
 
-  var init = function() {
+  var current;
 
+  var init = function() {
+    console.log("Menu initing");
     $(document).keydown(function(e){
         if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
             e.preventDefault();
         }
     });
 
+    console.log($("a.tool"));
     $("a.tool").click(function () {
-      console.log($(this).attr('id'));
+      if (current) {
+        current.removeClass("current");
+      }
       editor.activate($(this).attr('id'));
       $( this ).addClass("current");
+      current = $(this);
+      console.log(current);
       console.log("current", $( this ));
     });
 

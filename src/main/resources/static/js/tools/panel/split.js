@@ -17,6 +17,7 @@ define(["../../CanvasState"], function (CanvasState) {
 
 	/* previews vertical split */
 	var previewDivideX = function(obj, x) {
+	  console.log(!!obj);
 		if (obj && obj.edges) {
 			var coords = {x1: x, 
 		    	y1: obj.edges.top + canvasState.getPanelMargin(), 
@@ -42,6 +43,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			right: obj.edges.right,
 			bottom: old
 		});
+		old.setCoords();
 	};
 
 	/* creates vertical split */
@@ -59,6 +61,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			right: old,
 			bottom: obj.edges.bottom
 		});
+		obj.setCoords();
 	};
 
 	var initPreviewLine = function(y) {
@@ -88,8 +91,21 @@ define(["../../CanvasState"], function (CanvasState) {
 
 		initPreviewLine(-1); /* init line outside canvas */
 
+    canvas.deactivateAll();
+
 		var vertical = true;
 		canvas.on("mouse:move", function(options) {
+		  console.log(options.target);
+      canvas.deactivateAll();
+
+//		  var pt = new fabric.Point(options.e.offsetX, options.e.offsetY);
+//		  console.log(pt);
+//		  var targets = canvasState.filterElements(function(e) {
+//		    console.log(e, e.containsPoint(pt));
+//		    return e.type == "panel" && e.containsPoint(pt);
+//		  });
+//		  console.log(targets);
+//		  options.target = targets[0];
 			if (Math.abs(options.e.movementX) < Math.abs(options.e.movementY)) {
 				previewDivideY(options.target, options.e.offsetY);
 				vertical = false;
@@ -116,8 +132,9 @@ define(["../../CanvasState"], function (CanvasState) {
 				}
 			}
 			canvas.deactivateAll();
-
 		});
+		console.log(canvas.__eventListeners);
+		console.log(canvasState.mapElements(function(e) {console.log(e);}));
 
 		return this;
 	};
@@ -141,10 +158,10 @@ define(["../../CanvasState"], function (CanvasState) {
 		deactivate: deactivate,
 		test: function() {
 			console.log(canvas._objects[1]);
-			divideY(canvas._objects[1], 450);
-			divideY(canvas._objects[1], 150);
 			divideX(canvas._objects[1], 300);
-			divideX(canvas._objects[1], 100);
+			divideY(canvas._objects[1], 200);
+//			divideY(canvas._objects[1], 150);
+//			divideX(canvas._objects[1], 100);
 		}
 	}
 });

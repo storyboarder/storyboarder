@@ -49,7 +49,7 @@ define(["fabricjs"], function () {
 			lockMovementY: true,
 			lockScalingX: true,
 			lockScalingY: true,
-			hasRotatingPoint: false
+			hasRotatingPoint: false,
 		});
 		panel.edges = edges;
 		setControls(panel);
@@ -140,6 +140,10 @@ define(["fabricjs"], function () {
 		  elements.map(m);
 		},
 
+		filterElements: function(e) {
+		  return elements.filter(e);
+		},
+
 		getOppositeDirection: getOppositeDirection,
 
 		getDimension: getDimension,
@@ -191,15 +195,15 @@ define(["fabricjs"], function () {
 		   return panelMargin;
 	    },
 
-	    saveCanvas: function() {
-	    	return JSON.stringify(canvas);
-	    },
+    saveCanvas: function() {
+      return JSON.stringify(canvas);
+    },
 
-	    loadCanvas: function(json) {
-	    	canvas.loadFromJson(json, function(){
-	    		canvas.renderAll();
-	    	});
-	    }
+    loadCanvas: function(json) {
+      canvas.loadFromJson(json, function(){
+        canvas.renderAll();
+      });
+    }
 	};
 
 	return {
