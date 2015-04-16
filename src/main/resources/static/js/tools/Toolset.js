@@ -4,6 +4,7 @@ define(function(require) {
 
 	var toolset = {
 		"Split" : require("./panel/Split"),
+		"Join" : require("./panel/Join"),
 		"Select" : require("./page/Select"),
 		"Text" : require("./text/Text")
 	};
@@ -33,7 +34,8 @@ define(function(require) {
 		test: function() {
 			activate("Split");
 			currentTool.test();
-			activate("Select");
+			activate("Join");
+			currentTool.test();
 		}
 	};
 });

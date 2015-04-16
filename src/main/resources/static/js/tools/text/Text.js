@@ -1,15 +1,15 @@
-
 define(["../../CanvasState"], function (CanvasState) {
-
 		
 		var activate = function() {
 
+			// nothing should be moving
 			canvasState.filterMapElements(
-				function(e) { // filter
-					return e.type == "group";
-				},
 				function(found) { // map
-					found.element.set({selectable: true});
+					if(found.type === "group") {
+						found.set({selectable: true});
+					} else {
+						found.set({selectable: false});
+					}
 				}
 			);
 
@@ -25,10 +25,10 @@ define(["../../CanvasState"], function (CanvasState) {
 			// if click again onto an textbox + text object, allow for resize?
 
 			// toggling? 
-
 			var initialPos;
 			var finalPos;
 			var selected;
+			var edit;
 			TEXT_PADDING = 20;
 
 			canvas.on('mouse:down', function(coor) {
@@ -39,6 +39,7 @@ define(["../../CanvasState"], function (CanvasState) {
 				}
 
 				selected = coor.target;
+				edit = coor.e.shiftKey;
 			});
 
 			canvas.on('mouse:up', function(coor){
@@ -48,63 +49,60 @@ define(["../../CanvasState"], function (CanvasState) {
 					y: coor.e.offsetY
 				}
 
-				if(selected && selected.type === 'group') {  //i-text
-					console.log("group!!");
-					var items = selected._objects;
-					var isText = false;
-					var iText;
-					for(i in items) {
-						console.log(items[i].type);
-						if(items[i].type === 'i-text') {
-							isText = true;
-							iText = items[i];
+				// weird bug when I edit and then click out of the box
+				// phantom group box....?
+				if(selected && selected.type === 'group') {
+					if(edit) {
+						console.log("GROUP!!");
+						var pos = {
+							left : selected.left,
+							top : selected.top
+						}
+
+						var items = selected._objects;
+						var isText = false;
+						var iText;
+						console.log(items);
+						for(i in items) {
+							if(items[i].type === 'i-text') {
+								isText = true;
+								iText = items[i];
+							}
+						}
+
+						if(isText) {
+							console.log('checked text');
+							selected._restoreObjectsState();
+					        canvasState.deleteElement(selected);
+					        for(var i = 0; i < items.length; i++) {
+					          canvas.add(items[i]);
+					          //canvas.item(canvas.size()-1).hasControls = true;
+					        }
+
+					        canvas.on("text:editing:exited", function(e) {
+	    						console.log('finished editing');
+					        	var group = new fabric.Group([ items[0], items[1] ], {
+					        		left : pos.left,
+					        		top : pos.top
+					        	});	
+
+								canvasState.deleteElement(items[0]);
+								canvasState.deleteElement(items[1]);
+								canvasState.addElement(group, 'text');
+							});						
 						}
 					}
-
-					if(isText) {
-						console.log('checked text');
-						selected._restoreObjectsState();
-				        canvasState.deleteElement(selected);
-				        for(var i = 0; i < items.length; i++) {
-				          canvas.add(items[i]);
-				          //canvas.item(canvas.size()-1).hasControls = true;
-				        }
-
-				        if(iText.hasStateChanged()) {
-				        	console.log("changed");
-							var group = new fabric.Group([ items(0), items(1) ], {
-							  left: items(1).left,
-							  top: items(1).top
-							});				        	
-				        }
-
-						document.onkeydown = function (e) {
-							console.log("pressed");
-						   	var key = e.keyCode;
-						   	console.log(key);
-						   	if(key === 8 && selected.type === 'group') {
-						   		console.log("delete");
-						   		console.log(selected.type);
-						   		canvasState.deleteElement(selected);
-						   	}
-						}						
-					}
-
-
-				} else {	
-					console.log('editing');
+				} else {
+					console.log('creating new group');
 
 					if(Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
-						console.log('creating text box');
 						width = Math.abs(initialPos.x - finalPos.x);
 						height = Math.abs(initialPos.y - finalPos.y);
 
 
 					var input = new fabric.IText('Text', { 
 				  		fontFamily: 'arial black',
-				  		fontSize: 14,
-				  		width: width - TEXT_PADDING,
-				  		height: height - TEXT_PADDING
+				  		fontSize: 14
 					});
 
 					var textBox = new fabric.Rect({
@@ -120,13 +118,22 @@ define(["../../CanvasState"], function (CanvasState) {
 					  top: initialPos.y
 					});
 
-					//canvasState.addElement(input, 'text');
 					canvasState.addElement(group, 'text');
-
 					}
 				}
 				
 			});
+
+			document.onkeydown = function (e) {
+				console.log("pressed");
+			   	var key = e.keyCode;
+			   	console.log(key);
+			   	if(key === 8 && selected.type === 'group') {
+			   		console.log("delete");
+			   		console.log(selected.type);
+			   		canvasState.deleteElement(selected);
+			   	}
+			}
 
 		};
 
@@ -140,11 +147,9 @@ define(["../../CanvasState"], function (CanvasState) {
 			console.log("init text");
 			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
-
-
 		},
 		activate: activate,
-		deactivate: deactivate()
+		deactivate: deactivate
 	}
 	
 });

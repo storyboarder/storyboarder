@@ -4,14 +4,36 @@ define(["fabricjs"], function () {
 	var pageMargin;
 	var panelMargin;
 	var gridSpacing;
-	var edges; // edges of panel area
+	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
 	var elements;
 	var snapToGrid = false;
+	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
+	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	var addElement = function(e, type) {
-		elements.push({type:type, element: e});
+	  e.type = type;
+		elements.push(e);
 		canvas.add(e);
-	}
+	};
+
+	var setControls = function(panel) {
+		var bounds = [];
+		var options = {};
+		for (var e in edgeDirections) {
+			if (pageEdges[edgeDirections[e]] == panel.edges[edgeDirections[e]]) {
+				bounds.push(edgeDirections[e].substring(0, 1));
+			}
+		}
+		for (var c in controls) {
+			options[controls[c]] = true;
+			for (var b in bounds) {
+				if (controls[c].indexOf(bounds[b]) >= 0) {
+					options[controls[c]] = false;
+				}
+			}
+		}
+		panel.setControlsVisibility(options);
+	};
 
 	/* edges should be an object with left, top, right, and bottom keys */
 	var addPanel = function(edges) {
@@ -27,14 +49,72 @@ define(["fabricjs"], function () {
 			lockMovementY: true,
 			lockScalingX: true,
 			lockScalingY: true,
-			hasRotatingPoint: false
+			hasRotatingPoint: false,
 		});
 		panel.edges = edges;
+		setControls(panel);
 		addElement(panel, "panel");
-	}
+		return panel;
+	};
+
+	var getOppositeDirection = function(edgeDir) {
+		switch (edgeDir) {
+			case "top":
+				return "bottom";
+				break;
+			case "bottom":
+				return "top";
+				break;
+			case "left":
+				return "right";
+				break;
+			case "right":
+				return "left";
+				break;
+			default:
+				throw "Invalid edge direction " + edgeDir;
+				break;
+		}
+	};
+
+	var getDimension = function(edgeDir) {
+		switch (edgeDir) {
+			case "top":
+			case "bottom":
+				return "height";
+				break;
+			case "left":
+			case "right":
+				return "width";
+				break;
+			default:
+				throw "Invalid edge direction " + edgeDir;
+				break;
+		}
+	};
+
+	var between = function(lower, val, upper) {
+		return (lower <= val && val <= upper);
+	};
+
+	var contains = function(d, x) {
+		var min = pageMargin + panelMargin;
+		var max = canvas[getDimension(d)] - min;
+		return between(min, x, max);
+	};
 
 	var deleteElement = function(e) {
-		canvas.remove(e);
+//	  console.log(e);
+		var idx = elements.indexOf(e);
+//		console.log(idx, elements);
+		if (idx >= 0) {
+		  el = elements.splice(idx, 1);
+//	    console.log(el);
+		  canvas.remove(el[0]);
+		} else {
+		  throw "couldn't find element:" + e;
+		}
+//		console.log(elements.length);
 	}
 
 	var CanvasState = {
@@ -56,29 +136,31 @@ define(["fabricjs"], function () {
 
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
-		filterMapElements: function(f, m) {
-			for (e in elements.filter(f)) {
-				m(elements[e]);
-			}
+		mapElements: function(m) {
+		  elements.map(m);
 		},
+
+		filterElements: function(e) {
+		  return elements.filter(e);
+		},
+
+		getOppositeDirection: getOppositeDirection,
+
+		getDimension: getDimension,
+
+		contains: contains,
 
 		addPanel: addPanel,
 
-		deleteElement: deleteElement,
+		setControls: setControls,
 
-		/* b should be a boolean to set selectable to (for all elements of a certain type) */
-		// setSelectable: function(type, b) {
-		// 	for (var i = 0; i < elements.length; i++) {
-		// 		if (elements[i].type == type) {
-		// 			elements[i].element.set({"selectable": b});
-		// 		}
-		// 	}
-		// }, 
+		deleteElement: deleteElement,
 
 		init: function(canvasId) {
 			canvas = new fabric.Canvas(canvasId, {selection:false});
 			elements = [];
-			edges = {
+//			panelEdges = [];
+			pageEdges = {
 				left: pageMargin,
 				top: pageMargin,
 				right: canvas.getWidth() - pageMargin,
@@ -86,7 +168,7 @@ define(["fabricjs"], function () {
 			};
 
 			/* add the first panel */
-			addPanel(edges);
+			addPanel($.extend({}, pageEdges));
 
 			/* adding a circle because why not */
 		 	var circle = new fabric.Circle({
@@ -113,15 +195,15 @@ define(["fabricjs"], function () {
 		   return panelMargin;
 	    },
 
-	    saveCanvas: function() {
-	    	return JSON.stringify(canvas);
-	    },
+    saveCanvas: function() {
+      return JSON.stringify(canvas);
+    },
 
-	    loadCanvas: function(json) {
-	    	canvas.loadFromJson(json, function(){
-	    		canvas.renderAll();
-	    	});
-	    }
+    loadCanvas: function(json) {
+      canvas.loadFromJson(json, function(){
+        canvas.renderAll();
+      });
+    }
 	};
 
 	return {
