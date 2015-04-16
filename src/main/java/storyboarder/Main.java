@@ -1,5 +1,7 @@
 package storyboarder;
 
+import java.net.UnknownHostException;
+
 /**
  * @author narobins
  * @author yz38
@@ -11,7 +13,10 @@ public final class Main {
   private Main() {
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws UnknownHostException {
+    Multiplayer server = new Multiplayer(8887);
+    server.start();
+    
     Gui.runSparkServer(8000);
   }
 

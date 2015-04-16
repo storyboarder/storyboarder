@@ -3,7 +3,7 @@ define(["../Editor"], function(editor) {
 		editor.activate("split");
 	});
 
-	cosole.log("#toolbar .tool");
+	console.log("#toolbar .tool");
 	
 	$("#toolbar .tool").click(function () {
 		editor.activate($(this).id);
