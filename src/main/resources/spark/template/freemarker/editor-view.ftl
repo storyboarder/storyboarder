@@ -64,7 +64,7 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="tool" id="Add-Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+          <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
           <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
@@ -82,9 +82,9 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="action" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="action" id="Export" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
-          <a href="#" class="action" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
+          <a href="#" class="modal" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="modal" id="Export" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+          <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
   /* Actions are one-time functions, unlike tools. */
   var actions = {
     "Undo": function(params) {
-      console.log("undo called");
+    	console.log("undo called");
     },
     "Redo": function(params) {
       console.log("redo called");
@@ -31,8 +31,47 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
       });
     },
     "Export": function(params) {
-      console.log("save called");
     },
+    "Add Image" : function(params) {
+    	console.log("ADDING IMAGE!!!");
+    	console.log(params);
+	   	if(params.url && params.url != "http://") {
+	   		console.log(params.url);
+			fabric.Image.fromURL(params.url, function(img) {
+				img.set({ left: 30, top: 40, scaleX: 0.3, scaleY: 0.3 });
+				canvasState.addElement(img, "image");
+			});
+
+	   	} else if(params.file) {
+	   		console.log(params.file);
+
+	   		/*	
+			//document.getElementById('imgLoader').onchange = function handleImage(e) {
+			    var reader = new FileReader();
+			    reader.onload = function (event) { 
+			        var imgObj = new Image();
+			        imgObj.src = params.file;
+			        imgObj.onload = function () {
+			            // start fabricJS stuff
+			            var image = new fabric.Image(imgObj);
+			            image.set({
+			                left: 30,
+			                top: 40,
+			                scaleX: 0.3,
+			                scaleY: 0.3
+			            });
+			            //image.scale(getRandomNum(0.1, 0.25)).setCoords();
+			            canvasState.addElement(image, "image");
+			            
+			            // end fabricJS stuff
+			        } 
+			    }
+			    //reader.readAsDataURL(e.target.files[0]);
+			//}
+			*/
+	   	}
+
+    }
   };
 
 	var init = function(spec) {
@@ -88,7 +127,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action, action,
+		action: action,
 		test: test
 	};
 
