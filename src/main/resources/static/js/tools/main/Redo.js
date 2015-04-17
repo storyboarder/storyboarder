@@ -1,4 +1,4 @@
-define(["../../CanvasState"], function (CanvasState) {
+define(["../../CanvasState"], function(CanvasState) {
 
 	var canvasState;
 	var canvas;
@@ -9,7 +9,7 @@ define(["../../CanvasState"], function (CanvasState) {
 
 	return {
 		name: "Redo",
-		init: function () {
+		init: function() {
 			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},

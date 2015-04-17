@@ -1,8 +1,26 @@
 define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 
 
-	var init = function(canvasId) {
-		/* ideally the CanvasState will be initialized from here instead of from Main. */
+	var init = function(spec) {
+
+		console.log(spec);
+		var canvas = spec.canvas;
+		var width = spec.width;
+		var height = spec.height;
+		var pageMargin = spec.pageMargin;
+		var panelMargin = spec.panelMargin;
+		canvas.width = width;
+		canvas.height = height;
+		console.log(width, height);
+
+		console.log(canvas);
+		console.log(canvas.attr("id"));
+
+		canvasState = CanvasState.getCanvasState();
+		canvasState.setPageMargin(pageMargin);
+		canvasState.setGridSpacing(20);
+		canvasState.setPanelMargin(panelMargin);
+		canvasState.init(canvas.attr("id"), width, height);
 
 		console.log("init editor");
 
@@ -14,19 +32,19 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
-	  	toolset.activate(toolname);
+		toolset.activate(toolname);
 	};
 
 	var test = function() {
 		toolset.test();
-	  // console.log("editor tested");
-	  // console.log("toolset is now " + toolset);
-	  // console.log("test activating Split...");
+		// console.log("editor tested");
+		// console.log("toolset is now " + toolset);
+		// console.log("test activating Split...");
 		//console.log("activating split from editor 2");
 
-	   //this.activateTool("Split");
-	  // console.log(canvasState.getPageMargin());
-  	};
+		//this.activateTool("Split");
+		// console.log(canvasState.getPageMargin());
+	};
 
 	return {
 		init: init,
@@ -35,4 +53,3 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 	}
 
 });
-
