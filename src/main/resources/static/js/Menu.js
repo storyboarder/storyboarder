@@ -1,6 +1,4 @@
 define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
-	//define(["jquery", "semanticui", "./Editor"], function(jquery, ui, editor) {
-
 	var current;
 
 	var init_project = function() {
@@ -39,6 +37,10 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			}
 		});
 
+		$('.ui.checkbox')
+      .checkbox()
+    ;
+
 		$("a.tool").click(function() {
 			if (current) {
 				current.removeClass("current");
@@ -50,7 +52,18 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		});
 
 		$("a.action").click(function() {
+		  console.log("action called");
 		  editor.action($(this).attr('id'), {});
+		});
+
+		$("input[type='checkbox'].action").change(function() {
+		  console.log("check action called");
+		  editor.action($(this).attr('id'), {checked: $(this).prop("checked")});
+		});
+
+		$("input[type='text'].action").change(function() {
+		  console.log("text action called");
+		  editor.action($(this).attr('id'), {value: $(this).val()});
 		});
 
 		$(".toolset .title").click(function() {

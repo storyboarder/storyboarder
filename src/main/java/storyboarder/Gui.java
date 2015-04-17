@@ -50,6 +50,8 @@ public final class Gui {
     Spark.post("/load", new LoadHandler());
     Spark.get("/save", new SaveHandler(), new FreeMarkerEngine()); // should this be POST?
 
+    Spark.post("/savepage", new SavePageHandler()); // added for testing
+
   }
 
   /**
@@ -146,6 +148,17 @@ public final class Gui {
         result = ImmutableMap.of("result", "Failure: " + e.getMessage());
       }
       return new ModelAndView(result, "main.ftl");
+    }
+  }
+
+  private static class SavePageHandler implements Route {
+
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      String page = qm.value("page");
+      System.out.println(page);
+      return GSON.toJson("saved");
     }
   }
 }

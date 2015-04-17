@@ -8,14 +8,27 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
     "Redo": function(params) {
       console.log("redo called");
     },
+    "ToggleGrid": function(params) {
+      console.log("toggle-grid");
+      if (params.checked) {
+        canvasState.drawGrid();
+      } else {
+        canvasState.clearGrid();
+      }
+    },
+    "GridSpacing": function(params) {
+      canvasState.setGridSpacing(params.value);
+      canvasState.clearGrid();
+      canvasState.drawGrid();
+    },
     "Load": function(params) {
       console.log("load called");
     },
     "Save": function(params) {
       console.log("save called");
-//      $.post( "/save", {}, function( data ) {
-//        console.log(data);
-//      });
+      $.post( "/savepage", {page: {}}, function( data ) {
+        console.log(data);
+      });
     },
     "Export": function(params) {
       console.log("save called");
@@ -33,7 +46,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		console.log(width, height);
 
 		canvasState.setPageMargin(pageMargin);
-		canvasState.setGridSpacing(20); //TODO un-hardcode
+		canvasState.setGridSpacing(40); //TODO un-hardcode
+		canvasState.setSnapDistance(10); //TODO un-hardcode
+		console.log(canvasState.getGridSpacing());
+		console.log(canvasState);
 		canvasState.setPanelMargin(panelMargin);
 		canvasState.init(canvas.attr("id"), width, height);
 

@@ -1,14 +1,19 @@
 define(["jquery", "fabricjs"], function($) {
 
 	var canvas;
+	var width;
+	var height;
 	var pageMargin;
 	var panelMargin;
 	var gridSpacing;
+	var snapDistance;
 	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
 	var elements;
 	var snapToGrid = false;
 	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
 	var edgeDirections = ["left", "top", "right", "bottom"];
+	var grid; // array of grid lines
+	var gridColor = "#ddd";
 
 	var addElement = function(e, type) {
 		e.type = type;
@@ -115,7 +120,29 @@ define(["jquery", "fabricjs"], function($) {
 			throw "couldn't find element:" + e;
 		}
 		//		console.log(elements.length);
-	}
+	};
+
+	var drawGrid = function() {
+	  grid = [];
+	  for (var i = 0; i < (width / gridSpacing); i++) {
+      var line = new fabric.Line(
+        [ i * gridSpacing, 0, i * gridSpacing, height],
+        { stroke: gridColor, selectable: false }
+      );
+      canvas.add(line);
+      line.sendToBack();
+      grid.push(line);
+    }
+    for (var j = 0; j < (height / gridSpacing); j++) {
+      var line = new fabric.Line(
+        [ 0, j * gridSpacing, width, j * gridSpacing],
+        { stroke: gridColor, selectable: false }
+      );
+      canvas.add(line);
+      line.sendToBack();
+      grid.push(line);
+    }
+	};
 
 	var CanvasState = {
 		getCanvas: function() {
@@ -160,16 +187,17 @@ define(["jquery", "fabricjs"], function($) {
 
 		deleteElement: deleteElement,
 
-		init: function(canvasId, width, height) {
+		init: function(canvasId, w, h) {
+		  width = w;
+		  height = h;
 			canvas = new fabric.Canvas(canvasId, {
 				selection: false
 			});
+			grid = [];
 			canvas.setDimensions({
-				width: width,
-				height: height
+				width: w,
+				height: h
 			});
-			console.log(canvas);
-			console.log(canvas.getWidth());
 			elements = [];
 			pageEdges = {
 				left: pageMargin,
@@ -177,11 +205,9 @@ define(["jquery", "fabricjs"], function($) {
 				right: canvas.getWidth() - pageMargin,
 				bottom: canvas.getHeight() - pageMargin
 			};
-			console.log(pageEdges);
 
 			/* add the first panel */
 			addPanel($.extend({}, pageEdges));
-			console.log(canvas);
 
 			/* adding a circle because why not */
 			var circle = new fabric.Circle({
@@ -204,6 +230,9 @@ define(["jquery", "fabricjs"], function($) {
 		setGridSpacing: function(p) {
 			gridSpacing = p;
 		},
+		setSnapDistance: function(p) {
+			snapDistance = p;
+		},
 		getPageMargin: function() {
 			return pageMargin;
 		},
@@ -219,7 +248,28 @@ define(["jquery", "fabricjs"], function($) {
 			canvas.loadFromJson(json, function() {
 				canvas.renderAll();
 			});
-		}
+		},
+
+		drawGrid: drawGrid,
+
+		snapToGridEnabled: function() {
+		  return grid.length > 0;
+		},
+
+		clearGrid: function() {
+      for (g in grid) {
+        canvas.remove(grid[g]);
+      }
+      grid = [];
+		},
+
+		getGridSpacing: function() {
+		  return gridSpacing;
+		},
+
+		getSnapDistance: function() {
+		  return snapDistance;
+		},
 	};
 
 	return CanvasState;
