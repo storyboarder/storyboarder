@@ -1,26 +1,36 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
-  /* Actions are one-time functions, unlike tools. */
-  var actions = {
-    "Undo": function(params) {
-      console.log("undo called");
-    },
-    "Redo": function(params) {
-      console.log("redo called");
-    },
-    "Load": function(params) {
-      console.log("load called");
-    },
-    "Save": function(params) {
-      console.log("save called");
-//      $.post( "/save", {}, function( data ) {
-//        console.log(data);
-//      });
-    },
-    "Export": function(params) {
-      console.log("save called");
-    },
-  };
+	/* Actions are one-time functions, unlike tools. */
+	var actions = {
+		"Undo": function(params) {
+			console.log("undo called");
+		},
+		"Redo": function(params) {
+			console.log("redo called");
+		},
+		"Load": function(pageNum) {
+			console.log("load called");
+			$.post("/load", {
+					page: pageNum
+				},
+				function(responseJSON) {
+					responseObject = JSON.parse(responseJSON);
+					console.log("loaded: ");
+					console.log(responseObject);
+					return responseObject;
+				});
+		},
+		"Save": function(pageNum, pageObject) {
+			console.log("save called");
+			pageJSON = JSON.stringify(pageObject);
+			$.post("/save", {page: pageNum, json: pageJSON}, function(data) {
+				console.log(data);
+			});
+		},
+		"Export": function(params) {
+			console.log("save called");
+		},
+	};
 
 	var init = function(spec) {
 		var canvas = spec.canvas;
@@ -51,11 +61,11 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var action = function(name, params) {
-	  if (name in actions) {
-      actions[name](params);
-    } else {
-      throw "Action not found: " + name;
-    }
+		if (name in actions) {
+			actions[name](params);
+		} else {
+			throw "Action not found: " + name;
+		}
 	};
 
 	var test = function() {
@@ -72,7 +82,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action, action,
+		action,
+		action,
 		test: test
 	};
 
