@@ -1,4 +1,4 @@
-define(["fabricjs"], function () {
+define(["jquery", "fabricjs"], function ($) {
 
 	var canvas;
 	var pageMargin;
@@ -154,21 +154,29 @@ define(["fabricjs"], function () {
 
 		setControls: setControls,
 
+		getPageEdge: function(c) {
+		  return pageEdges[c];
+		},
+
 		deleteElement: deleteElement,
 
-		init: function(canvasId) {
+		init: function(canvasId, width, height) {
 			canvas = new fabric.Canvas(canvasId, {selection:false});
+			canvas.setDimensions({width: width, height: height});
+			console.log(canvas);
+			console.log(canvas.getWidth());
 			elements = [];
-//			panelEdges = [];
 			pageEdges = {
 				left: pageMargin,
 				top: pageMargin,
 				right: canvas.getWidth() - pageMargin,
 				bottom: canvas.getHeight() - pageMargin
 			};
+			console.log(pageEdges);
 
 			/* add the first panel */
 			addPanel($.extend({}, pageEdges));
+			console.log(canvas);
 
 			/* adding a circle because why not */
 		 	var circle = new fabric.Circle({

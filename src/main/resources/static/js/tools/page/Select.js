@@ -1,3 +1,5 @@
+//TODO: fix bug with resizing panels outside of valid page area
+
 define(["../../CanvasState"], function (CanvasState) {
 
 	var canvasState;
@@ -32,8 +34,8 @@ define(["../../CanvasState"], function (CanvasState) {
 		canvasState.mapElements(
 			function(found) {
 				if (found.type == "panel" &&
+				    found != obj &&
 				    (found.edges[isOpposite? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
-				  console.log(found.edges, dir);
           var e = found;
           var size = canvasState.getDimension(dir);
           e.edges[isOpposite? opposite : dir] = newEdges[dir];
@@ -51,7 +53,7 @@ define(["../../CanvasState"], function (CanvasState) {
 	var resizePanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
-				//resizeOneDirection(n, obj, newEdges, true);
+				resizeOneDirection(n, obj, newEdges, true);
 				resizeOneDirection(n, obj, newEdges, false);
 			}
 		}
@@ -76,17 +78,17 @@ define(["../../CanvasState"], function (CanvasState) {
 
 		// for resizing and snap to grid functionality
 		canvas.on('object:scaling', function(options) {
+
 			options.target.width *= options.target.scaleX;
-	    	options.target.scaleX = 1;
+      options.target.scaleX = 1;
 			options.target.height *= options.target.scaleY;
 			options.target.scaleY = 1;
-		    options.target.corners = {
-		        left: options.target.left - 5,
-		        right: options.target.left + options.target.width + 5,
-		        top: options.target.top - 5,
-		        bottom: options.target.top + options.target.height + 5
-		    };
-			//console.log(options.target);
+      options.target.corners = {
+          left: options.target.left - 5,
+          right: options.target.left + options.target.width + 5,
+          top: options.target.top - 5,
+          bottom: options.target.top + options.target.height + 5
+      };
 			if(canvasState.getSnapToGrid()) {
 				if(options.e.clientX < distanceToClosestX) {
 					// snap or display snap line

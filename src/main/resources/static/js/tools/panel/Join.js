@@ -2,6 +2,9 @@ define(["../../CanvasState"], function (CanvasState) {
 	var panelEdges;
 	var canvasState;
 	var canvas;
+	var selected = "blue";
+	var deselected = "#bbb";
+	var currentLine;
 
 	var addPanelEdge = function(line) {
 		canvas.add(line); /* do not add to elements array */
@@ -13,7 +16,7 @@ define(["../../CanvasState"], function (CanvasState) {
     console.log("coords of line", coords);
 		var line = new fabric.Line(coords, {
 			fill: 'black',
-			stroke: 'blue',
+			stroke: deselected,
 			strokeWidth: 1,
 			selectable: true,
 			padding: canvasState.getPanelMargin(),
@@ -125,6 +128,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			}
 		);
     console.log(panelEdges);
+
     canvas.on("object:selected", function(options) {
       console.log(options.target);
       merge(options.target);

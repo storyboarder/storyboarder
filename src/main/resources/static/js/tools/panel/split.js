@@ -2,6 +2,7 @@ define(["../../CanvasState"], function (CanvasState) {
 	var previewDivideLine;
 	var canvasState;
 	var canvas;
+	var threshold = 2;
 
 	/* previews horizontal split */
 	var previewDivideY = function(obj, y) {
@@ -17,7 +18,6 @@ define(["../../CanvasState"], function (CanvasState) {
 
 	/* previews vertical split */
 	var previewDivideX = function(obj, x) {
-	  console.log(!!obj);
 		if (obj && obj.edges) {
 			var coords = {x1: x, 
 		    	y1: obj.edges.top + canvasState.getPanelMargin(), 
@@ -43,7 +43,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			right: obj.edges.right,
 			bottom: old
 		});
-		old.setCoords();
+		obj.setCoords();
 	};
 
 	/* creates vertical split */
@@ -95,23 +95,19 @@ define(["../../CanvasState"], function (CanvasState) {
 
 		var vertical = true;
 		canvas.on("mouse:move", function(options) {
-		  console.log(options.target);
       canvas.deactivateAll();
-
-//		  var pt = new fabric.Point(options.e.offsetX, options.e.offsetY);
-//		  console.log(pt);
-//		  var targets = canvasState.filterElements(function(e) {
-//		    console.log(e, e.containsPoint(pt));
-//		    return e.type == "panel" && e.containsPoint(pt);
-//		  });
-//		  console.log(targets);
-//		  options.target = targets[0];
-			if (Math.abs(options.e.movementX) < Math.abs(options.e.movementY)) {
+			if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
 				previewDivideY(options.target, options.e.offsetY);
 				vertical = false;
-			} else {
+			} else if (Math.abs(options.e.movementX) - Math.abs(options.e.movementY) > threshold) {
 				previewDivideX(options.target, options.e.offsetX);
 				vertical = true;
+			} else {
+			  if (vertical) {
+				  previewDivideX(options.target, options.e.offsetX);
+			  } else {
+				  previewDivideY(options.target, options.e.offsetY);
+			  }
 			}
 		});
 
