@@ -25,6 +25,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		});
 	};
 
+
 	var init = function() {
 		console.log("Menu initing");
 
@@ -38,7 +39,6 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			}
 		});
 
-		console.log($("a.tool"));
 		$("a.tool").click(function() {
 			if (current) {
 				current.removeClass("current");
@@ -46,13 +46,27 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			editor.activate($(this).attr('id'));
 			$(this).addClass("current");
 			current = $(this);
-			console.log(current);
 			console.log("current", $(this));
+		});
+
+		$("a.action").click(function() {
+		  editor.action($(this).attr('id'));
+		  console.log($(this).attr('id'));
 		});
 
 		$(".toolset .title").click(function() {
 			$(this).parent().children(".tools").slideToggle();
 		});
+
+    $("a.new-page").click(function() {
+      console.log("new page");
+    });
+
+    $("a.remove-page").click(function() {
+      console.log("remove page");
+    });
+
+
 
 		init_project();
 	};

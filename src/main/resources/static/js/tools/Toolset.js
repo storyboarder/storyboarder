@@ -9,6 +9,10 @@ define(function(require) {
 		"Text": require("./text/Text")
 	};
 
+	var actionset = {
+
+	};
+
 	var activate = function(toolname) {
 		if (toolname in toolset) {
 			if (currentTool) {
@@ -20,6 +24,10 @@ define(function(require) {
 		} else {
 			throw "Tool not found: " + toolname;
 		}
+	};
+
+	var action = function(name) {
+	  
 	};
 
 	return {

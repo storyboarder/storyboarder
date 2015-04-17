@@ -2,13 +2,16 @@
     <div id="navigator">
       <div>
         <div class="page-thumb">
+          <a class="page-thumb" href="#"> </a>
+          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
+        </div>
+        <div class="page-thumb">
+          <a class="page-thumb" href="#"> </a>
+          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
+        </div>
+        <div class="page-thumb">
+          <a class="page-thumb" href="#"> </a>
           <a href="#" class="new-page"><i class="fa fa-x fa-plus"></i></a>
-        </div>
-        <div class="page-thumb">
-          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
-        </div>
-        <div class="page-thumb">
-          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
         </div>
       <!--<a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>/-->
       </div>
@@ -36,8 +39,8 @@
         <div class="title">Main</div>
         <div class="tools">
           <a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>
-          <a href="#" class="tool" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
-          <a href="#" class="tool" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
+          <a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
+          <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
           <br>Grid: <input type="number" /> <input type="number" />
 
         </div>
@@ -76,9 +79,9 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="tool" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="tool" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
-          <a href="#" class="tool" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
+          <a href="#" class="action" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="action" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+          <a href="#" class="action" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
     </div>

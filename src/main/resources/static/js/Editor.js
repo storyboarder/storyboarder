@@ -35,6 +35,10 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 		toolset.activate(toolname);
 	};
 
+	var action = function(name) {
+    toolset.action(name);
+	};
+
 	var test = function() {
 		toolset.test();
 		// console.log("editor tested");
@@ -49,6 +53,7 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
+		action, action,
 		test: test
 	}
 

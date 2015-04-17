@@ -1,5 +1,4 @@
 <div class="ui standard modal page-setup">
-<i class="ui close icon"></i>
 
 <div class="header">
   Page Setup

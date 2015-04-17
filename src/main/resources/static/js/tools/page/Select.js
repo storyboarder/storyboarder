@@ -53,7 +53,7 @@ define(["../../CanvasState"], function(CanvasState) {
 	var resizePanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
-				//resizeOneDirection(n, obj, newEdges, true);
+				resizeOneDirection(n, obj, newEdges, true);
 				resizeOneDirection(n, obj, newEdges, false);
 			}
 		}
