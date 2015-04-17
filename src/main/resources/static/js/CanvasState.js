@@ -222,10 +222,5 @@ define(["jquery", "fabricjs"], function($) {
 		}
 	};
 
-	return {
-		/* this ensures all tools will get the same object */
-		getCanvasState: function() {
-			return CanvasState;
-		}
-	};
+	return CanvasState;
 });

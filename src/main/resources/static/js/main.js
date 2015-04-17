@@ -31,7 +31,7 @@ require.config({
       ];
 
       require(dependencies, function(editor, menu) {
-//        editor.init("canvas");
+        // editor.init("canvas");
         console.log(menu);
         menu.init();
 //        editor.test(); /* */

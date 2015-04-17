@@ -1,6 +1,5 @@
-define(["../../CanvasState"], function (CanvasState) {
+define(["../../CanvasState"], function (canvasState) {
 	var panelEdges;
-	var canvasState;
 	var canvas;
 	var selected = "blue";
 	var deselected = "#bbb";
@@ -151,7 +150,6 @@ define(["../../CanvasState"], function (CanvasState) {
 	return {
 		name: "Join",
 		init: function () {
-			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,
@@ -159,5 +157,5 @@ define(["../../CanvasState"], function (CanvasState) {
 		test: function() {
 
 		}
-	}
+	};
 });
