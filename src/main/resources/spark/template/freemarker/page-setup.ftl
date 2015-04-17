@@ -23,7 +23,7 @@
       <div class="ui right labeled field">
         <label>Page Height</label>
         <div class="ui right labeled input">
-          <input type="text" id="page-height" placeholder="" value="700">
+          <input type="text" id="page-height" placeholder="" value="600">
           <div class="ui label">
             px
           </div>

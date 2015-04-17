@@ -2,12 +2,15 @@
     <div id="navigator">
       <div>
         <div class="page-thumb">
+          <a href="#" class="new-page"><i class="fa fa-x fa-plus"></i></a>
+        </div>
+        <div class="page-thumb">
           <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
         </div>
         <div class="page-thumb">
           <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
         </div>
-      <a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>
+      <!--<a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>/-->
       </div>
     </div>
 
