@@ -1,7 +1,7 @@
 package storyboarder;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,25 +31,50 @@ import spark.template.freemarker.FreeMarkerEngine;
  * @author yz38
  *
  */
-public final class Gui {
+final class StoryboarderGUI {
 
   private static final Gson GSON = new Gson();
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  private Gui() {
+  private final int port;
+
+  private File project;
+
+  StoryboarderGUI(int port) {
+    this.port = port;
   }
 
-  /**
-   * @param port
-   */
-  public static void runSparkServer(int port) {
+  StoryboarderGUI loadProject(String path) {
+    project = new File(path);
+    assertions();
+    return this;
+  }
+
+  StoryboarderGUI createProject(String path) throws IOException {
+    project = new File(path);
+    if (!project.mkdirs()) {
+      throw new IOException("Could not create the necessary directories.");
+    }
+    if (!project.createNewFile()) {
+      throw new IOException("Could not create the file.");
+    }
+    assertions();
+    return this;
+  }
+
+  private void assertions() {
+    assert project.isFile();
+    assert project.exists();
+    assert project.canRead();
+    assert project.canWrite();
+  }
+
+  void start() {
     Spark.setPort(port);
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
     Spark.post("/load", new LoadHandler());
-    Spark.get("/save", new SaveHandler(), new FreeMarkerEngine()); // should this be POST?
-
+    Spark.post("/save", new SaveHandler());
   }
 
   /**
@@ -65,7 +90,7 @@ public final class Gui {
 
     @Override
     public ModelAndView handle(Request arg0, Response arg1) {
-      Map<String, Object> variables = ImmutableMap.of("title", "Maps");
+      Map<String, Object> variables = ImmutableMap.of("title", "Storyboarder");
       return new ModelAndView(variables, "main.ftl");
     }
   }
@@ -93,10 +118,18 @@ public final class Gui {
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
       String path = qm.value("path");
+
       try {
+        Files.newBufferedReader(Paths.get(path), StandardCharsets.UTF_8);
         // Apparently this uses buffering so it is good even for large projects.
-        List<String> pages = Files.readAllLines(Paths.get(path), CHARSET);
-        return GSON.toJson(pages);
+        List<String> pages = Files.readAllLines(Paths.get(path),
+            StandardCharsets.UTF_8);
+        if (qm.value("page") != null) {
+          int page = Integer.parseInt(qm.value("page"));
+          return GSON.toJson(pages.get(page));
+        } else {
+          return GSON.toJson(pages);
+        }
       } catch (IOException e) {
         return GSON.toJson(new String[] {"Failure: " + e.getMessage()});
       }
@@ -113,7 +146,7 @@ public final class Gui {
    * @author yz38
    *
    */
-  private static class SaveHandler implements TemplateViewRoute {
+  private static class SaveHandler implements Route {
     /**
      * Writes the JSON strings for each page on a new line of a file at the
      * given path (in req). If a file is present with the same path, it will be
@@ -128,24 +161,23 @@ public final class Gui {
      *         save was successful.
      */
     @Override
-    public ModelAndView handle(Request req, Response res) {
-      Map<String, Object> result;
+    public Object handle(Request req, Response res) {
       try {
         QueryParamsMap qm = req.queryMap();
-        Path path = Paths.get(qm.value("path")); // should the back-end keep track of the path?
+        Path path = Paths.get(qm.value("path")); // should the back-end keep
+        // track of the path?
         String Json = qm.value("pages");
 
         List<String> pages = Arrays.asList(GSON.fromJson(Json, String[].class));
 
         // TODO: It is unclear if this uses buffering, so saving huge files may
         // be problematic.
-        Files.write(path, pages, CHARSET);
+        Files.write(path, pages, StandardCharsets.UTF_8);
 
-        result = ImmutableMap.of("result", "Success!");
+        return "Success!";
       } catch (IOException e) {
-        result = ImmutableMap.of("result", "Failure: " + e.getMessage());
+        return "Failure: " + e.getMessage();
       }
-      return new ModelAndView(result, "main.ftl");
     }
   }
 }
