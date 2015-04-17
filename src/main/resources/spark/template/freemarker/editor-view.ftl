@@ -79,9 +79,9 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="action" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="action" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
-          <a href="#" class="action" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
+          <a href="#" class="action" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="action" id="Export" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+          <a href="#" class="action" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
     </div>

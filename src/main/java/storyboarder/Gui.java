@@ -48,7 +48,7 @@ public final class Gui {
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
     Spark.post("/load", new LoadHandler());
-    Spark.get("/save", new SaveHandler(), new FreeMarkerEngine());
+    Spark.get("/save", new SaveHandler(), new FreeMarkerEngine()); // should this be POST?
 
   }
 
@@ -132,7 +132,7 @@ public final class Gui {
       Map<String, Object> result;
       try {
         QueryParamsMap qm = req.queryMap();
-        Path path = Paths.get(qm.value("path"));
+        Path path = Paths.get(qm.value("path")); // should the back-end keep track of the path?
         String Json = qm.value("pages");
 
         List<String> pages = Arrays.asList(GSON.fromJson(Json, String[].class));

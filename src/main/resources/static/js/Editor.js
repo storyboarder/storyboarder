@@ -1,9 +1,28 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
+  /* Actions are one-time functions, unlike tools. */
+  var actions = {
+    "Undo": function(params) {
+      console.log("undo called");
+    },
+    "Redo": function(params) {
+      console.log("redo called");
+    },
+    "Load": function(params) {
+      console.log("load called");
+    },
+    "Save": function(params) {
+      console.log("save called");
+//      $.post( "/save", {}, function( data ) {
+//        console.log(data);
+//      });
+    },
+    "Export": function(params) {
+      console.log("save called");
+    },
+  };
 
 	var init = function(spec) {
-
-		console.log(spec);
 		var canvas = spec.canvas;
 		var width = spec.width;
 		var height = spec.height;
@@ -13,13 +32,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		canvas.height = height;
 		console.log(width, height);
 
-		console.log(canvas);
-		console.log(canvas.attr("id"));
-
 		canvasState.setPageMargin(pageMargin);
-		canvasState.setGridSpacing(20);
+		canvasState.setGridSpacing(20); //TODO un-hardcode
 		canvasState.setPanelMargin(panelMargin);
-		console.log("init canvas state");
 		canvasState.init(canvas.attr("id"), width, height);
 
 		console.log("init editor");
@@ -35,8 +50,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		toolset.activate(toolname);
 	};
 
-	var action = function(name) {
-    toolset.action(name);
+	var action = function(name, params) {
+	  if (name in actions) {
+      actions[name](params);
+    } else {
+      throw "Action not found: " + name;
+    }
 	};
 
 	var test = function() {

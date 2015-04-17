@@ -50,8 +50,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		});
 
 		$("a.action").click(function() {
-		  editor.action($(this).attr('id'));
-		  console.log($(this).attr('id'));
+		  editor.action($(this).attr('id'), {});
 		});
 
 		$(".toolset .title").click(function() {

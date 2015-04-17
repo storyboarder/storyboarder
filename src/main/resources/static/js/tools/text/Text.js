@@ -3,7 +3,7 @@ define(["../../CanvasState"], function (canvasState) {
 		var activate = function() {
 
 			// nothing should be moving
-			canvasState.filterMapElements(
+			canvasState.mapElements(
 				function(found) { // map
 					if(found.type === "group") {
 						found.set({selectable: true});
