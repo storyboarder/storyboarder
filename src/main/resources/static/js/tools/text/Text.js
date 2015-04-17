@@ -120,21 +120,24 @@ define(["../../CanvasState"], function (canvasState) {
 					//   top: initialPos.y
 					// });
 					
-
-					canvasState.addElement(input, 'text');					
+		
 					canvas.on('after:render', function() {
 						canvas.contextContainer.strokeStyle = '#555';
 
 						var bound = input.getBoundingRect();
+						bound.strokeDashArray = [5, 5];
 						canvas.contextContainer.strokeRect(
-							bound.left + 0.5,
-						    bound.top + 0.5,
+							bound.left + 0.7,
+						    bound.top + 0.7,
 						    bound.width,
 						    bound.height
 						);
 					});	
-					}				
-				}
+
+					canvasState.addElement(input, 'text');	
+
+					} // if within range				
+				} // else
 			}); // mouseup
 
 			document.onkeydown = function (e) {

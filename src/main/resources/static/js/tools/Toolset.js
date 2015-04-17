@@ -6,8 +6,7 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
-		"Text": require("./text/Text"),
-		"Photo": require("./image/Photo")
+		"Text": require("./text/Text")
 	};
 
 	var activate = function(toolname) {
