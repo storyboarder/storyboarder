@@ -23,13 +23,35 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"Save": function(pageNum, pageObject) {
 			console.log("save called");
 			pageJSON = JSON.stringify(pageObject);
-			$.post("/save", {page: pageNum, json: pageJSON}, function(data) {
+			$.post("/save", {
+				page: pageNum,
+				json: pageJSON
+			}, function(data) {
 				console.log(data);
 			});
 		},
 		"Export": function(params) {
 			console.log("save called");
 		},
+		"Add Image": function(params) {
+			console.log("ADDING IMAGE!!!");
+			console.log(params);
+			if (params.url && params.url != "http://") {
+				console.log(params.url);
+				fabric.Image.fromURL(params.url, function(img) {
+					img.set({
+						left: 30,
+						top: 40,
+						scaleX: 0.3,
+						scaleY: 0.3
+					});
+					canvasState.addElement(img, "image");
+				});
+
+			} else if (params.file) {
+				console.log(params.file);
+			}
+		}
 	};
 
 	var init = function(spec) {
@@ -82,8 +104,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
+		<< << << < HEAD
 		action,
 		action,
+		=== === =
+		action: action,
+		>>> >>> > origin / master
 		test: test
 	};
 
