@@ -1,12 +1,15 @@
 package storyboarder;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +37,8 @@ import spark.template.freemarker.FreeMarkerEngine;
 final class StoryboarderGUI {
 
   private static final Gson GSON = new Gson();
+
+  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   private final int port;
 
@@ -104,7 +109,7 @@ final class StoryboarderGUI {
    * @author yz38
    *
    */
-  private static class LoadHandler implements Route {
+  private class LoadHandler implements Route {
 
     /**
      * @param req
@@ -117,21 +122,23 @@ final class StoryboarderGUI {
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      String path = qm.value("path");
+      List<String> pages = new ArrayList<String>();
 
-      try {
-        Files.newBufferedReader(Paths.get(path), StandardCharsets.UTF_8);
-        // Apparently this uses buffering so it is good even for large projects.
-        List<String> pages = Files.readAllLines(Paths.get(path),
-            StandardCharsets.UTF_8);
-        if (qm.value("page") != null) {
-          int page = Integer.parseInt(qm.value("page"));
-          return GSON.toJson(pages.get(page));
-        } else {
-          return GSON.toJson(pages);
+      try (BufferedReader reader = Files.newBufferedReader(project.toPath(),
+          CHARSET)) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          pages.add(line);
         }
       } catch (IOException e) {
         return GSON.toJson(new String[] {"Failure: " + e.getMessage()});
+      }
+
+      if (qm.value("page").equals("all")) {
+        return GSON.toJson(pages);
+      } else {
+        int page = GSON.fromJson(qm.value("page"), Integer.class);
+        return GSON.toJson(pages.get(page));
       }
     }
   }
@@ -146,7 +153,7 @@ final class StoryboarderGUI {
    * @author yz38
    *
    */
-  private static class SaveHandler implements Route {
+  private class SaveHandler implements Route {
     /**
      * Writes the JSON strings for each page on a new line of a file at the
      * given path (in req). If a file is present with the same path, it will be
@@ -162,22 +169,18 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      try {
-        QueryParamsMap qm = req.queryMap();
-        Path path = Paths.get(qm.value("path")); // should the back-end keep
-        // track of the path?
-        String Json = qm.value("pages");
+      QueryParamsMap qm = req.queryMap();
+      int page = GSON.fromJson(qm.value("page"), Integer.class);
+      String Json = qm.value("json");
 
-        List<String> pages = Arrays.asList(GSON.fromJson(Json, String[].class));
-
-        // TODO: It is unclear if this uses buffering, so saving huge files may
-        // be problematic.
-        Files.write(path, pages, StandardCharsets.UTF_8);
-
-        return "Success!";
+      OpenOption options = StandardOpenOption.WRITE;
+      try (BufferedWriter writer = Files.newBufferedWriter(project.toPath(),
+          CHARSET, options)) {
+        return null;
       } catch (IOException e) {
         return "Failure: " + e.getMessage();
       }
+
     }
   }
 
