@@ -1,8 +1,7 @@
 //TODO: fix bug with resizing panels outside of valid page area
 
-define(["../../CanvasState"], function(CanvasState) {
+define(["../../CanvasState"], function(canvasState) {
 
-	var canvasState;
 	var canvas;
 
 	// var resizeSameDirection = function(dir, obj, newEdges) {
@@ -53,7 +52,7 @@ define(["../../CanvasState"], function(CanvasState) {
 	var resizePanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
-				//resizeOneDirection(n, obj, newEdges, true);
+				resizeOneDirection(n, obj, newEdges, true);
 				resizeOneDirection(n, obj, newEdges, false);
 			}
 		}
@@ -151,7 +150,6 @@ define(["../../CanvasState"], function(CanvasState) {
 	return {
 		name: "Select",
 		init: function() {
-			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,

@@ -1,6 +1,5 @@
-define(["../../CanvasState"], function(CanvasState) {
+define(["../../CanvasState"], function(canvasState) {
 
-	var canvasState;
 	var canvas;
 
 	var deactivate = function() {
@@ -10,7 +9,6 @@ define(["../../CanvasState"], function(CanvasState) {
 	return {
 		name: "Redo",
 		init: function() {
-			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,

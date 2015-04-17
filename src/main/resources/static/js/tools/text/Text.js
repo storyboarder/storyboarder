@@ -1,4 +1,4 @@
-define(["../../CanvasState"], function (CanvasState) {
+define(["../../CanvasState"], function (canvasState) {
 		
 		var activate = function() {
 
@@ -133,7 +133,7 @@ define(["../../CanvasState"], function (CanvasState) {
 			   		console.log(selected.type);
 			   		canvasState.deleteElement(selected);
 			   	}
-			}
+			};
 
 		};
 
@@ -145,11 +145,10 @@ define(["../../CanvasState"], function (CanvasState) {
 	return {
 		init: function () {
 			console.log("init text");
-			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,
 		deactivate: deactivate
-	}
+	};
 	
 });

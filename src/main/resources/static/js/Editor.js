@@ -1,4 +1,4 @@
-define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
+define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 
 	var init = function(spec) {
@@ -16,10 +16,10 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 		console.log(canvas);
 		console.log(canvas.attr("id"));
 
-		canvasState = CanvasState.getCanvasState();
 		canvasState.setPageMargin(pageMargin);
 		canvasState.setGridSpacing(20);
 		canvasState.setPanelMargin(panelMargin);
+		console.log("init canvas state");
 		canvasState.init(canvas.attr("id"), width, height);
 
 		console.log("init editor");
@@ -50,6 +50,6 @@ define(["./CanvasState", "./tools/Toolset"], function(CanvasState, toolset) {
 		init: init,
 		activate: activate,
 		test: test
-	}
+	};
 
 });

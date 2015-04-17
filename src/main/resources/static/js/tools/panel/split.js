@@ -1,6 +1,5 @@
-define(["../../CanvasState"], function(CanvasState) {
+define(["../../CanvasState"], function(canvasState) {
 	var previewDivideLine;
-	var canvasState;
 	var canvas;
 	var threshold = 2;
 
@@ -159,7 +158,6 @@ define(["../../CanvasState"], function(CanvasState) {
 	return {
 		name: "Split",
 		init: function() {
-			canvasState = CanvasState.getCanvasState();
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,
