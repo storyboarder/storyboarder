@@ -6,7 +6,8 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
-		"Text": require("./text/Text")
+		"Text": require("./text/Text"),
+		"Photo": require("./image/Photo")
 	};
 
 	var activate = function(toolname) {
@@ -26,6 +27,8 @@ define(function(require) {
 		init: function() {
 			console.log("initing tools");
 			for (var i in toolset) {
+				console.log(i);
+				console.log(toolset[i]);
 				toolset[i].init();
 			}
 		},
@@ -35,6 +38,8 @@ define(function(require) {
 			activate("Split");
 			currentTool.test();
 			activate("Join");
+			currentTool.test();
+			activate("Test");
 			currentTool.test();
 		}
 	};

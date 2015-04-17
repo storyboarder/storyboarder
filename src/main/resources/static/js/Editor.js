@@ -72,7 +72,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action, action,
+		action: action,
 		test: test
 	};
 

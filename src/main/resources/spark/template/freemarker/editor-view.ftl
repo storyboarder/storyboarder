@@ -59,7 +59,8 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="tool" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+           <input type="file" id="Photo" name="imageLoader" />
+          //<a href="#" class="tool" id="Photo" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
           <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
