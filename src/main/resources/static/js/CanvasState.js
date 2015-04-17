@@ -1,4 +1,4 @@
-define(["jquery", "fabricjs"], function ($) {
+define(["jquery", "fabricjs"], function($) {
 
 	var canvas;
 	var pageMargin;
@@ -11,7 +11,7 @@ define(["jquery", "fabricjs"], function ($) {
 	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	var addElement = function(e, type) {
-	  e.type = type;
+		e.type = type;
 		elements.push(e);
 		canvas.add(e);
 	};
@@ -104,22 +104,22 @@ define(["jquery", "fabricjs"], function ($) {
 	};
 
 	var deleteElement = function(e) {
-//	  console.log(e);
+		//	  console.log(e);
 		var idx = elements.indexOf(e);
-//		console.log(idx, elements);
+		//		console.log(idx, elements);
 		if (idx >= 0) {
-		  el = elements.splice(idx, 1);
-//	    console.log(el);
-		  canvas.remove(el[0]);
+			el = elements.splice(idx, 1);
+			//	    console.log(el);
+			canvas.remove(el[0]);
 		} else {
-		  throw "couldn't find element:" + e;
+			throw "couldn't find element:" + e;
 		}
-//		console.log(elements.length);
+		//		console.log(elements.length);
 	}
 
 	var CanvasState = {
-		getCanvas: function () {
-		  return canvas;
+		getCanvas: function() {
+			return canvas;
 		},
 
 		getSnapToGrid: function() {
@@ -137,11 +137,11 @@ define(["jquery", "fabricjs"], function ($) {
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
 		mapElements: function(m) {
-		  elements.map(m);
+			elements.map(m);
 		},
 
 		filterElements: function(e) {
-		  return elements.filter(e);
+			return elements.filter(e);
 		},
 
 		getOppositeDirection: getOppositeDirection,
@@ -155,14 +155,19 @@ define(["jquery", "fabricjs"], function ($) {
 		setControls: setControls,
 
 		getPageEdge: function(c) {
-		  return pageEdges[c];
+			return pageEdges[c];
 		},
 
 		deleteElement: deleteElement,
 
 		init: function(canvasId, width, height) {
-			canvas = new fabric.Canvas(canvasId, {selection:false});
-			canvas.setDimensions({width: width, height: height});
+			canvas = new fabric.Canvas(canvasId, {
+				selection: false
+			});
+			canvas.setDimensions({
+				width: width,
+				height: height
+			});
 			console.log(canvas);
 			console.log(canvas.getWidth());
 			elements = [];
@@ -179,10 +184,13 @@ define(["jquery", "fabricjs"], function ($) {
 			console.log(canvas);
 
 			/* adding a circle because why not */
-		 	var circle = new fabric.Circle({
-				radius: 20, fill: 'green', left: 100, top: 100
-		 	});
-		 	canvas.add(circle);
+			var circle = new fabric.Circle({
+				radius: 20,
+				fill: 'green',
+				left: 100,
+				top: 100
+			});
+			canvas.add(circle);
 		},
 
 		addElement: addElement,
@@ -197,27 +205,27 @@ define(["jquery", "fabricjs"], function ($) {
 			gridSpacing = p;
 		},
 		getPageMargin: function() {
-		   return pageMargin;
-	    },
+			return pageMargin;
+		},
 		getPanelMargin: function() {
-		   return panelMargin;
-	    },
+			return panelMargin;
+		},
 
-    saveCanvas: function() {
-      return JSON.stringify(canvas);
-    },
+		saveCanvas: function() {
+			return JSON.stringify(canvas);
+		},
 
-    loadCanvas: function(json) {
-      canvas.loadFromJson(json, function(){
-        canvas.renderAll();
-      });
-    }
+		loadCanvas: function(json) {
+			canvas.loadFromJson(json, function() {
+				canvas.renderAll();
+			});
+		}
 	};
 
 	return {
 		/* this ensures all tools will get the same object */
-		getCanvasState: function() { 
-			return CanvasState; 
+		getCanvasState: function() {
+			return CanvasState;
 		}
 	};
 });
