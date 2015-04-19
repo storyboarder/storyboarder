@@ -1,17 +1,9 @@
 package storyboarder;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -36,41 +28,17 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 final class StoryboarderGUI {
 
-  private static final Gson GSON = new Gson();
+  private static final int AUTO_SAVE_TIME = 60000;
 
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
+  private static final Gson GSON = new Gson();
 
   private final int port;
 
-  private File project;
+  private final StoryboarderProject project;
 
-  StoryboarderGUI(int port) {
+  StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
-  }
-
-  StoryboarderGUI loadProject(String path) {
-    project = new File(path);
-    assertions();
-    return this;
-  }
-
-  StoryboarderGUI createProject(String path) throws IOException {
-    project = new File(path);
-    if (!project.mkdirs()) {
-      throw new IOException("Could not create the necessary directories.");
-    }
-    if (!project.createNewFile()) {
-      throw new IOException("Could not create the file.");
-    }
-    assertions();
-    return this;
-  }
-
-  private void assertions() {
-    assert project.isFile();
-    assert project.exists();
-    assert project.canRead();
-    assert project.canWrite();
+    this.project = project;
   }
 
   void start() {
@@ -80,6 +48,22 @@ final class StoryboarderGUI {
 
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
+
+    TimerTask saveTask = new TimerTask() {
+      @Override
+      public void run() {
+        System.out.println("Saving to disk...");
+        try {
+          project.saveToDisk();
+        } catch (IOException e) {
+          System.err.println("ERROR: saving: " + e.getMessage());
+        }
+      }
+    };
+
+    Timer saveTimer = new Timer();
+    saveTimer.schedule(saveTask, AUTO_SAVE_TIME);
+
   }
 
   /**
@@ -122,23 +106,11 @@ final class StoryboarderGUI {
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      List<String> pages = new ArrayList<String>();
-
-      try (BufferedReader reader = Files.newBufferedReader(project.toPath(),
-          CHARSET)) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          pages.add(line);
-        }
-      } catch (IOException e) {
-        return GSON.toJson(new String[] {"Failure: " + e.getMessage()});
-      }
-
-      if (qm.value("page").equals("all")) {
-        return GSON.toJson(pages);
+      int page = GSON.fromJson(qm.value("page"), Integer.class);
+      if (page < project.numberOfPages()) {
+        return project.getPage(page);
       } else {
-        int page = GSON.fromJson(qm.value("page"), Integer.class);
-        return GSON.toJson(pages.get(page));
+        return "index out of bounds!";
       }
     }
   }
@@ -171,16 +143,9 @@ final class StoryboarderGUI {
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
       int page = GSON.fromJson(qm.value("page"), Integer.class);
-      String Json = qm.value("json");
-
-      OpenOption options = StandardOpenOption.WRITE;
-      try (BufferedWriter writer = Files.newBufferedWriter(project.toPath(),
-          CHARSET, options)) {
-        return null;
-      } catch (IOException e) {
-        return "Failure: " + e.getMessage();
-      }
-
+      String json = qm.value("json");
+      project.saveOrAdd(page, json);
+      return null;
     }
   }
 
