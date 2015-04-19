@@ -3,6 +3,8 @@ package storyboarder;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.NoSuchFileException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -68,24 +70,32 @@ public final class Main {
 
     if (options.has(newProjectSpec)) {
       project = new StoryboarderProject(options.valueOf(newProjectSpec));
-      project.create();
+      try {
+        project.create();
+      } catch (FileAlreadyExistsException e) {
+        exit("file already exists!");
+      }
     } else if (options.has(loadSpec)) {
       project = new StoryboarderProject(options.valueOf(loadSpec));
-      project.load();
+      try {
+        project.load();
+      } catch (NoSuchFileException e) {
+        exit("file does not exist!");
+      }
     } else {
       exit("specify whether to load or create a project");
     }
 
-    StoryboarderGUI gui = new StoryboarderGUI(sparkPort, project);
+    // StoryboarderGUI gui = new StoryboarderGUI(sparkPort, project);
 
-    gui.start();
+    // gui.start();
 
-    int socketPort = DEFAULT_SOCKET_PORT;
-    if (options.has(socketSpec)) {
-      socketPort = options.valueOf(socketSpec);
-    }
-    Multiplayer server = new Multiplayer(socketPort);
-    server.start();
+    // int socketPort = DEFAULT_SOCKET_PORT;
+    // if (options.has(socketSpec)) {
+    // socketPort = options.valueOf(socketSpec);
+    // }
+    // Multiplayer server = new Multiplayer(socketPort);
+    // server.start();
   }
 
 }
