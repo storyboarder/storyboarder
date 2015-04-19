@@ -23,12 +23,15 @@ class StoryboarderProject {
 
   StoryboarderProject(String path) throws IOException {
     file = Paths.get(path);
-    if (Files.exists(file)) {
-      System.out.println("Found existing project");
-    } else {
-      Files.createDirectories(file.getParent());
-      Files.createFile(file);
-    }
+  }
+
+  void load() throws IOException {
+    readFile();
+  }
+
+  void create() throws IOException {
+    Files.createDirectories(file.getParent());
+    Files.createFile(file);
     readFile();
   }
 
@@ -57,6 +60,7 @@ class StoryboarderProject {
   }
 
   void saveToDisk() throws IOException {
+    System.out.println(pages);
     OpenOption options = StandardOpenOption.WRITE;
     PrintWriter writer = new PrintWriter(Files.newBufferedWriter(file, CHARSET,
         options));

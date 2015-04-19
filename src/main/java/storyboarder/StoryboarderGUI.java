@@ -48,6 +48,7 @@ final class StoryboarderGUI {
 
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
+    Spark.post("/quit", new QuitHandler());
 
     TimerTask saveTask = new TimerTask() {
       @Override
@@ -145,18 +146,33 @@ final class StoryboarderGUI {
       int page = GSON.fromJson(qm.value("page"), Integer.class);
       String json = qm.value("json");
       project.saveOrAdd(page, json);
-      return null;
+      return "success!";
     }
   }
 
-  private static class SavePageHandler implements Route {
+  private class QuitHandler implements Route {
 
     @Override
-    public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      String page = qm.value("page");
-      System.out.println(page);
-      return GSON.toJson("saved");
+    public Object handle(Request arg0, Response arg1) {
+      try {
+        project.saveToDisk();
+        Spark.stop();
+        return "success!";
+      } catch (IOException e) {
+        return "failure!";
+      }
+    }
+
+  }
+
+  String quit() {
+    System.out.println("Hi");
+    try {
+      project.saveToDisk();
+      Spark.stop();
+      return "success!";
+    } catch (IOException e) {
+      return "failure!";
     }
   }
 }
