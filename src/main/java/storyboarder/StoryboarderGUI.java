@@ -67,6 +67,17 @@ final class StoryboarderGUI {
 
   }
 
+  String quit() {
+    System.out.println("Hi");
+    try {
+      project.saveToDisk();
+      Spark.stop();
+      return "success!";
+    } catch (IOException e) {
+      return "failure!";
+    }
+  }
+
   /**
    * Sends set up data to the spark site.
    *
@@ -118,7 +129,7 @@ final class StoryboarderGUI {
 
   /**
    * Saves a Storyboarder project to a given path. If a file is present with the
-   * same path, it will be overwritten. (TODO test that claim)
+   * same path, it will be overwritten.
    *
    * @author fbystric
    * @author ktsakas
@@ -163,16 +174,5 @@ final class StoryboarderGUI {
       }
     }
 
-  }
-
-  String quit() {
-    System.out.println("Hi");
-    try {
-      project.saveToDisk();
-      Spark.stop();
-      return "success!";
-    } catch (IOException e) {
-      return "failure!";
-    }
   }
 }
