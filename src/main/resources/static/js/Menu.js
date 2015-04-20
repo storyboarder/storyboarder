@@ -145,7 +145,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
 
 						init_project();
-					};
+					});
 
 					return {
 						init: init
