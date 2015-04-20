@@ -39,7 +39,7 @@ public final class Main {
   }
 
   public static void main(String[] args) throws UnsupportedEncodingException,
-    FileNotFoundException, IOException {
+  FileNotFoundException, IOException {
 
     OptionParser parser = new OptionParser();
 
@@ -86,9 +86,9 @@ public final class Main {
       exit("specify whether to load or create a project");
     }
 
-    // StoryboarderGUI gui = new StoryboarderGUI(sparkPort, project);
+    StoryboarderGUI gui = new StoryboarderGUI(sparkPort, project);
 
-    // gui.start();
+    gui.start();
 
     // int socketPort = DEFAULT_SOCKET_PORT;
     // if (options.has(socketSpec)) {
