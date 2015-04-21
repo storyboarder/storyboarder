@@ -32,7 +32,6 @@ class StoryboarderProject {
   void create() throws IOException {
     Files.createDirectories(file.getParent());
     Files.createFile(file);
-    readFile();
   }
 
   String getPage(int page) {

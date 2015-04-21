@@ -1,6 +1,8 @@
 package storyboarder;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,11 +36,17 @@ final class StoryboarderGUI {
 
   private final int port;
 
-  private final StoryboarderProject project;
+  private StoryboarderProject project;
+
+  private static final String NULL_PROJ_MSG = "ERROR: Need to initialize the project!";
 
   StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
     this.project = project;
+  }
+
+  StoryboarderGUI(int port) {
+    this.port = port;
   }
 
   void start() {
@@ -46,25 +54,39 @@ final class StoryboarderGUI {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
+    Spark.post("/init", new InitHandler());
+
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
     Spark.post("/quit", new QuitHandler());
+  }
 
+  void startAutoSave() {
     TimerTask saveTask = new TimerTask() {
       @Override
       public void run() {
-        System.out.println("Saving to disk...");
-        try {
-          project.saveToDisk();
-        } catch (IOException e) {
-          System.err.println("ERROR: saving: " + e.getMessage());
-        }
+        saveToDisk();
       }
     };
-
     Timer saveTimer = new Timer();
     saveTimer.schedule(saveTask, AUTO_SAVE_TIME);
+  }
 
+  String saveToDisk() {
+    if (project != null) {
+      System.out.println("Saving to disk...");
+      try {
+        project.saveToDisk();
+      } catch (IOException e) {
+        String msg = "ERROR: saving: " + e.getMessage();
+        System.err.println(msg);
+        return msg;
+      }
+    } else {
+      System.err.println(NULL_PROJ_MSG);
+      return NULL_PROJ_MSG;
+    }
+    return "Success!";
   }
 
   String quit() {
@@ -96,6 +118,40 @@ final class StoryboarderGUI {
     }
   }
 
+  private class InitHandler implements Route {
+
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      try {
+        project = new StoryboarderProject(qm.value("path"));
+      } catch (IOException e) {
+        return "Failed to create/find the path.";
+      }
+
+      if (qm.value("type").equals("create")) {
+        try {
+          project.create();
+        } catch (FileAlreadyExistsException e) {
+          return "Project of the same name already exists!";
+        } catch (IOException e) {
+          return "Failed to create the project.";
+        }
+      } else if (qm.value("type").equals("load")) {
+        try {
+          project.load();
+        } catch (NoSuchFileException e) {
+          return "Could not find the project.";
+        } catch (IOException e) {
+          return "Failed to load the project.";
+        }
+      }
+      startAutoSave();
+      return "Success!";
+    }
+
+  }
+
   /**
    * Loads a Storyboarder project from a given path.
    *
@@ -117,12 +173,16 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      int page = GSON.fromJson(qm.value("page"), Integer.class);
-      if (page < project.numberOfPages()) {
-        return project.getPage(page);
+      if (project != null) {
+        QueryParamsMap qm = req.queryMap();
+        int page = GSON.fromJson(qm.value("page"), Integer.class);
+        if (page < project.numberOfPages()) {
+          return project.getPage(page);
+        } else {
+          return "index out of bounds!";
+        }
       } else {
-        return "index out of bounds!";
+        return NULL_PROJ_MSG;
       }
     }
   }
@@ -153,11 +213,15 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      int page = GSON.fromJson(qm.value("page"), Integer.class);
-      String json = qm.value("json");
-      project.saveOrAdd(page, json);
-      return "success!";
+      if (project != null) {
+        QueryParamsMap qm = req.queryMap();
+        int page = GSON.fromJson(qm.value("page"), Integer.class);
+        String json = qm.value("json");
+        project.saveOrAdd(page, json);
+        return "success!";
+      } else {
+        return NULL_PROJ_MSG;
+      }
     }
   }
 
@@ -165,13 +229,8 @@ final class StoryboarderGUI {
 
     @Override
     public Object handle(Request arg0, Response arg1) {
-      try {
-        project.saveToDisk();
-        Spark.stop();
-        return "success!";
-      } catch (IOException e) {
-        return "failure!";
-      }
+      Spark.stop();
+      return saveToDisk();
     }
 
   }
