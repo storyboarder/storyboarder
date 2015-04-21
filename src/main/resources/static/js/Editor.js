@@ -1,26 +1,26 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
-  /* Actions are one-time functions, unlike tools. */
-  var actions = {
-    "Undo": function(params) {
-    	console.log("undo called");
-    },
-    "Redo": function(params) {
-      console.log("redo called");
-    },
-    "ToggleGrid": function(params) {
-      console.log("toggle-grid");
-      if (params.checked) {
-        canvasState.drawGrid();
-      } else {
-        canvasState.clearGrid();
-      }
-    },
-    "GridSpacing": function(params) {
-      canvasState.setGridSpacing(params.value);
-      canvasState.clearGrid();
-      canvasState.drawGrid();
-    },
+	/* Actions are one-time functions, unlike tools. */
+	var actions = {
+		"Undo": function(params) {
+			console.log("undo called");
+		},
+		"Redo": function(params) {
+			console.log("redo called");
+		},
+		"ToggleGrid": function(params) {
+			console.log("toggle-grid");
+			if (params.checked) {
+				canvasState.drawGrid();
+			} else {
+				canvasState.clearGrid();
+			}
+		},
+		"GridSpacing": function(params) {
+			canvasState.setGridSpacing(params.value);
+			canvasState.clearGrid();
+			canvasState.drawGrid();
+		},
 		"Load": function(pageNum) {
 			console.log("load called");
 			$.post("/load", {
@@ -44,9 +44,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			});
 		},
 		"Export": function(params) {
-			console.log("save called");
+			console.log("export called");
 		},
-		"Add Image": function(params) {
+		"AddImage": function(params) {
 			console.log("ADDING IMAGE!!!");
 			console.log(params);
 			if (params.url && params.url != "http://") {
@@ -66,7 +66,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		}
 	};
-
 	var init = function(spec) {
 		var canvas = spec.canvas;
 		var width = spec.width;
@@ -107,6 +106,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var test = function() {
+		console.log("testing load on empty file. Expecting index out of bounds. Result: ");
+		actions.Load();
 		toolset.test();
 		// console.log("editor tested");
 		// console.log("toolset is now " + toolset);
