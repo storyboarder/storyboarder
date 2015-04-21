@@ -42,3 +42,7 @@ require.config({
 	}
 });
 
+function quit() {
+  $.post("/quit", {}, function(responseJSON){});
+}
+

@@ -35,6 +35,8 @@ class StoryboarderProject {
   }
 
   String getPage(int page) {
+    // System.out.println("\ngetting page from this list:");
+    // System.out.println(pages);
     return pages.get(page);
   }
 
