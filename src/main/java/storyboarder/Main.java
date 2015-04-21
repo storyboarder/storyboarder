@@ -1,11 +1,5 @@
 package storyboarder;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.NoSuchFileException;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -38,16 +32,9 @@ public final class Main {
     System.exit(1);
   }
 
-  public static void main(String[] args) throws UnsupportedEncodingException,
-  FileNotFoundException, IOException {
+  public static void main(String[] args) {
 
     OptionParser parser = new OptionParser();
-
-    OptionSpec<String> loadSpec = parser.accepts(LOAD_FLAG).withRequiredArg()
-        .ofType(String.class);
-
-    OptionSpec<String> newProjectSpec = parser.accepts(NEW_PROJECT_FLAG)
-        .withRequiredArg().ofType(String.class);
 
     OptionSpec<Integer> sparkSpec = parser.accepts(SPARK_PORT_FLAG)
         .withRequiredArg().ofType(Integer.class);
@@ -57,36 +44,12 @@ public final class Main {
 
     OptionSet options = parser.parse(args);
 
-    if (options.has(loadSpec) && options.has(newProjectSpec)) {
-      exit("can't start a new project and load one at the same time.");
-    }
-
     int sparkPort = DEFAULT_SPARK_PORT;
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
 
-    StoryboarderProject project = null;
-
-    if (options.has(newProjectSpec)) {
-      project = new StoryboarderProject(options.valueOf(newProjectSpec));
-      try {
-        project.create();
-      } catch (FileAlreadyExistsException e) {
-        exit("file already exists!");
-      }
-    } else if (options.has(loadSpec)) {
-      project = new StoryboarderProject(options.valueOf(loadSpec));
-      try {
-        project.load();
-      } catch (NoSuchFileException e) {
-        exit("file does not exist!");
-      }
-    } else {
-      exit("specify whether to load or create a project");
-    }
-
-    StoryboarderGUI gui = new StoryboarderGUI(sparkPort, project);
+    StoryboarderGUI gui = new StoryboarderGUI(sparkPort);
 
     gui.start();
 

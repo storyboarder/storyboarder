@@ -1,6 +1,8 @@
 package storyboarder;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,11 +36,15 @@ final class StoryboarderGUI {
 
   private final int port;
 
-  private final StoryboarderProject project;
+  private StoryboarderProject project;
 
   StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
     this.project = project;
+  }
+
+  StoryboarderGUI(int port) {
+    this.port = port;
   }
 
   void start() {
@@ -46,25 +52,40 @@ final class StoryboarderGUI {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
+    Spark.post("/init", new InitHandler());
+
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
     Spark.post("/quit", new QuitHandler());
+  }
 
+  void startAutoSave() {
     TimerTask saveTask = new TimerTask() {
       @Override
       public void run() {
-        System.out.println("Saving to disk...");
-        try {
-          project.saveToDisk();
-        } catch (IOException e) {
-          System.err.println("ERROR: saving: " + e.getMessage());
-        }
+        saveToDisk();
       }
     };
-
     Timer saveTimer = new Timer();
     saveTimer.schedule(saveTask, AUTO_SAVE_TIME);
+  }
 
+  String saveToDisk() {
+    if (project != null) {
+      System.out.println("Saving to disk...");
+      try {
+        project.saveToDisk();
+      } catch (IOException e) {
+        String msg = "ERROR: saving: " + e.getMessage();
+        System.err.println(msg);
+        return msg;
+      }
+    } else {
+      String msg = "ERROR: Need to initialize the project!";
+      System.err.println(msg);
+      return msg;
+    }
+    return "Success!";
   }
 
   String quit() {
@@ -94,6 +115,40 @@ final class StoryboarderGUI {
       Map<String, Object> variables = ImmutableMap.of("title", "Storyboarder");
       return new ModelAndView(variables, "main.ftl");
     }
+  }
+
+  private class InitHandler implements Route {
+
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      try {
+        project = new StoryboarderProject(qm.value("path"));
+      } catch (IOException e) {
+        return "Failed to create/find the path.";
+      }
+
+      if (qm.value("type").equals("create")) {
+        try {
+          project.create();
+        } catch (FileAlreadyExistsException e) {
+          return "Project of the same name already exists!";
+        } catch (IOException e) {
+          return "Failed to create the project.";
+        }
+      } else if (qm.value("type").equals("load")) {
+        try {
+          project.load();
+        } catch (NoSuchFileException e) {
+          return "Could not find the project.";
+        } catch (IOException e) {
+          return "Failed to load the project.";
+        }
+      }
+      startAutoSave();
+      return "Success!";
+    }
+
   }
 
   /**
@@ -165,13 +220,8 @@ final class StoryboarderGUI {
 
     @Override
     public Object handle(Request arg0, Response arg1) {
-      try {
-        project.saveToDisk();
-        Spark.stop();
-        return "success!";
-      } catch (IOException e) {
-        return "failure!";
-      }
+      Spark.stop();
+      return saveToDisk();
     }
 
   }
