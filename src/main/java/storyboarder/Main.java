@@ -1,5 +1,7 @@
 package storyboarder;
 
+import java.net.UnknownHostException;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -11,10 +13,6 @@ import joptsimple.OptionSpec;
  * @author fbystric
  */
 public final class Main {
-
-  private static final String LOAD_FLAG = "load";
-
-  private static final String NEW_PROJECT_FLAG = "create";
 
   private static final String SPARK_PORT_FLAG = "port";
 
@@ -53,12 +51,16 @@ public final class Main {
 
     gui.start();
 
-    // int socketPort = DEFAULT_SOCKET_PORT;
-    // if (options.has(socketSpec)) {
-    // socketPort = options.valueOf(socketSpec);
-    // }
-    // Multiplayer server = new Multiplayer(socketPort);
-    // server.start();
+    try {
+      int socketPort = DEFAULT_SOCKET_PORT;
+      if (options.has(socketSpec)) {
+        socketPort = options.valueOf(socketSpec);
+      }
+      Multiplayer server = new Multiplayer(socketPort);
+      // server.start();
+    } catch (UnknownHostException e) {
+      exit("could not start the multiplayer server: " + e.getMessage());
+    }
   }
 
 }
