@@ -51,6 +51,40 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		}
 	};
 
+	var forms = {
+	  "CreateProject": function(form) {
+      console.log($("#page-width").val(), $("#page-height").val());
+      // TODO call editor create project
+      $('.ui.modal.page-setup').modal('hide');
+      $('#page').width(parseInt($("#page-width").val()));
+      $('#page').height(parseInt($("#page-height").val()));
+      console.log($('#canvas').width());
+      editor.init({
+        canvas: $("#canvas"),
+        width: parseInt($("#page-width").val()),
+        height: parseInt($("#page-height").val()),
+        pageMargin: parseInt($("#page-margin").val()),
+        panelMargin: parseInt($("#panel-margin").val())
+      });
+
+	  },
+	  "LoadProject": function(form) {
+      console.log($("#project-file").val());
+      // TODO call editor load project
+      $('.ui.modal.page-setup').modal('hide');
+      $('#page').width(parseInt($("#page-width").val()));
+      $('#page').height(parseInt($("#page-height").val()));
+      console.log($('#canvas').width());
+      editor.init({
+        canvas: $("#canvas"),
+        width: parseInt($("#page-width").val()),
+        height: parseInt($("#page-height").val()),
+        pageMargin: parseInt($("#page-margin").val()),
+        panelMargin: parseInt($("#panel-margin").val())
+      });
+	  },
+	};
+
 
 	var init_project = function() {
 		console.log($('.ui.modal.page-setup'));
@@ -59,34 +93,23 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			.modal('show');
 
 		console.log(editor);
-		$('.create-page').click(function() {
-			$('.ui.modal.page-setup').modal('hide');
-			$('#page').width(parseInt($("#page-width").val()));
-			$('#page').height(parseInt($("#page-height").val()));
-			console.log($('#canvas').width());
-			editor.init({
-				canvas: $("#canvas"),
-				width: parseInt($("#page-width").val()),
-				height: parseInt($("#page-height").val()),
-				pageMargin: parseInt($("#page-margin").val()),
-				panelMargin: parseInt($("#panel-margin").val())
-			});
-		});
 	};
 
 
 	var init = function() {
 		console.log("Menu initing");
 
-		//    $(".tools a").popup({
-		//      padding: "2px",
-		//    });
 
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
 			}
 		});
+
+    /* Toolbar init */
+    $(".tools a").popup({
+      padding: "4px",
+    });
 
 		$('.ui.checkbox')
 			.checkbox();
@@ -140,6 +163,17 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
     $("a.remove-page").click(function() {
       console.log("remove page");
+    });
+
+
+    /* Form inits */
+
+    $(".form-action").click(function() {
+      console.log("form submitted");
+      var id = $(this).attr("id");
+      console.log(id);
+      forms[id]();
+
     });
 
     init_project();
