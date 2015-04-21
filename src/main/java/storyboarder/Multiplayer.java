@@ -14,8 +14,8 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 /**
- * A simple WebSocketServer implementation. Keeps track of a "chatroom".
- */
+* A simple WebSocketServer implementation. Keeps track of a "chatroom".
+*/
 public class Multiplayer extends WebSocketServer {
 
   public Multiplayer( int port ) throws UnknownHostException {
@@ -85,7 +85,7 @@ public class Multiplayer extends WebSocketServer {
 
   /**
    * Sends <var>text</var> to all currently connected WebSocket clients.
-   * 
+   *
    * @param text
    *            The String to send across the network.
    * @throws InterruptedException

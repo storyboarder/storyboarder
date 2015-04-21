@@ -14,8 +14,8 @@ public final class Main {
   }
 
   public static void main(String[] args) throws UnknownHostException {
-    Multiplayer server = new Multiplayer(8887);
-    server.start();
+    //Multiplayer server = new Multiplayer(8887);
+//    server.start();
     
     Gui.runSparkServer(8000);
   }

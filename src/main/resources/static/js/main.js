@@ -7,6 +7,12 @@ require.config({
 		view: "view",
 		semanticui: "semantic"
 	},
+	shim: {
+	  "semanticui": {
+	    deps: ["jquery"],
+	    exports: "semanticui"
+	  }
+	},
 
 	callback: function() {
     // should prompt user for project initialization

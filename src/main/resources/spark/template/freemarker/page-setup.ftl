@@ -1,7 +1,7 @@
 <div class="ui standard modal page-setup">
 
 <div class="header">
-  Page Setup
+  Project Setup
 </div>
 
 <div class="content">

@@ -18,7 +18,6 @@
  * http://opensource.org/licenses/MIT
  *
  */
-define(["jquery"], function($) { //for use with requireJS
 ;(function ( $, window, document, undefined ) {
 
 $.site = $.fn.site = function(parameters) {
@@ -17852,5 +17851,3 @@ $.fn.visibility.settings = {
 };
 
 })( jQuery, window , document );
-
-});
