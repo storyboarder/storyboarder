@@ -31,12 +31,7 @@ require.config({
 
 //      console.log(canvasState);
 
-      var dependencies = [
-        "Editor",
-        "Menu"
-      ];
-
-      require(dependencies, function(editor, menu) {
+      require(["Menu", "Editor"], function(menu, editor) {
         // editor.init("canvas");
         console.log(menu);
         menu.init();

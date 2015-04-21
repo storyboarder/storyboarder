@@ -1,7 +1,6 @@
 define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	var current;
 
-
 	var modals = {
 		"Add Image": function() {
 			console.log("add image called");
@@ -119,36 +118,34 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			editor.action($(this).attr('id'), {
 				value: $(this).val()
 			});
-
-			$("a.modal").click(function() {
-				console.log($(this).attr('id'));
-				var id = $(this).attr('id');
-				if (id in modals) {
-					modals[id]();
-				} else {
-					throw "Modal not found: " + name;
-				}
-			});
-
-			$(".toolset .title").click(function() {
-				$(this).parent().children(".tools").slideToggle();
-			});
-
-			$("a.new-page").click(function() {
-				console.log("new page");
-			});
-
-			$("a.remove-page").click(function() {
-				console.log("remove page");
-			});
-
-
-
-			init_project();
 		});
 
-		return {
-			init: init
-		};
+    $("a.modal").click(function() {
+      console.log($(this).attr('id'));
+      var id = $(this).attr('id');
+      if (id in modals) {
+        modals[id]();
+      } else {
+        throw "Modal not found: " + name;
+      }
+    });
+
+    $(".toolset .title").click(function() {
+      $(this).parent().children(".tools").slideToggle();
+    });
+
+    $("a.new-page").click(function() {
+      console.log("new page");
+    });
+
+    $("a.remove-page").click(function() {
+      console.log("remove page");
+    });
+
+    init_project();
 	};
+
+  return {
+    init: init
+  };
 });
