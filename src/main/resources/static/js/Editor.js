@@ -109,19 +109,19 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		console.log("testing load on empty file. Expecting index out of bounds. Result: ");
 		actions.Load(0);
 
-		console.log("testing save for empty file. Expecting success!. Result: ");
-		actions.Save(0, {content: "FOOOO!!!"});
+		// console.log("testing save for empty file. Expecting success!. Result: ");
+		// actions.Save(0, {content: "FOOOO!!!"});
 
-		console.log("testing load after addition of FOOOO!!!. Expecing {content: FOOOO!!!}. Result:");
-		actions.Load(0);
+		// console.log("testing load after addition of FOOOO!!!. Expecing {content: FOOOO!!!}. Result:");
+		// actions.Load(0);
 
-		console.log("testing save for nonempty file. Expecting success! twice. Result:");
-		actions.Save(0, {content: "New string!"});
-		actions.Save(1, {content: "Line 2!"});
+		// console.log("testing save for nonempty file. Expecting success! twice. Result:");
+		// actions.Save(0, {content: "New string!"});
+		// actions.Save(1, {content: "Line 2!"});
 
-		console.log("testing load after previous changes. Expecting {content: New string!}, then {content: Line 2!}. Result:")
-		actions.Load(0);
-		actions.Load(1);
+		// console.log("testing load after previous changes. Expecting {content: New string!}, then {content: Line 2!}. Result:")
+		// actions.Load(0);
+		// actions.Load(1);
 
 
 		toolset.test();

@@ -53,6 +53,8 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
 	var forms = {
 	  "CreateProject": function(form) {
+	  	console.log("HERE IS THE FORM:");
+	  	console.log(form);
       console.log($("#page-width").val(), $("#page-height").val());
       // TODO call editor create project
       $('.ui.modal.page-setup').modal('hide');

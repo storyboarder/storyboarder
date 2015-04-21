@@ -32,7 +32,7 @@ require.config({
 //      console.log(canvasState);
 
       require(["Menu", "Editor"], function(menu, editor) {
-        // editor.init("canvas");
+        //editor.init("canvas");
         console.log(menu);
         menu.init();
         editor.test(); /* */
