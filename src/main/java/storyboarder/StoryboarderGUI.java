@@ -38,6 +38,8 @@ final class StoryboarderGUI {
 
   private StoryboarderProject project;
 
+  private static final String NULL_PROJ_MSG = "ERROR: Need to initialize the project!";
+
   StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
     this.project = project;
@@ -81,9 +83,8 @@ final class StoryboarderGUI {
         return msg;
       }
     } else {
-      String msg = "ERROR: Need to initialize the project!";
-      System.err.println(msg);
-      return msg;
+      System.err.println(NULL_PROJ_MSG);
+      return NULL_PROJ_MSG;
     }
     return "Success!";
   }
@@ -172,12 +173,16 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      int page = GSON.fromJson(qm.value("page"), Integer.class);
-      if (page < project.numberOfPages()) {
-        return project.getPage(page);
+      if (project != null) {
+        QueryParamsMap qm = req.queryMap();
+        int page = GSON.fromJson(qm.value("page"), Integer.class);
+        if (page < project.numberOfPages()) {
+          return project.getPage(page);
+        } else {
+          return "index out of bounds!";
+        }
       } else {
-        return "index out of bounds!";
+        return NULL_PROJ_MSG;
       }
     }
   }
@@ -208,11 +213,15 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      int page = GSON.fromJson(qm.value("page"), Integer.class);
-      String json = qm.value("json");
-      project.saveOrAdd(page, json);
-      return "success!";
+      if (project != null) {
+        QueryParamsMap qm = req.queryMap();
+        int page = GSON.fromJson(qm.value("page"), Integer.class);
+        String json = qm.value("json");
+        project.saveOrAdd(page, json);
+        return "success!";
+      } else {
+        return NULL_PROJ_MSG;
+      }
     }
   }
 

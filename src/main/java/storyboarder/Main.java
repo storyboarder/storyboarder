@@ -46,9 +46,7 @@ public final class Main {
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
-
     StoryboarderGUI gui = new StoryboarderGUI(sparkPort);
-
     gui.start();
 
     try {
