@@ -1,40 +1,71 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
-  /* Actions are one-time functions, unlike tools. */
-  var actions = {
-    "Undo": function(params) {
-      console.log("undo called");
-    },
-    "Redo": function(params) {
-      console.log("redo called");
-    },
-    "ToggleGrid": function(params) {
-      console.log("toggle-grid");
-      if (params.checked) {
-        canvasState.drawGrid();
-      } else {
-        canvasState.clearGrid();
-      }
-    },
-    "GridSpacing": function(params) {
-      canvasState.setGridSpacing(params.value);
-      canvasState.clearGrid();
-      canvasState.drawGrid();
-    },
-    "Load": function(params) {
-      console.log("load called");
-    },
-    "Save": function(params) {
-      console.log("save called");
-      $.post( "/savepage", {page: {}}, function( data ) {
-        console.log(data);
-      });
-    },
-    "Export": function(params) {
-      console.log("save called");
-    },
-  };
+	/* Actions are one-time functions, unlike tools. */
+	var actions = {
+		"Undo": function(params) {
+			console.log("undo called");
+		},
+		"Redo": function(params) {
+			console.log("redo called");
+		},
+		"ToggleGrid": function(params) {
+			console.log("toggle-grid");
+			if (params.checked) {
+				canvasState.drawGrid();
+			} else {
+				canvasState.clearGrid();
+			}
+		},
+		"GridSpacing": function(params) {
+			canvasState.setGridSpacing(params.value);
+			canvasState.clearGrid();
+			canvasState.drawGrid();
+		},
+		"Load": function(pageNum) {
+			console.log("load called");
+			$.post("/load", {
+					page: pageNum
+				},
+				function(responseJSON) {
+					responseObject = JSON.parse(responseJSON);
+					console.log("loaded: ");
+					console.log(responseObject);
+					return responseObject;
+				});
+		},
+		"Save": function(pageNum, pageObject) {
+			console.log("save called");
+			pageJSON = JSON.stringify(pageObject);
+			$.post("/save", {
+				page: pageNum,
+				json: pageJSON
+			}, function(data) {
+				console.log(data);
+			});
+		},
+		"Export": function(params) {
+			console.log("export called");
+		},
+		"AddImage": function(params) {
+			console.log("ADDING IMAGE!!!");
+			console.log(params);
+			if (params.url && params.url != "http://") {
+				console.log(params.url);
+				fabric.Image.fromURL(params.url, function(img) {
+					img.set({
+						left: 30,
+						top: 40,
+						scaleX: 0.3,
+						scaleY: 0.3
+					});
+					canvasState.addElement(img, "image");
+				});
 
+			} else if (params.file) {
+				console.log(params.file);
+			}
+		}
+	};
 	var init = function(spec) {
 		var canvas = spec.canvas;
 		var width = spec.width;
@@ -67,14 +98,16 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var action = function(name, params) {
-	  if (name in actions) {
-      actions[name](params);
-    } else {
-      throw "Action not found: " + name;
-    }
+		if (name in actions) {
+			actions[name](params);
+		} else {
+			throw "Action not found: " + name;
+		}
 	};
 
 	var test = function() {
+		console.log("testing load on empty file. Expecting index out of bounds. Result: ");
+		actions.Load();
 		toolset.test();
 		// console.log("editor tested");
 		// console.log("toolset is now " + toolset);
@@ -88,7 +121,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action, action,
+		action: action,
 		test: test
 	};
 

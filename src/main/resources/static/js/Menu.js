@@ -1,6 +1,58 @@
 define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	var current;
 
+
+	var modals = {
+		"Add Image": function() {
+			console.log("add image called");
+			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
+			$('.upload').click(function() {
+				$('.ui.modal.add-image').modal('hide');
+
+
+				var imageLoader = document.getElementById('filepath');
+				imageLoader.addEventListener('change', handleImage, false);
+
+				function handleImage(e) {
+					var reader = new FileReader();
+					reader.onload = function(event) {
+						var img = new Image();
+						img.onload = function() {
+							var imgInstance = new fabric.Image(img, {
+								scaleX: 0.2,
+								scaleY: 0.2
+							})
+							canvasState.addElement(imgInstance, "image");
+						}
+						img.src = event.target.result;
+					}
+					reader.readAsDataURL(e.target.files[0]);
+				}
+
+				console.log("ADDING");
+				var send = {
+					url: $("#image-url").val(),
+					file: $("#filepath").val()
+				}
+
+				editor.action("Add Image", send);
+			});
+		},
+		"Save": function() {
+			console.log("save called");
+			// $.post( "/save", {}, function( data ) {
+			// console.log(data);
+			// });
+		},
+		"Export": function() {
+			console.log("export called");
+		},
+		"Load": function() {
+			console.log("load called");
+		}
+	};
+
+
 	var init_project = function() {
 		console.log($('.ui.modal.page-setup'));
 		$('.ui.modal.page-setup')
@@ -38,8 +90,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		});
 
 		$('.ui.checkbox')
-      .checkbox()
-    ;
+			.checkbox();
 
 		$("a.tool").click(function() {
 			if (current) {
@@ -52,38 +103,52 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		});
 
 		$("a.action").click(function() {
-		  console.log("action called");
-		  editor.action($(this).attr('id'), {});
+			console.log("action called");
+			editor.action($(this).attr('id'), {});
 		});
 
 		$("input[type='checkbox'].action").change(function() {
-		  console.log("check action called");
-		  editor.action($(this).attr('id'), {checked: $(this).prop("checked")});
+			console.log("check action called");
+			editor.action($(this).attr('id'), {
+				checked: $(this).prop("checked")
+			});
 		});
 
 		$("input[type='text'].action").change(function() {
-		  console.log("text action called");
-		  editor.action($(this).attr('id'), {value: $(this).val()});
+			console.log("text action called");
+			editor.action($(this).attr('id'), {
+				value: $(this).val()
+			});
+
+			$("a.modal").click(function() {
+				console.log($(this).attr('id'));
+				var id = $(this).attr('id');
+				if (id in modals) {
+					modals[id]();
+				} else {
+					throw "Modal not found: " + name;
+				}
+			});
+
+			$(".toolset .title").click(function() {
+				$(this).parent().children(".tools").slideToggle();
+			});
+
+			$("a.new-page").click(function() {
+				console.log("new page");
+			});
+
+			$("a.remove-page").click(function() {
+				console.log("remove page");
+			});
+
+
+
+			init_project();
 		});
 
-		$(".toolset .title").click(function() {
-			$(this).parent().children(".tools").slideToggle();
-		});
-
-    $("a.new-page").click(function() {
-      console.log("new page");
-    });
-
-    $("a.remove-page").click(function() {
-      console.log("remove page");
-    });
-
-
-
-		init_project();
-	};
-
-	return {
-		init: init
+		return {
+			init: init
+		};
 	};
 });

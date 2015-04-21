@@ -5,7 +5,7 @@ define(["../../CanvasState"], function (canvasState) {
 			// nothing should be moving
 			canvasState.mapElements(
 				function(found) { // map
-					if(found.type === "group") {
+					if(found.type === "text") {
 						found.set({selectable: true});
 					} else {
 						found.set({selectable: false});
@@ -51,7 +51,7 @@ define(["../../CanvasState"], function (canvasState) {
 
 				// weird bug when I edit and then click out of the box
 				// phantom group box....?
-				if(selected && selected.type === 'group') {
+				if(selected && selected.type === 'text') {
 					if(edit) {
 						console.log("GROUP!!");
 						var pos = {
@@ -99,42 +99,58 @@ define(["../../CanvasState"], function (canvasState) {
 						width = Math.abs(initialPos.x - finalPos.x);
 						height = Math.abs(initialPos.y - finalPos.y);
 
+						var input = new fabric.IText('Text', { 
+					  		fontFamily: 'arial black',
+					  		fontSize: 14,
+					  		left: initialPos.x,
+					  		top: initialPos.y
+						});
+					
 
-					var input = new fabric.IText('Text', { 
-				  		fontFamily: 'arial black',
-				  		fontSize: 14
-					});
+					// var textBox = new fabric.Rect({
+					// 	width : width,
+					// 	height: height,
+					// 	fill: 'white',
+					// 	stroke: '#C0C0C0',
+					// 	strokeDashArray: [5, 5]
+					// });
 
-					var textBox = new fabric.Rect({
-						width : width,
-						height: height,
-						fill: 'white',
-						stroke: '#C0C0C0',
-						strokeDashArray: [5, 5]
-					});
+					// var group = new fabric.Group([ textBox, input ], {
+					//   left: initialPos.x,
+					//   top: initialPos.y
+					// });
+					
+		
+					canvas.on('after:render', function() {
+						canvas.contextContainer.strokeStyle = '#555';
 
-					var group = new fabric.Group([ textBox, input ], {
-					  left: initialPos.x,
-					  top: initialPos.y
-					});
+						var bound = input.getBoundingRect();
+						bound.strokeDashArray = [5, 5];
+						canvas.contextContainer.strokeRect(
+							bound.left + 0.7,
+						    bound.top + 0.7,
+						    bound.width,
+						    bound.height
+						);
+					});	
 
-					canvasState.addElement(group, 'text');
-					}
-				}
-				
-			});
+					canvasState.addElement(input, 'text');	
+
+					} // if within range				
+				} // else
+			}); // mouseup
 
 			document.onkeydown = function (e) {
 				console.log("pressed");
 			   	var key = e.keyCode;
 			   	console.log(key);
-			   	if(key === 8 && selected.type === 'group') {
+			   	console.log(selected.type);
+			   	if(key === 8 && selected.type === 'text') {
 			   		console.log("delete");
 			   		console.log(selected.type);
 			   		canvasState.deleteElement(selected);
 			   	}
 			};
-
 		};
 
 		var deactivate = function() {
@@ -143,6 +159,7 @@ define(["../../CanvasState"], function (canvasState) {
 
 	
 	return {
+		name: "Text",
 		init: function () {
 			console.log("init text");
 			canvas = canvasState.getCanvas();

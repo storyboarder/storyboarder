@@ -1,14 +1,9 @@
 package storyboarder;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -31,27 +26,56 @@ import spark.template.freemarker.FreeMarkerEngine;
  * @author yz38
  *
  */
-public final class Gui {
+final class StoryboarderGUI {
+
+  private static final int AUTO_SAVE_TIME = 60000;
 
   private static final Gson GSON = new Gson();
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  private Gui() {
+  private final int port;
+
+  private final StoryboarderProject project;
+
+  StoryboarderGUI(int port, StoryboarderProject project) {
+    this.port = port;
+    this.project = project;
   }
 
-  /**
-   * @param port
-   */
-  public static void runSparkServer(int port) {
+  void start() {
     Spark.setPort(port);
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
     Spark.post("/load", new LoadHandler());
-    Spark.get("/save", new SaveHandler(), new FreeMarkerEngine()); // should this be POST?
+    Spark.post("/save", new SaveHandler());
+    Spark.post("/quit", new QuitHandler());
 
-    Spark.post("/savepage", new SavePageHandler()); // added for testing
+    TimerTask saveTask = new TimerTask() {
+      @Override
+      public void run() {
+        System.out.println("Saving to disk...");
+        try {
+          project.saveToDisk();
+        } catch (IOException e) {
+          System.err.println("ERROR: saving: " + e.getMessage());
+        }
+      }
+    };
 
+    Timer saveTimer = new Timer();
+    saveTimer.schedule(saveTask, AUTO_SAVE_TIME);
+
+  }
+
+  String quit() {
+    System.out.println("Hi");
+    try {
+      project.saveToDisk();
+      Spark.stop();
+      return "success!";
+    } catch (IOException e) {
+      return "failure!";
+    }
   }
 
   /**
@@ -67,7 +91,7 @@ public final class Gui {
 
     @Override
     public ModelAndView handle(Request arg0, Response arg1) {
-      Map<String, Object> variables = ImmutableMap.of("title", "Maps");
+      Map<String, Object> variables = ImmutableMap.of("title", "Storyboarder");
       return new ModelAndView(variables, "main.ftl");
     }
   }
@@ -81,7 +105,7 @@ public final class Gui {
    * @author yz38
    *
    */
-  private static class LoadHandler implements Route {
+  private class LoadHandler implements Route {
 
     /**
      * @param req
@@ -94,20 +118,18 @@ public final class Gui {
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      String path = qm.value("path");
-      try {
-        // Apparently this uses buffering so it is good even for large projects.
-        List<String> pages = Files.readAllLines(Paths.get(path), CHARSET);
-        return GSON.toJson(pages);
-      } catch (IOException e) {
-        return GSON.toJson(new String[] {"Failure: " + e.getMessage()});
+      int page = GSON.fromJson(qm.value("page"), Integer.class);
+      if (page < project.numberOfPages()) {
+        return project.getPage(page);
+      } else {
+        return "index out of bounds!";
       }
     }
   }
 
   /**
    * Saves a Storyboarder project to a given path. If a file is present with the
-   * same path, it will be overwritten. (TODO test that claim)
+   * same path, it will be overwritten.
    *
    * @author fbystric
    * @author ktsakas
@@ -115,7 +137,7 @@ public final class Gui {
    * @author yz38
    *
    */
-  private static class SaveHandler implements TemplateViewRoute {
+  private class SaveHandler implements Route {
     /**
      * Writes the JSON strings for each page on a new line of a file at the
      * given path (in req). If a file is present with the same path, it will be
@@ -130,35 +152,27 @@ public final class Gui {
      *         save was successful.
      */
     @Override
-    public ModelAndView handle(Request req, Response res) {
-      Map<String, Object> result;
-      try {
-        QueryParamsMap qm = req.queryMap();
-        Path path = Paths.get(qm.value("path")); // should the back-end keep track of the path?
-        String Json = qm.value("pages");
-
-        List<String> pages = Arrays.asList(GSON.fromJson(Json, String[].class));
-
-        // TODO: It is unclear if this uses buffering, so saving huge files may
-        // be problematic.
-        Files.write(path, pages, CHARSET);
-
-        result = ImmutableMap.of("result", "Success!");
-      } catch (IOException e) {
-        result = ImmutableMap.of("result", "Failure: " + e.getMessage());
-      }
-      return new ModelAndView(result, "main.ftl");
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      int page = GSON.fromJson(qm.value("page"), Integer.class);
+      String json = qm.value("json");
+      project.saveOrAdd(page, json);
+      return "success!";
     }
   }
 
-  private static class SavePageHandler implements Route {
+  private class QuitHandler implements Route {
 
     @Override
-    public Object handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      String page = qm.value("page");
-      System.out.println(page);
-      return GSON.toJson("saved");
+    public Object handle(Request arg0, Response arg1) {
+      try {
+        project.saveToDisk();
+        Spark.stop();
+        return "success!";
+      } catch (IOException e) {
+        return "failure!";
+      }
     }
+
   }
 }
