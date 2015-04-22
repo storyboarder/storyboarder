@@ -49,7 +49,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"AddImage": function(params) {
 			console.log("ADDING IMAGE!!!");
 			console.log(params);
-			if (params.url && params.url != "http://") {
+			if (params.url && params.url != "http://") { //TODO this doesn't seem right
 				console.log(params.url);
 				fabric.Image.fromURL(params.url, function(img) {
 					img.set({
@@ -111,7 +111,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("testing save for empty file. Expecting success!. Result: ");
-			actions.Save(0, {content: "FOOOO!!!"});
+			actions.Save(0, {
+				content: "FOOOO!!!"
+			});
 		}, 1000);
 
 		window.setTimeout(function() {
@@ -119,19 +121,25 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			actions.Load(0);
 		}, 2000);
 
-		window.setTimeout(function() {		
+		window.setTimeout(function() {
 			console.log("testing save for nonempty file. Expecting success! twice. Result:");
-			actions.Save(0, {content: "New string!"});
-			actions.Save(1, {content: "Line 2!"});
+			actions.Save(0, {
+				content: "New string!"
+			});
+			actions.Save(1, {
+				content: "Line 2!"
+			});
 		}, 3000);
 
 		window.setTimeout(function() {
-			console.log("testing load after previous changes. Expecting {content: New string!}, then {content: Line 2!}. Result:")
+			console.log("testing load after previous changes. Expecting {content: New string!}. Result:");
 			actions.Load(0);
 		}, 4000);
 
-		window.setTimeout(function(){actions.Load(1)}, 5000);
-
+		window.setTimeout(function() {
+			console.log("Expecting {content: Line 2!}. Result:");
+			actions.Load(1);
+		}, 5000);
 
 
 		//toolset.test();
