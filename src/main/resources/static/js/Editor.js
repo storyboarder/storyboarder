@@ -124,7 +124,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		actions.Load(1);
 
 
-		toolset.test();
+		//toolset.test();
 		// console.log("editor tested");
 		// console.log("toolset is now " + toolset);
 		// console.log("test activating Split...");
