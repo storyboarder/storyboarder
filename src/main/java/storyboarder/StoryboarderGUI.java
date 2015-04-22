@@ -123,6 +123,9 @@ final class StoryboarderGUI {
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
+      System.out.println("\nGot init request.\npath: " + qm.value("path")
+          + "\ntype: " + qm.value("type"));
+
       try {
         project = new StoryboarderProject(qm.value("path"));
       } catch (IOException e) {
@@ -173,15 +176,22 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
+      String msg = "\nGot load request\n";
+
       if (project != null) {
         QueryParamsMap qm = req.queryMap();
+        msg += "page: " + qm.value("page") + "\nresult:\n";
+
         int page = GSON.fromJson(qm.value("page"), Integer.class);
         if (page < project.numberOfPages()) {
+          System.out.println(msg + project.getPage(page));
           return project.getPage(page);
         } else {
+          System.out.println(msg + "index out of bounds!");
           return "index out of bounds!";
         }
       } else {
+        System.out.println(msg + NULL_PROJ_MSG);
         return NULL_PROJ_MSG;
       }
     }
@@ -213,13 +223,19 @@ final class StoryboarderGUI {
      */
     @Override
     public Object handle(Request req, Response res) {
+      String msg = "\nGot save request\n";
+
       if (project != null) {
         QueryParamsMap qm = req.queryMap();
+        System.out.println(msg + "page: " + qm.value("page") + "\njson: "
+            + qm.value("json"));
+
         int page = GSON.fromJson(qm.value("page"), Integer.class);
         String json = qm.value("json");
         project.saveOrAdd(page, json);
         return "success!";
       } else {
+        System.out.println(msg + NULL_PROJ_MSG);
         return NULL_PROJ_MSG;
       }
     }
@@ -229,7 +245,9 @@ final class StoryboarderGUI {
 
     @Override
     public Object handle(Request arg0, Response arg1) {
-      Spark.stop();
+      System.out.println();
+      System.out.println("got quit request");
+      // Spark.stop();
       return saveToDisk();
     }
 
