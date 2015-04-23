@@ -5,14 +5,20 @@
  	var height;
  	var pageMargin;
  	var panelMargin;
- 	var gridSpacing;
- 	var snapDistance;
  	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
  	var elements;
- 	var snapToGrid = false;
  	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
  	var edgeDirections = ["left", "top", "right", "bottom"];
+
+  /* snapping */
+ 	var snapToGrid = false;
+ 	var snapToPanelGrid = false;
  	var grid; // array of grid lines
+ 	var panelGrid;
+ 	var gridSpacing;
+ 	var panelRows;
+ 	var panelColumns
+ 	var snapDistance;
  	var gridColor = "#ddd";
 
  	var addElement = function(e, type) {
@@ -148,6 +154,38 @@
  		}
  	};
 
+ 	var drawPanelGrid = function() {
+ 		panelGrid = [];
+    var h = (pageEdges.bottom - pageEdges.top - 2 * panelMargin) / panelRows;
+    var begin = pageEdges.top - panelMargin;
+    console.log(h, begin);
+ 		for (var i = 0; i < panelRows; i++) {
+ 			var line = new fabric.Line(
+ 				[0, begin + h * i, width, begin + h * i], {
+ 					stroke: gridColor,
+ 					selectable: false
+ 				}
+ 			);
+ 			canvas.add(line);
+ 			line.sendToBack();
+ 			panelGrid.push(line);
+ 		}
+    var w = (pageEdges.right - pageEdges.left - 2 * panelMargin) / panelColumns;
+    var begin = pageEdges.left - panelMargin;
+    console.log(w, begin);
+ 		for (var j = 0; j < panelColumns; j++) {
+ 			var line = new fabric.Line(
+ 				[begin + w * i, 0, begin + w * i, height], {
+ 					stroke: gridColor,
+ 					selectable: false
+ 				}
+ 			);
+ 			canvas.add(line);
+ 			line.sendToBack();
+ 			panelGrid.push(line);
+ 		}
+ 	};
+
  	var CanvasState = {
  		getCanvas: function() {
  			return canvas;
@@ -197,7 +235,7 @@
  			canvas = new fabric.Canvas(canvasId, {
  				selection: false
  			});
- 			grid = [];
+// 			grid = [];
  			canvas.setDimensions({
  				width: w,
  				height: h
@@ -234,6 +272,12 @@
  		setGridSpacing: function(p) {
  			gridSpacing = p;
  		},
+ 		setPanelRows: function(p) {
+ 			panelRows = p;
+ 		},
+ 		setPanelColumns: function(p) {
+ 			panelColumns = p;
+ 		},
  		setSnapDistance: function(p) {
  			snapDistance = p;
  		},
@@ -256,6 +300,8 @@
 
  		drawGrid: drawGrid,
 
+ 		drawPanelGrid: drawPanelGrid,
+
  		snapToGridEnabled: function() {
  			return grid.length > 0;
  		},
@@ -265,6 +311,13 @@
  				canvas.remove(grid[g]);
  			}
  			grid = [];
+ 		},
+
+ 		clearPanelGrid: function() {
+ 			for (g in panelGrid) {
+ 				canvas.remove(panelGrid[g]);
+ 			}
+ 			panelGrid = [];
  		},
 
  		getGridSpacing: function() {

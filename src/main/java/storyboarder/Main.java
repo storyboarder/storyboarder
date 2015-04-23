@@ -50,7 +50,8 @@ public final class Main {
       sparkPort = options.valueOf(sparkSpec);
     }
     StoryboarderProject testProj = new StoryboarderProject(
-        "/course/testProj/testProj.txt");
+        "~/testProj/testProj.txt");
+//        "/course/testProj/testProj.txt");
     try {
       testProj.create();
     } catch (FileAlreadyExistsException e) {

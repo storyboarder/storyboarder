@@ -42,13 +42,20 @@
           <a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
           <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
           <br>
-                <div class="ui checkbox">
+            <div class="ui checkbox">
                   <input type="checkbox" class="action" name="ToggleGrid" id="ToggleGrid">
                   <label>Snap to grid</label>
             </div>
-
             <div class="ui mini input">
                   <label>Spacing</label><input type="text" class="action" id="GridSpacing" value="20">
+            </div>
+            <div class="ui checkbox">
+                  <input type="checkbox" class="action" name="TogglePanelGrid" id="TogglePanelGrid">
+                  <label>Snap to panel grid</label>
+            </div>
+            <div class="ui mini input">
+                  <label>Rows</label><input type="text" class="action" id="PanelRows" value="3">
+                  <label>Columns</label><input type="text" class="action" id="PanelColumns" value="2">
             </div>
         </div>
       </div>
