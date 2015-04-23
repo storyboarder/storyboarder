@@ -15,8 +15,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  	var grid; // array of grid lines
  	var gridColor = "#ddd";
 
- 	var addElement = function(e, type) {
- 		e.type = type;
+ 	var addElement = function(e, elmType) {
+ 		e.elmType = elmType;
  		elements.push(e);
  		canvas.add(e);
  	};
@@ -150,36 +150,60 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
  	var CanvasState = {
  		history: [],
- 		historyIdx: 0,
+ 		historyIdx: -1,
  		previousState: null,
 
  		storeState: function () {
+ 			console.log("Diff patch: ", jsondiffpatch);
 			var state = this.getState();
-			var delta = jsondiffpatch.diff(state, previousState);
 
- 			this.history.push(delta);
+			// If there is history
+			if (this.canRevert()) {
+				var delta = jsondiffpatch.diff(state, previousState);
+	 			this.history.push(delta);
+			}
+
+			this.historyIdx++;
  			this.previousState = state;
  		},
 
- 		revertState: function () {
- 			var delta = this.history[this.historyIdx];
- 			this.historyIdx--;
- 			var prevDelta = this.history[this.historyIdx];
- 			var canvas = this.getCanvas();
+ 		canRevert: function () {
+ 			return this.historyIdx >= 0;
+ 		},
 
+ 		canRestore: function () {
+ 			return (this.historyIdx >= this.history.length-1);
+ 		},
+
+ 		revertState: function () {
+ 			if (!this.canRevert()) return;
+
+ 			// Repaint canvas
 			canvas.clear().renderAll();
-			canvas.loadFromJSON(state, canvas.renderAll.bind(canvas));
-			jsondiffpatch.patch(this.previousState, prevDelta);
+			console.log(this.previousState);
+			canvas.loadFromJSON(this.previousState, canvas.renderAll.bind(canvas));
+
+			// Move previous state one back
+ 			this.historyIdx--;
+ 			if (this.canRevert()) {	
+ 				var prevDelta = this.history[this.historyIdx];
+				this.previousState = jsondiffpatch.patch(this.previousState, prevDelta);	
+ 			} else {
+ 				this.previousState = null;
+ 			}
  		},
 
  		restoreState: function () {
- 			if (this.historyIdx >= this.history.length-1) return;
+ 			if (!this.canRestore()) return;
 
+ 			// Move prebious state one forward
 			this.previousState = this.getState();
 			this.historyIdx++;
+ 			console.log("History: ", this.history);
  			var delta = this.history[this.historyIdx];
  			var nextState = jsondiffpatch.patch(this.previousState, delta);
 
+ 			// Repaint canvas
 			canvas.clear().renderAll();
 			canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
  		},
