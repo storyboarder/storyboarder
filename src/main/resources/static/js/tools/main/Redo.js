@@ -3,7 +3,7 @@ define(["../../CanvasState"], function(canvasState) {
 	var canvas;
 
 	var activate = function () {
-
+		canvasState.storeState();
 	};
 
 	var deactivate = function() {

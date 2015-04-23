@@ -5,11 +5,18 @@ define(["../../CanvasState"], function(canvasState) {
 	var state;
 
 	var activate = function () {
-		state = canvas.toJSON(["elmType"]);
-		console.log("undo state", state);
+		canvasState.revertState();
+		/*var newState = canvasState.getState();
+		var delta = jsondiffpatch.diff(state, newState);
+
+		history.push(delta);
+
+		// console.log("undo state", state);
 		canvas.clear().renderAll();
 		canvas.loadFromJSON(state, canvas.renderAll.bind(canvas));
-		console.log("New state: ", canvas.toJSON(["elmType"]));
+		// console.log("New state: ", canvas.toJSON(["elmType"]));
+
+		state = newState;*/
 	};
 
 	var deactivate = function () {
