@@ -41,8 +41,15 @@
           <a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>
           <a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
           <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
-          <br>Grid: <input type="number" /> <input type="number" />
+          <br>
+                <div class="ui checkbox">
+                  <input type="checkbox" class="action" name="ToggleGrid" id="ToggleGrid">
+                  <label>Snap to grid</label>
+            </div>
 
+            <div class="ui mini input">
+                  <label>Spacing</label><input type="text" class="action" id="GridSpacing" value="20">
+            </div>
         </div>
       </div>
 
@@ -51,8 +58,6 @@
         <div class="tools">
           <a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>
           <a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>
-          <br>Margin size: <input type="number" />
-          <br>Snap to grid: <input type="checkbox" />
         </div>
       </div>
 
@@ -84,7 +89,6 @@
           <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
-          <br>Snap to grid: <input type="checkbox" />
         </div>
       </div>
 
@@ -92,8 +96,7 @@
         <div class="title">Text</div>
         <div class="tools">
           <a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
-          <br>Borders: <input type="radio" name="text-borders" value="ellipse"/>ellipse <input type="radio" name="text-borders" value="rectangle" checked="true"/>rectangle <input type="radio" name="text-borders" value="border"/>none
-          <br>Snap to grid: <input type="checkbox" />
+          <br>Borders: <input type="radio" name="text-borders"/>ellipse <input type="radio" name="text-borders"/>rectangle <input type="radio" name="text-borders" checked="true"/>none
         </div>
       </div>
 
