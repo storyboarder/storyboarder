@@ -36,7 +36,7 @@ define(["../../CanvasState"], function (canvasState) {
 				initialPos = {
 					x: coor.e.offsetX,
 					y: coor.e.offsetY
-				}
+				};
 
 				selected = coor.target;
 				edit = coor.e.shiftKey;
@@ -47,7 +47,7 @@ define(["../../CanvasState"], function (canvasState) {
 				finalPos = {
 					x: coor.e.offsetX,
 					y: coor.e.offsetY
-				}
+				};
 
 				// weird bug when I edit and then click out of the box
 				// phantom group box....?
@@ -57,7 +57,7 @@ define(["../../CanvasState"], function (canvasState) {
 						var pos = {
 							left : selected.left,
 							top : selected.top
-						}
+						};
 
 						var items = selected._objects;
 						var isText = false;

@@ -1,4 +1,5 @@
-define(["jquery", "fabricjs"], function($) {
+define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
+	console.log("Json diff patch: ", jsondiffpatch);
 
 	var canvas;
 	var pageMargin;
@@ -10,8 +11,8 @@ define(["jquery", "fabricjs"], function($) {
 	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
 	var edgeDirections = ["left", "top", "right", "bottom"];
 
-	var addElement = function(e, type) {
-		e.type = type;
+	var addElement = function(e, elmType) {
+		e.set("elmType", elmType);
 		elements.push(e);
 		canvas.add(e);
 	};

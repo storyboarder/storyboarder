@@ -33,9 +33,9 @@ define(["../../CanvasState"], function (canvasState) {
 	}
 	panelEdges = [];
 	canvasState.mapElements(function(p1, rank1) {
-	  if (p1.type == "panel") {
+	  if (p1.elmType == "panel") {
 		canvasState.mapElements(function(p2, rank2) {
-		  if (p2.type == "panel" && rank2 > rank1) {
+		  if (p2.elmType == "panel" && rank2 > rank1) {
 			matchPanels(p1, p2);
 		  }
 		});
@@ -52,12 +52,12 @@ define(["../../CanvasState"], function (canvasState) {
 		line = initPanelEdge([p1.edges.left, p1.edges.top, p1.edges.left, p1.edges.bottom]);
 		line.leftPanel = p2;
 		line.rightPanel = p1;
-		line.type = "vertical";
+		line.elmType = "vertical";
 		} else if (p1.edges.right == p2.edges.left) {
 		line = initPanelEdge([p2.edges.left, p2.edges.top, p2.edges.left, p2.edges.bottom]);
 		line.leftPanel = p1;
 		line.rightPanel = p2;
-		line.type = "vertical";
+		line.elmType = "vertical";
 		}
 	  } else if (p1.edges.left == p2.edges.left &&
 		  p1.edges.right == p2.edges.right) {
@@ -65,17 +65,17 @@ define(["../../CanvasState"], function (canvasState) {
 		line = initPanelEdge([p1.edges.left, p1.edges.top, p1.edges.right, p1.edges.top]);
 		line.topPanel = p2;
 		line.bottomPanel = p1;
-		line.type = "horizontal";
+		line.elmType = "horizontal";
 		} else if (p1.edges.bottom == p2.edges.top) {
 		line = initPanelEdge([p2.edges.left, p2.edges.top, p2.edges.right, p2.edges.top]);
 		line.topPanel = p1;
 		line.bottomPanel = p2;
-		line.type = "horizontal";
+		line.elmType = "horizontal";
 		}
 	  }
 	  if (line) {
 		addPanelEdge(line);
-		if (line.type == "horizontal") {
+		if (line.elmType == "horizontal") {
 		console.log(line.topPanel.edges, line.bottomPanel.edges);
 	  } else {
 		console.log(line.leftPanel.edges, line.rightPanel.edges);
@@ -86,7 +86,7 @@ define(["../../CanvasState"], function (canvasState) {
   var merge = function(p) {
 	console.log("merge", p);
 	var toKeep, toDelete;
-	switch (p.type) {
+	switch (p.elmType) {
 	  case "horizontal":
 		var topPanel = p.topPanel;
 		var bottomPanel = p.bottomPanel;
@@ -104,7 +104,7 @@ define(["../../CanvasState"], function (canvasState) {
 		toKeep = leftPanel;
 		break;
 	  default:
-		console.log("unexpected type:", p.type);
+		console.log("unexpected type:", p.elmType);
 		break;
 	}
 	console.log("p", p);
@@ -121,7 +121,7 @@ define(["../../CanvasState"], function (canvasState) {
 
 		canvasState.mapElements(
 			function(e) { // map
-				if (e.type == "panel") {
+				if (e.elmType == "panel") {
 				  e.set({selectable: false});
 				}
 			}

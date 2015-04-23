@@ -9,7 +9,7 @@ define(["../../CanvasState"], function(canvasState) {
 	// 	var oldEdges = obj.edges;
 	// 	canvasState.filterMapElements(
 	// 		function(e) {
-	// 			if (e.type == "panel") {
+	// 			if (e.elmType == "panel") {
 	// 				return ((e.element.edges[dir] == oldEdges[dir]) && !!newEdges[dir]);
 	// 			}
 	// 		},
@@ -32,7 +32,7 @@ define(["../../CanvasState"], function(canvasState) {
 		var oldEdges = obj.edges;
 		canvasState.mapElements(
 			function(found) {
-				if (found.type == "panel" &&
+				if (found.elmType == "panel" &&
 					found != obj &&
 					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
 					var e = found;
@@ -65,7 +65,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type == "panel") {
+				if (found.elmType == "panel") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,
@@ -125,7 +125,7 @@ define(["../../CanvasState"], function(canvasState) {
 		});
 
 		canvas.on('object:selected', function(options) {
-			if (options.type !== 'text') {
+			if (options.elmType !== 'text') {
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}

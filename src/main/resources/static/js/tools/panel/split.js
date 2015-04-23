@@ -90,7 +90,7 @@ define(["../../CanvasState"], function(canvasState) {
 		//canvasState.setSelectable("panel", true);
 		canvasState.mapElements(
 			function(e) { // map
-				if (e.type == "panel") {
+				if (e.elmType == "panel") {
 					e.set({
 						selectable: true
 					});
@@ -169,5 +169,5 @@ define(["../../CanvasState"], function(canvasState) {
 			//			divideY(canvas._objects[1], 150);
 			//			divideX(canvas._objects[1], 100);
 		}
-	}
+	};
 });

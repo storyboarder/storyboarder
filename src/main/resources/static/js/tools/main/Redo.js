@@ -2,6 +2,10 @@ define(["../../CanvasState"], function(canvasState) {
 
 	var canvas;
 
+	var activate = function () {
+
+	};
+
 	var deactivate = function() {
 
 	};
