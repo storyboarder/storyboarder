@@ -25,6 +25,8 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
+  private static final String DEFAULT_DIRECTORY = "~/storyboarderTest/test.txt";
+
   private Main() {
   }
 
@@ -49,8 +51,7 @@ public final class Main {
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
-    StoryboarderProject testProj = new StoryboarderProject(
-        "/course/testProj/testProj.txt");
+    StoryboarderProject testProj = new StoryboarderProject(DEFAULT_DIRECTORY);
     try {
       testProj.create();
     } catch (FileAlreadyExistsException e) {
