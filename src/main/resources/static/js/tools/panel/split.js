@@ -1,7 +1,8 @@
-define(["../../CanvasState"], function(canvasState) {
+define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	var previewDivideLine;
 	var canvas;
 	var threshold = 2;
+	var snap = Snap.snap;
 
 	/* previews horizontal split */
 	var previewDivideY = function(obj, y) {
@@ -81,7 +82,7 @@ define(["../../CanvasState"], function(canvasState) {
 			selectable: false
 		});
 		canvas.add(previewDivideLine); /* do not add to elements array */
-		previewDivideLine.sendToBack();
+		previewDivideLine.bringToFront();
 	};
 
 	/* activate returns this (the tool) */
@@ -105,17 +106,19 @@ define(["../../CanvasState"], function(canvasState) {
 		var vertical = true;
 		canvas.on("mouse:move", function(options) {
 			canvas.deactivateAll();
+			var x = snap(options.e.offsetX);
+			var y = snap(options.e.offsetY);
 			if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
-				previewDivideY(options.target, options.e.offsetY);
+				previewDivideY(options.target, y);
 				vertical = false;
 			} else if (Math.abs(options.e.movementX) - Math.abs(options.e.movementY) > threshold) {
-				previewDivideX(options.target, options.e.offsetX);
+				previewDivideX(options.target, x);
 				vertical = true;
 			} else {
 				if (vertical) {
-					previewDivideX(options.target, options.e.offsetX);
+					previewDivideX(options.target, x);
 				} else {
-					previewDivideY(options.target, options.e.offsetY);
+					previewDivideY(options.target, y);
 				}
 			}
 		});
@@ -123,8 +126,8 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas.on("object:selected", function(options) {
 			console.log(options);
 			var obj = options.target;
-			var x = options.e.offsetX;
-			var y = options.e.offsetY;
+			var x = snap(options.e.offsetX);
+			var y = snap(options.e.offsetY);
 			if (obj && obj.edges) {
 				if (!vertical &&
 					obj.edges.bottom - y > 3 * canvasState.getPanelMargin() &&

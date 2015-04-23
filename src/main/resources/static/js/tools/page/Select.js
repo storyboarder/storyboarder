@@ -1,31 +1,18 @@
 //TODO: fix bug with resizing panels outside of valid page area
 
-define(["../../CanvasState"], function(canvasState) {
+define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	var canvas;
-
-	// var resizeSameDirection = function(dir, obj, newEdges) {
-	// 	var opposite = canvasState.getOppositeDirection(dir);
-	// 	var oldEdges = obj.edges;
-	// 	canvasState.filterMapElements(
-	// 		function(e) {
-	// 			if (e.elmType == "panel") {
-	// 				return ((e.element.edges[dir] == oldEdges[dir]) && !!newEdges[dir]);
-	// 			}
-	// 		},
-	// 		function(found) {
-	// 			var e = found.element;
-	// 			var size = canvasState.getDimension(dir);
-	// 			e.edges[dir] = newEdges[dir];
-	// 			e[dir] = newEdges[dir] + canvasState.getPanelMargin();	
-	// 			if (dir == "bottom" || dir == "right") {
-	// 				e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
-	// 			} else {
-	// 				e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
-	// 			}
-	// 		});
-
-	// };
+	var snap = Snap.snap;
+	var setLeft = Snap.setLeft;
+	var setRight = Snap.setRight;
+	var setTop = Snap.setTop;
+	var setBottom = Snap.setBottom;
+	var getLeft = Snap.getLeft;
+	var getRight = Snap.getRight;
+	var getTop = Snap.getTop;
+	var getDist = Snap.getDist;
+	var getBottom = Snap.getBottom;
 
 	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
 		var opposite = canvasState.getOppositeDirection(dir);
@@ -46,7 +33,8 @@ define(["../../CanvasState"], function(canvasState) {
 					}
 					found.setCoords();
 				}
-			});
+	    }
+	  );
 	};
 
 	var resizePanels = function(obj, newEdges) {
@@ -75,42 +63,86 @@ define(["../../CanvasState"], function(canvasState) {
 			}
 		);
 
-		// for resizing and snap to grid functionality
+		canvas.on('object:moving', function(options) {
+		  if (canvasState.snapToGridEnabled() && options.target.type != "panel") {
+		    var gridSpacing = canvasState.getGridSpacing();
+		    var snapTolerance = canvasState.getSnapDistance();
+        var edges = [
+          new Snap.edge(getDist(getLeft(options)), function(opt) {
+              setLeft(opt, snap(getLeft(opt)));
+          }),
+          new Snap.edge(getDist(getRight(options)), function(opt) {
+              setRight(opt, snap(getRight(opt)));
+          }),
+          new Snap.edge(getDist(getTop(options)), function(opt) {
+              setTop(opt, snap(getTop(opt)));
+          }),
+          new Snap.edge(getDist(getBottom(options)), function(opt) {
+              setBottom(opt, snap(getBottom(opt)));
+          }),
+        ];
+
+        edges.sort(function(a, b) {return a.dist - b.dist});
+        edges[0].snap(options);
+        edges[1].snap(options);
+
+        for (var i = 2; i < edges.length; i++) {
+          dif = edges[i].dist - edges[i-1].dist;
+          if (dif < 0.5) {
+            edges[i].snap(options);
+          }
+        }
+      }
+		});
+
 		canvas.on('object:scaling', function(options) {
+      var gridSpacing = canvasState.getGridSpacing();
+      var snapTolerance = canvasState.getSnapDistance();
+      var snapToGrid = canvasState.snapToGridEnabled();
+      var panelMargin = canvasState.getPanelMargin();
 
 			options.target.width *= options.target.scaleX;
 			options.target.scaleX = 1;
 			options.target.height *= options.target.scaleY;
 			options.target.scaleY = 1;
-			options.target.corners = {
-				left: options.target.left - 5,
-				right: options.target.left + options.target.width + 5,
-				top: options.target.top - 5,
-				bottom: options.target.top + options.target.height + 5
-			};
-			if (canvasState.getSnapToGrid()) {
-				if (options.e.clientX < distanceToClosestX) {
-					// snap or display snap line
-				}
-
-				if (options.e.clientY < distanceToClosestY) {
-					// snap or display snap ine
-				}
-			} else {
+			if (options.target.type == "panel") {
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};
-				if (corner.indexOf('l') >= 0) {
-					newEdges.left = obj.left - canvasState.getPanelMargin();
-				}
-				if (corner.indexOf('t') >= 0) {
-					newEdges.top = obj.top - canvasState.getPanelMargin();
-				}
-				if (corner.indexOf('r') >= 0) {
-					newEdges.right = obj.width + obj.left + canvasState.getPanelMargin();
-				}
-				if (corner.indexOf('b') >= 0) {
-					newEdges.bottom = obj.height + obj.top + canvasState.getPanelMargin();
+				if (snapToGrid) {
+				  console.log("scaling panel with snap");
+          if (corner.indexOf('l') >= 0) {
+            newEdges.left = snap(obj.left - panelMargin);
+            obj.left = newEdges.left + panelMargin;
+            obj.width = obj.edges.right - obj.left - panelMargin;
+          }
+          if (corner.indexOf('t') >= 0) {
+            newEdges.top = snap(obj.top - panelMargin);
+            obj.top = newEdges.top + panelMargin;
+            obj.height = obj.edges.bottom - obj.top - panelMargin;
+          }
+          if (corner.indexOf('r') >= 0) {
+            newEdges.right = snap(obj.width + obj.left + panelMargin);
+            obj.width = newEdges.right - obj.left - panelMargin;
+          }
+          if (corner.indexOf('b') >= 0) {
+            newEdges.bottom = snap(obj.height + obj.top + panelMargin);
+            obj.height = newEdges.bottom - obj.top - panelMargin;
+          }
+          console.log(newEdges);
+				} else {
+          if (corner.indexOf('l') >= 0) {
+            newEdges.left = obj.left - panelMargin;
+          }
+          if (corner.indexOf('t') >= 0) {
+            newEdges.top = obj.top - panelMargin;
+          }
+          if (corner.indexOf('r') >= 0) {
+            newEdges.right = obj.width + obj.left + panelMargin;
+          }
+          if (corner.indexOf('b') >= 0) {
+            newEdges.bottom = obj.height + obj.top + panelMargin;
+          }
 				}
 				resizePanels(obj, newEdges);
 				obj.edges = {
@@ -119,8 +151,8 @@ define(["../../CanvasState"], function(canvasState) {
 					right: newEdges.right || obj.edges.right,
 					bottom: newEdges.bottom || obj.edges.bottom,
 				};
-				obj.scaleX = 1;
-				obj.scaleY = 1;
+//				obj.scaleX = 1;
+//				obj.scaleY = 1;
 			}
 		});
 

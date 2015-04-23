@@ -13,7 +13,7 @@ define(function(require) {
 
 	var activate = function(toolname) {
 		if (toolname in toolset) {
-			if (currentTool) {
+			if (currentTool) { //TODO How is currentTool evaluated to a boolean?
 				currentTool.deactivate();
 				console.log("deactivating from toolset:", currentTool.name);
 			}
@@ -28,15 +28,20 @@ define(function(require) {
 		init: function() {
 			console.log("initing tools");
 			for (var i in toolset) {
+				console.log(i);
+				console.log(toolset[i]);
 				toolset[i].init();
 			}
 		},
 		toolset: toolset,
 		activate: activate,
 		test: function() {
+			//TODO could this cause issues when doing asynchronous operations?
 			activate("Split");
 			currentTool.test();
 			activate("Join");
+			currentTool.test();
+			activate("Test");
 			currentTool.test();
 		}
 	};

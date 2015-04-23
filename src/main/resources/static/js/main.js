@@ -8,6 +8,12 @@ require.config({
 		view: "view",
 		semanticui: "semantic"
 	},
+	shim: {
+	  "semanticui": {
+	    deps: ["jquery"],
+	    exports: "semanticui"
+	  }
+	},
 
 	callback: function() {
     // should prompt user for project initialization
@@ -26,19 +32,18 @@ require.config({
 
 //      console.log(canvasState);
 
-      var dependencies = [
-        "Editor",
-        "Menu"
-      ];
-
-      require(dependencies, function(editor, menu) {
-        // editor.init("canvas");
+      require(["Menu", "Editor"], function(menu, editor) {
+        //editor.init("canvas");
         console.log(menu);
         menu.init();
-//        editor.test(); /* */
+        editor.test(); /* */
       });
 //    });
 
 	}
 });
+
+function quit() {
+  $.post("/quit", {}, function(responseJSON){});
+}
 
