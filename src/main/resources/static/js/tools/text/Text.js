@@ -1,7 +1,7 @@
 define(["../../CanvasState"], function(canvasState) {
 
 	var activate = function() {
-
+/*
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) { // map
@@ -183,6 +183,7 @@ define(["../../CanvasState"], function(canvasState) {
 				canvasState.deleteElement(selected);
 			}
 		};
+	*/
 	};
 
 	var deactivate = function() {
