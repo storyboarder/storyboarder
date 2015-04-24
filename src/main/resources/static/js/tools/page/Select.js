@@ -10,7 +10,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		var oldEdges = obj.edges;
 		canvasState.mapElements(
 			function(found) {
-				if (found.type == "panel" &&
+				if (found.elmType == "panel" &&
 					found != obj &&
 					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
 					var e = found;
@@ -44,7 +44,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type == "panel") {
+				if (found.elmType == "panel") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,
@@ -156,7 +156,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:selected', function(options) {
-			if (options.type !== 'text') {
+			if (options.elmType !== 'text') {
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}

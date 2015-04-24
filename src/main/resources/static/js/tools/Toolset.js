@@ -6,7 +6,9 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
-		"Text": require("./text/Text")
+		"Text": require("./text/Text"),
+		"Undo": require("./main/Undo"),
+		"Redo": require("./main/Redo")
 	};
 
 	var activate = function(toolname) {

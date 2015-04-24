@@ -91,7 +91,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		//canvasState.setSelectable("panel", true);
 		canvasState.mapElements(
 			function(e) { // map
-				if (e.type == "panel") {
+				if (e.elmType == "panel") {
 					e.set({
 						selectable: true
 					});
@@ -171,5 +171,5 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			//			divideY(canvas._objects[1], 150);
 			//			divideX(canvas._objects[1], 100);
 		}
-	}
+	};
 });

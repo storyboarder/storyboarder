@@ -35,18 +35,46 @@ define(["../../CanvasState"], function(canvasState) {
 		var edit;
 		TEXT_PADDING = 20;
 
+<<<<<<< HEAD
+			canvas.on('mouse:down', function(coor) {
+				
+				initialPos = {
+					x: coor.e.offsetX,
+					y: coor.e.offsetY
+				};
+=======
 		canvas.on('mouse:down', function(coor) {
+>>>>>>> ea8dd2af02a40e4a3d637fa1bd599908715faf8c
 
 			initialPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
 			}
 
+<<<<<<< HEAD
+			canvas.on('mouse:up', function(coor){
+				
+				finalPos = {
+					x: coor.e.offsetX,
+					y: coor.e.offsetY
+				};
+
+				// weird bug when I edit and then click out of the box
+				// phantom group box....?
+				if(selected && selected.type === 'group') {
+					if(edit) {
+						console.log("GROUP!!");
+						var pos = {
+							left : selected.left,
+							top : selected.top
+						};
+=======
 			selected = coor.target;
 			edit = coor.e.shiftKey;
 		});
 
 		canvas.on('mouse:up', function(coor) {
+>>>>>>> ea8dd2af02a40e4a3d637fa1bd599908715faf8c
 
 			finalPos = {
 				x: coor.e.offsetX,

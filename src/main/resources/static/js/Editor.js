@@ -3,10 +3,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
-			console.log("undo called");
+			canvasState.revertState();
 		},
 		"Redo": function(params) {
-			console.log("redo called");
+			canvasState.restoreState();
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
@@ -107,6 +107,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
+		canvasState.storeState();
+
 		toolset.activate(toolname);
 	};
 
