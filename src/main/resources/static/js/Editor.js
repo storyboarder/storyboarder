@@ -10,34 +10,27 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
+			console.log(params);
 			if (params.checked) {
-				canvasState.drawGrid();
+				canvasState.drawGrid(params.name);
 			} else {
-				canvasState.clearGrid();
+				canvasState.clearGrid(params.name);
 			}
 		},
-		"TogglePanelGrid": function(params) {
-			console.log("toggle-panel-grid");
-			if (params.checked) {
-				canvasState.drawPanelGrid();
-			} else {
-				canvasState.clearPanelGrid();
-			}
-		},
-		"GridSpacing": function(params) {
-			canvasState.setGridSpacing(params.value);
-			canvasState.clearGrid();
-			canvasState.drawGrid();
+		"SetSnap": function(params) {
+		  var obj = {};
+		  obj[params.id] = params.value;
+			canvasState.setSnap(params.name, obj);
 		},
 		"PanelRows": function(params) {
 			canvasState.setPanelRows(params.value);
-			canvasState.clearPanelGrid();
-			canvasState.drawPanelGrid();
+			canvasState.clearPanelGrid(params.name);
+			canvasState.drawPanelGrid(params.name);
 		},
 		"PanelColumns": function(params) {
 			canvasState.setPanelColumns(params.value);
-			canvasState.clearPanelGrid();
-			canvasState.drawPanelGrid();
+			canvasState.clearPanelGrid(params.name);
+			canvasState.drawPanelGrid(params.name);
 		},
 		"Load": function(pageNum) {
 			console.log("load called");
@@ -84,7 +77,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		}
 	};
-	var init = function(spec) {
+	var init = function(spec, callback) {
+	  console.log("editor init");
 		var canvas = spec.canvas;
 		var width = spec.width;
 		var height = spec.height;
@@ -95,14 +89,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		console.log(width, height);
 
 		canvasState.setPageMargin(pageMargin);
-		canvasState.setGridSpacing(40); //TODO un-hardcode
-		canvasState.setSnapDistance(10); //TODO un-hardcode
-		canvasState.setPanelRows(3);
-		canvasState.setPanelRows(2);
-		console.log(canvasState.getGridSpacing());
 		console.log(canvasState);
 		canvasState.setPanelMargin(panelMargin);
-		canvasState.init(canvas.attr("id"), width, height);
+		canvasState.init(canvas.attr("id"), width, height, callback);
+//		canvasState.setGridSpacing(40); //TODO un-hardcode
+//		canvasState.setSnapDistance(10); //TODO un-hardcode
+//		canvasState.setPanelRows(3);
+//		canvasState.setPanelColumns(2);
 
 		console.log("init editor");
 

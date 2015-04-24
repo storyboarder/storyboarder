@@ -65,8 +65,12 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
         height: parseInt($("#page-height").val()),
         pageMargin: parseInt($("#page-margin").val()),
         panelMargin: parseInt($("#panel-margin").val())
+      }, function() {
+        $("input[type='text'].action").each(function(e) {
+          console.log($(this));
+          set_value($(this));
+        });
       });
-
 	  },
 	  "LoadProject": function(form) {
       console.log($("#project-file").val());
@@ -81,7 +85,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
         height: parseInt($("#page-height").val()),
         pageMargin: parseInt($("#page-margin").val()),
         panelMargin: parseInt($("#panel-margin").val())
-      });
+	    });
 	  },
 	};
 
@@ -95,10 +99,23 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		console.log(editor);
 	};
 
+  var set_value = function(item) {
+    console.log("text action called");
+    console.log(item);
+    var val = item.val();
+    console.log(val);
+    val = isNaN(val) ? val : parseInt(val);
+    console.log(typeof val);
+    console.log(isNaN(val) ? val : parseInt(val));
+    editor.action(item.attr('data-action'), {
+      name: item.attr("name"),
+      id: item.attr("id"),
+      value: val
+    });
+  };
 
 	var init = function() {
 		console.log("Menu initing");
-
 
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
@@ -126,21 +143,19 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
 		$("a.action").click(function() {
 			console.log("action called");
-			editor.action($(this).attr('id'), {});
+			editor.action($(this).attr('data-action'), {name: $(this).attr('name')});
 		});
 
 		$("input[type='checkbox'].action").change(function() {
 			console.log("check action called");
-			editor.action($(this).attr('id'), {
-				checked: $(this).prop("checked")
+			editor.action($(this).attr('data-action'), {
+				checked: $(this).prop("checked"),
+				name: $(this).attr("name")
 			});
 		});
 
 		$("input[type='text'].action").change(function() {
-			console.log("text action called");
-			editor.action($(this).attr('id'), {
-				value: $(this).val()
-			});
+			set_value($(this));
 		});
 
     $("a.modal").click(function() {

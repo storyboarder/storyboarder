@@ -106,9 +106,10 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		var vertical = true;
 		canvas.on("mouse:move", function(options) {
 			canvas.deactivateAll();
-			var x = snap(options.e.offsetX);
-			var y = snap(options.e.offsetY);
-			if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
+      pt = canvasState.snapPoint({x: options.e.offsetX, y: options.e.offsetY});
+      var x = pt.x;
+      var y = pt.y;
+      if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
 				previewDivideY(options.target, y);
 				vertical = false;
 			} else if (Math.abs(options.e.movementX) - Math.abs(options.e.movementY) > threshold) {
@@ -124,10 +125,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on("object:selected", function(options) {
-			console.log(options);
 			var obj = options.target;
-			var x = snap(options.e.offsetX);
-			var y = snap(options.e.offsetY);
+      pt = canvasState.snapPoint({x: options.e.offsetX, y: options.e.offsetY});
+      var x = pt.x;
+      var y = pt.y;
+
 			if (obj && obj.edges) {
 				if (!vertical &&
 					obj.edges.bottom - y > 3 * canvasState.getPanelMargin() &&
@@ -141,10 +143,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			}
 			canvas.deactivateAll();
 		});
-		console.log(canvas.__eventListeners);
-		console.log(canvasState.mapElements(function(e) {
-			console.log(e);
-		}));
+//		console.log(canvas.__eventListeners);
 
 		return this;
 	};

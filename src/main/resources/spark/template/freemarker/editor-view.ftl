@@ -43,19 +43,19 @@
           <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
           <br>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" name="ToggleGrid" id="ToggleGrid">
+                  <input type="checkbox" class="action" data-action="ToggleGrid" name="gridSnap">
                   <label>Snap to grid</label>
             </div>
             <div class="ui mini input">
-                  <label>Spacing</label><input type="text" class="action" id="GridSpacing" value="20">
+                  <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
             </div>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" name="TogglePanelGrid" id="TogglePanelGrid">
+                  <input type="checkbox" class="action" data-action="ToggleGrid" name="panelGridSnap">
                   <label>Snap to panel grid</label>
             </div>
             <div class="ui mini input">
-                  <label>Rows</label><input type="text" class="action" id="PanelRows" value="3">
-                  <label>Columns</label><input type="text" class="action" id="PanelColumns" value="2">
+                  <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
+                  <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
             </div>
         </div>
       </div>
@@ -72,6 +72,27 @@
         <div class="title">Image</div>
         <div class="tools">
           <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+          <div style="display: none;" id="drawing-mode-options">
+            <label for="drawing-mode-selector">Mode:</label>
+            <select id="drawing-mode-selector">
+              <option>Pencil</option>
+              <option>Circle</option>
+              <option>Spray</option>
+              <option>Pattern</option>
+              <option>hline</option>
+              <option>vline</option>
+              <option>square</option>
+              <option>diamond</option>
+              <option>texture</option>
+            </select><br>
+            <label for="drawing-line-width">Line width:</label>
+            <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
+            <label for="drawing-color">Line color:</label>
+            <input type="color" value="#005E7A" id="drawing-color"><br>
+            <label for="drawing-shadow-width">Line shadow width:</label>
+            <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
+          </div>
+
           <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>

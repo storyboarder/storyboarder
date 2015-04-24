@@ -53,7 +53,7 @@ class Multiplayer extends WebSocketServer {
    */
 
   public static void main(String[] args) throws InterruptedException,
-    IOException {
+  IOException {
     WebSocketImpl.DEBUG = true;
     int port = 8887; // 843 flash policy port
     try {
