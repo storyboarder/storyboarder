@@ -1,0 +1,2 @@
+{"content":"New string!"}
+{"content":"Line 2!"}

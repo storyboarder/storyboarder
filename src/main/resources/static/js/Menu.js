@@ -52,37 +52,37 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	};
 
 	var forms = {
-	  "CreateProject": function(form) {
-      console.log($("#page-width").val(), $("#page-height").val());
-      // TODO call editor create project
-      $('.ui.modal.page-setup').modal('hide');
-      $('#page').width(parseInt($("#page-width").val()));
-      $('#page').height(parseInt($("#page-height").val()));
-      console.log($('#canvas').width());
-      editor.init({
-        canvas: $("#canvas"),
-        width: parseInt($("#page-width").val()),
-        height: parseInt($("#page-height").val()),
-        pageMargin: parseInt($("#page-margin").val()),
-        panelMargin: parseInt($("#panel-margin").val())
-      });
-
-	  },
-	  "LoadProject": function(form) {
-      console.log($("#project-file").val());
-      // TODO call editor load project
-      $('.ui.modal.page-setup').modal('hide');
-      $('#page').width(parseInt($("#page-width").val()));
-      $('#page').height(parseInt($("#page-height").val()));
-      console.log($('#canvas').width());
-      editor.init({
-        canvas: $("#canvas"),
-        width: parseInt($("#page-width").val()),
-        height: parseInt($("#page-height").val()),
-        pageMargin: parseInt($("#page-margin").val()),
-        panelMargin: parseInt($("#panel-margin").val())
-      });
-	  },
+		"CreateProject": function(form) {
+			console.log($("#page-width").val(), $("#page-height").val());
+			// TODO call editor create project
+			$('.ui.modal.page-setup').modal('hide');
+			$('#page').width(parseInt($("#page-width").val()));
+			$('#page').height(parseInt($("#page-height").val()));
+			console.log($('#canvas').width());
+			editor.init({
+				canvas: $("#canvas"),
+				width: parseInt($("#page-width").val()),
+				height: parseInt($("#page-height").val()),
+				pageMargin: parseInt($("#page-margin").val()),
+				panelMargin: parseInt($("#panel-margin").val())
+			});
+		},
+		"LoadProject": function(form) {
+			console.log("file:");
+			console.log($("#project-file").val());
+			// TODO call editor load project
+			$('.ui.modal.page-setup').modal('hide');
+			$('#page').width(parseInt($("#page-width").val()));
+			$('#page').height(parseInt($("#page-height").val()));
+			console.log($('#canvas').width());
+			editor.init({
+				canvas: $("#canvas"),
+				width: parseInt($("#page-width").val()),
+				height: parseInt($("#page-height").val()),
+				pageMargin: parseInt($("#page-margin").val()),
+				panelMargin: parseInt($("#panel-margin").val())
+			});
+		},
 	};
 
 
@@ -106,10 +106,10 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			}
 		});
 
-    /* Toolbar init */
-    $(".tools a").popup({
-      padding: "4px",
-    });
+		/* Toolbar init */
+		$(".tools a").popup({
+			padding: "4px",
+		});
 
 		$('.ui.checkbox')
 			.checkbox();
@@ -143,43 +143,43 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			});
 		});
 
-    $("a.modal").click(function() {
-      console.log($(this).attr('id'));
-      var id = $(this).attr('id');
-      if (id in modals) {
-        modals[id]();
-      } else {
-        throw "Modal not found: " + name;
-      }
-    });
+		$("a.modal").click(function() {
+			console.log($(this).attr('id'));
+			var id = $(this).attr('id');
+			if (id in modals) {
+				modals[id]();
+			} else {
+				throw "Modal not found: " + name;
+			}
+		});
 
-    $(".toolset .title").click(function() {
-      $(this).parent().children(".tools").slideToggle();
-    });
+		$(".toolset .title").click(function() {
+			$(this).parent().children(".tools").slideToggle();
+		});
 
-    $("a.new-page").click(function() {
-      console.log("new page");
-    });
+		$("a.new-page").click(function() {
+			console.log("new page");
+		});
 
-    $("a.remove-page").click(function() {
-      console.log("remove page");
-    });
+		$("a.remove-page").click(function() {
+			console.log("remove page");
+		});
 
 
-    /* Form inits */
+		/* Form inits */
 
-    $(".form-action").click(function() {
-      console.log("form submitted");
-      var id = $(this).attr("id");
-      console.log(id);
-      forms[id]();
+		$(".form-action").click(function() {
+			console.log("form submitted");
+			var id = $(this).attr("id");
+			console.log(id);
+			forms[id]();
 
-    });
+		});
 
-    init_project();
+		init_project();
 	};
 
-  return {
-    init: init
-  };
+	return {
+		init: init
+	};
 });

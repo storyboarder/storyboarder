@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -17,12 +18,20 @@ class StoryboarderProject {
 
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  private final Path file;
+  private DirectoryStream<Path> projects;
+
+  private final Path project;
 
   private List<String> pages = new ArrayList<String>();
 
+  StoryboarderProject(Path project) {
+    this.project = project;
+  }
+
   StoryboarderProject(String path) throws IOException {
-    file = Paths.get(path);
+    Path projectFolder = Paths.get(path);
+    projects = Files.newDirectoryStream(projectFolder);
+    project = Paths.get(path);
   }
 
   void load() throws IOException {
@@ -30,13 +39,11 @@ class StoryboarderProject {
   }
 
   void create() throws IOException {
-    Files.createDirectories(file.getParent());
-    Files.createFile(file);
+    Files.createDirectories(project.getParent());
+    Files.createFile(project);
   }
 
   String getPage(int page) {
-    // System.out.println("\ngetting page from this list:");
-    // System.out.println(pages);
     return pages.get(page);
   }
 
@@ -63,7 +70,8 @@ class StoryboarderProject {
   void saveToDisk() throws IOException {
     System.out.println(pages);
     OpenOption options = StandardOpenOption.WRITE;
-    PrintWriter writer = new PrintWriter(Files.newBufferedWriter(file, CHARSET,
+    PrintWriter writer = new PrintWriter(Files.newBufferedWriter(project,
+        CHARSET,
         options));
 
     for (String page : pages) {
@@ -73,7 +81,7 @@ class StoryboarderProject {
   }
 
   private void readFile() throws IOException {
-    BufferedReader reader = Files.newBufferedReader(file, CHARSET);
+    BufferedReader reader = Files.newBufferedReader(project, CHARSET);
     pages.clear();
     String line;
     while ((line = reader.readLine()) != null) {
