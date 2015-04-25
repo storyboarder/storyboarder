@@ -65,14 +65,22 @@
     <div class="column" style="height:100%">
       <h2 class="ui header">Load</h2>
       <div class="ui form" class="LoadProject">
-        <div class="field">
-          <div class="ui input">
-            <input type="file" id="project-file"> <!--TODO override default style (make it match semantic ui)/-->
+        <div id="project-choices" class="ui divided list">
+          <div class="item">
+            <div class="content">
+              <a>Item 1</a>
+            </div>
           </div>
-        </div>
-
-        <div class="ui button form-action" id="LoadProject">
-          Load
+          <div class="item">
+            <div class="content">
+              <a>Item 2</a>
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <a>Item 3</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
