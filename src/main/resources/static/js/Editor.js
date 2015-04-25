@@ -33,7 +33,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			$.post("/loadProj", params, function(response) {
 				console.log(response);
 			});
-		}
+		},
 		"CreateProj": function(params) {
 			console.log("creating project with: ");
 			console.log(params);
@@ -171,6 +171,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("Expecting {content: Line 2!}. Result:");
 			actions.Load(1);
 		}, 5000);
+
+
 
 
 		//toolset.test();
