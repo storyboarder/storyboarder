@@ -72,9 +72,10 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
         });
       });
 	  },
-	  "LoadProject": function(form) {
+	  "LoadProject": function(num) {
       console.log($("#project-file").val());
       // TODO call editor load project
+      editor.action("LoadProj", num);
       $('.ui.modal.page-setup').modal('hide');
       $('#page').width(parseInt($("#page-width").val()));
       $('#page').height(parseInt($("#page-height").val()));
@@ -95,6 +96,15 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		$('.ui.modal.page-setup')
 			.modal('setting', 'closable', false)
 			.modal('show');
+		editor.action("GetChoices", function(choices) {
+		  console.log(choices);
+		  for (c in choices) {
+		    $("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
+		  }
+		  $("#project-choices .item a").click(function() {
+		    forms["LoadProject"](parseInt($(this).attr("id")));
+		  });
+		});
 
 		console.log(editor);
 	};

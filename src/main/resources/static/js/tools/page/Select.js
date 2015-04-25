@@ -78,12 +78,13 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:scaling', function(options) {
-      var panelMargin = canvasState.getPanelMargin();
-			options.target.width *= options.target.scaleX;
-			options.target.scaleX = 1;
-			options.target.height *= options.target.scaleY;
-			options.target.scaleY = 1;
 			if (options.target.type == "panel") {
+        var panelMargin = canvasState.getPanelMargin();
+        options.target.width *= options.target.scaleX;
+        options.target.scaleX = 1;
+        options.target.height *= options.target.scaleY;
+        options.target.scaleY = 1;
+			  console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};

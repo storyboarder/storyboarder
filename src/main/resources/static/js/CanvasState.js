@@ -121,17 +121,17 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  		previousState: null,
 
  		storeState: function () {
- 			console.log("Diff patch: ", jsondiffpatch);
-			var state = this.getState();
-
-			// If there is history
-			if (this.canRevert()) {
-				var delta = jsondiffpatch.diff(state, previousState);
-	 			this.history.push(delta);
-			}
-
-			this.historyIdx++;
- 			this.previousState = state;
+// 			console.log("Diff patch: ", jsondiffpatch);
+//			var state = this.getState();
+//
+//			// If there is history
+//			if (this.canRevert()) {
+//				var delta = jsondiffpatch.diff(state, previousState);
+//	 			this.history.push(delta);
+//			}
+//
+//			this.historyIdx++;
+// 			this.previousState = state;
  		},
 
  		canRevert: function () {
@@ -222,6 +222,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
  		deleteElement: deleteElement,
 
+ 		load: function(json) {
+ 		  console.log("loading project...");
+ 		  console.log(json);
+ 		},
+
  		init: function(canvasId, w, h, callback) {
  			width = w;
  			height = h;
@@ -257,7 +262,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  			  snap = snapUtil;
  			  snap.init(that);
  			  console.log("init", snap);
- 			  callback();
+ 			  if (typeof callback != "undefined") {
+ 			    callback();
+ 			  }
  			});
  		},
 

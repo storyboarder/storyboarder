@@ -66,21 +66,6 @@
       <h2 class="ui header">Load</h2>
       <div class="ui form" class="LoadProject">
         <div id="project-choices" class="ui divided list">
-          <div class="item">
-            <div class="content">
-              <a>Item 1</a>
-            </div>
-          </div>
-          <div class="item">
-            <div class="content">
-              <a>Item 2</a>
-            </div>
-          </div>
-          <div class="item">
-            <div class="content">
-              <a>Item 3</a>
-            </div>
-          </div>
         </div>
       </div>
     </div>
