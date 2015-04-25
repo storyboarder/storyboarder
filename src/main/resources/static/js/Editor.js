@@ -185,6 +185,21 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			actions.Load(1);
 		}, 5000);
 
+		window.setTimeout(function() {
+			actions.GetChoices(function(choices) {
+				console.log("Testing getting of choices. Expecting [test_0, test_2, test_3, test_4]");
+				console.log(choices);
+			});
+		}, 6000);
+
+		window.setTimeout(function() {
+			console.log("Testing loading of projects");
+			actions.LoadProj(0);
+			actions.LoadProj(1);
+			actions.LoadProj(2);
+			actions.LoadProj(3);
+		}, 7000);
+
 
 
 
