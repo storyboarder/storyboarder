@@ -115,7 +115,6 @@ final class StoryboarderGUI {
   private static List<Path> getPathChoices() {
     try {
       Files.createDirectories(PROJECT_FOLDER);
-      Files.createDirectory(PROJECT_FOLDER);
     } catch (IOException e) {
       System.err.println("ERROR: error creating necessary directories: "
           + e.getMessage());
@@ -208,7 +207,6 @@ final class StoryboarderGUI {
    * @author yz38
    */
   private class CreateProjectHandler implements Route {
-
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();

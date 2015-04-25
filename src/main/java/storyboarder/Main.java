@@ -2,8 +2,6 @@ package storyboarder;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.NoSuchFileException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -25,7 +23,7 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
-  private static final String DEFAULT_DIRECTORY = "testProject/test.txt";
+  private static final String DEFAULT_DIRECTORY = "testProject";
 
   private Main() {
   }
@@ -52,13 +50,13 @@ public final class Main {
       sparkPort = options.valueOf(sparkSpec);
     }
     StoryboarderProject testProj = new StoryboarderProject(DEFAULT_DIRECTORY);
-    try {
-      testProj.create();
-    } catch (FileAlreadyExistsException e) {
-      testProj.load();
-    } catch (NoSuchFileException e) {
-      exit("this shouldn't be happening...");
-    }
+    // try {
+    // testProj.create();
+    // } catch (FileAlreadyExistsException e) {
+    // testProj.load();
+    // } catch (NoSuchFileException e) {
+    // exit("this shouldn't be happening...");
+    // }
     StoryboarderGUI gui = new StoryboarderGUI(sparkPort, testProj);
     gui.start();
 
