@@ -25,8 +25,7 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
-  private static final String DEFAULT_DIRECTORY = "~/testProj/testProj.txt";
-//  private static final String DEFAULT_DIRECTORY = "~/storyboarderTest/test.txt";
+  private static final String DEFAULT_DIRECTORY = "testProject/test.txt";
 
   private Main() {
   }

@@ -32,6 +32,35 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			canvasState.clearPanelGrid(params.name);
 			canvasState.drawPanelGrid(params.name);
 		},
+		"GetChoices": function(displayChoices) {
+			console.log("getting project choices");
+			$.post("/choices", {}, function(responseJSON) {
+				displayChoices(JSON.parse(responseJSON));
+			});
+		},
+		"LoadProj": function(params) {
+			console.log("loading project with:");
+			console.log(params);
+			$.post("/loadProj", params, function(response) {
+				console.log(response);
+			});
+		}
+		"CreateProj": function(params) {
+			console.log("creating project with: ");
+			console.log(params);
+			$.post("/createProj", params, function(response) {
+				console.log(response);
+			});
+		},
+
+		"InitProj": function(params) {
+			console.log("initializing the project with: ");
+			console.log(params);
+			$.post("/init", params,
+				function(responseJSON) {
+					console.log(responseJSON);
+				});
+		},
 		"Load": function(pageNum) {
 			console.log("load called");
 			$.post("/load", {
