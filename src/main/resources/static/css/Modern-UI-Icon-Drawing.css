@@ -1,0 +1,430 @@
+@font-face {
+	font-family: 'Modern-UI-Icons-Drawing';
+	src:url('fonts/Modern-UI-Icons-Drawing.eot');
+	src:url('fonts/Modern-UI-Icons-Drawing.eot?#iefix') format('embedded-opentype'),
+		url('fonts/Modern-UI-Icons-Drawing.woff') format('woff'),
+		url('fonts/Modern-UI-Icons-Drawing.ttf') format('truetype'),
+		url('fonts/Modern-UI-Icons-Drawing.svg#Modern-UI-Icons-Drawing') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+[data-icon]:before {
+	font-family: 'Modern-UI-Icons-Drawing';
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-drawing-"] {
+*/
+.icon-drawing-image, .icon-drawing-image-multiple, .icon-drawing-image-hdr, .icon-drawing-image-redeye, .icon-drawing-image-focus, .icon-drawing-image-ants, .icon-drawing-arrow-collapsed, .icon-drawing-arrow-expand, .icon-drawing-vector-pen, .icon-drawing-vector-pen-add, .icon-drawing-vector-pen-minus, .icon-drawing-vector-pen-convert, .icon-drawing-fullscreen-box, .icon-drawing-fullscreen, .icon-drawing-draw-pencil, .icon-drawing-edit, .icon-drawing-draw-pen-reflection, .icon-drawing-draw-pen, .icon-drawing-draw-pen-add, .icon-drawing-draw-pen-minus, .icon-drawing-draw-marker-reflection, .icon-drawing-draw-marker, .icon-drawing-draw-paintbrush, .icon-drawing-draw-button, .icon-drawing-draw-brush-reflection, .icon-drawing-draw-brush, .icon-drawing-dropper, .icon-drawing-vector-line-curve, .icon-drawing-vector-line-spline, .icon-drawing-vector-line, .icon-drawing-vector-rectangle, .icon-drawing-vector-polygon, .icon-drawing-vector-circle, .icon-drawing-vector-star, .icon-drawing-vector-group-removed, .icon-drawing-vector-group, .icon-drawing-redo-point, .icon-drawing-undo-point, .icon-drawing-redo, .icon-drawing-undo, .icon-drawing-redo-curve, .icon-drawing-undo-curve, .icon-drawing-transform-rotate-right, .icon-drawing-transform-rotate-left, .icon-drawing-transform-rotate-counterclockwise, .icon-drawing-transform-rotate-clockwise, .icon-drawing-transform-flip-vertical, .icon-drawing-transform-flip-horizontal, .icon-drawing-tiles-plus, .icon-drawing-tiles-minus, .icon-drawing-tiles-four, .icon-drawing-tiles-nine, .icon-drawing-tiles-sixteen, .icon-drawing-text-bold, .icon-drawing-text-italic, .icon-drawing-text-underline, .icon-drawing-text-strikethrough, .icon-drawing-text-overline, .icon-drawing-text-size, .icon-drawing-text-size-plus, .icon-drawing-text-size-minus, .icon-drawing-text-size-up, .icon-drawing-text-size-down, .icon-drawing-text-serif, .icon-drawing-text-sans, .icon-drawing-text-script, .icon-drawing-text-align-left, .icon-drawing-text-align-center, .icon-drawing-text-align-right, .icon-drawing-text-align-justify, .icon-drawing-crop, .icon-drawing-crosshair, .icon-drawing-dimension-line-width-short, .icon-drawing-dimension-line-height, .icon-drawing-dimension-line-height-short, .icon-drawing-dimension-box-width, .icon-drawing-dimension-box-height, .icon-drawing-dimension-arrow-line-width-thick, .icon-drawing-dimension-arrow-line-width, .icon-drawing-dimension-arrow-line-width-short, .icon-drawing-dimension-arrow-line-height-thick, .icon-drawing-dimension-arrow-line-height, .icon-drawing-dimension-arrow-line-height-short, .icon-drawing-dimension-arrow-box-width, .icon-drawing-dimension-arrow-box-height, .icon-drawing-dimension-line-width, .icon-drawing-layer-arrange-solid-sendtoback, .icon-drawing-layer-arrange-solid-bringtofront, .icon-drawing-layer-arrange-solid-sendbackward, .icon-drawing-layer-arrange-solid-bringforward, .icon-drawing-align-left, .icon-drawing-align-center, .icon-drawing-align-right, .icon-drawing-align-justify, .icon-drawing-printer, .icon-drawing-printer-text, .icon-drawing-printer-blank, .icon-drawing-layer, .icon-drawing-layer-down, .icon-drawing-layer-up, .icon-drawing-layer-add, .icon-drawing-layer-minus, .icon-drawing-layer-delete, .icon-drawing-image-export, .icon-drawing-image-gallery, .icon-drawing-list-one, .icon-drawing-list-two, .icon-drawing-list, .icon-drawing-list-create, .icon-drawing-list-star, .icon-drawing-list-gear, .icon-drawing-list-select, .icon-drawing-list-reorder-down, .icon-drawing-list-reorder, .icon-drawing-list-reorder-up, .icon-drawing-list-hidden, .icon-drawing-list-merge, .icon-drawing-section-expand-all, .icon-drawing-section-collapse-all, .icon-drawing-section-expand, .icon-drawing-section-collapse, .icon-drawing-checkmark-cross, .icon-drawing-checkmark-uncrossed, .icon-drawing-folder-open, .icon-drawing-folder, .icon-drawing-folder-lock, .icon-drawing-folder-ellipsis, .icon-drawing-appbarcursordefault, .icon-drawing-appbarcursordefaultoutline, .icon-drawing-appbarcursorhand {
+	font-family: 'Modern-UI-Icons-Drawing';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	font-size:22pt;
+	-webkit-font-smoothing: antialiased;
+}
+.icon-drawing-image:before {
+	content: "\e000";
+}
+.icon-drawing-image-multiple:before {
+	content: "\e001";
+}
+.icon-drawing-image-hdr:before {
+	content: "\e002";
+}
+.icon-drawing-image-redeye:before {
+	content: "\e003";
+}
+.icon-drawing-image-focus:before {
+	content: "\e004";
+}
+.icon-drawing-image-ants:before {
+	content: "\e005";
+}
+.icon-drawing-arrow-collapsed:before {
+	content: "\e006";
+}
+.icon-drawing-arrow-expand:before {
+	content: "\e007";
+}
+.icon-drawing-vector-pen:before {
+	content: "\e008";
+}
+.icon-drawing-vector-pen-add:before {
+	content: "\e009";
+}
+.icon-drawing-vector-pen-minus:before {
+	content: "\e00a";
+}
+.icon-drawing-vector-pen-convert:before {
+	content: "\e00b";
+}
+.icon-drawing-fullscreen-box:before {
+	content: "\e00c";
+}
+.icon-drawing-fullscreen:before {
+	content: "\e00d";
+}
+.icon-drawing-draw-pencil:before {
+	content: "\e00e";
+}
+.icon-drawing-edit:before {
+	content: "\e00f";
+}
+.icon-drawing-draw-pen-reflection:before {
+	content: "\e010";
+}
+.icon-drawing-draw-pen:before {
+	content: "\e011";
+}
+.icon-drawing-draw-pen-add:before {
+	content: "\e012";
+}
+.icon-drawing-draw-pen-minus:before {
+	content: "\e013";
+}
+.icon-drawing-draw-marker-reflection:before {
+	content: "\e014";
+}
+.icon-drawing-draw-marker:before {
+	content: "\e015";
+}
+.icon-drawing-draw-paintbrush:before {
+	content: "\e016";
+}
+.icon-drawing-draw-button:before {
+	content: "\e017";
+}
+.icon-drawing-draw-brush-reflection:before {
+	content: "\e018";
+}
+.icon-drawing-draw-brush:before {
+	content: "\e019";
+}
+.icon-drawing-dropper:before {
+	content: "\e01a";
+}
+.icon-drawing-vector-line-curve:before {
+	content: "\e01b";
+}
+.icon-drawing-vector-line-spline:before {
+	content: "\e01c";
+}
+.icon-drawing-vector-line:before {
+	content: "\e01d";
+}
+.icon-drawing-vector-rectangle:before {
+	content: "\e01e";
+}
+.icon-drawing-vector-polygon:before {
+	content: "\e01f";
+}
+.icon-drawing-vector-circle:before {
+	content: "\e020";
+}
+.icon-drawing-vector-star:before {
+	content: "\e021";
+}
+.icon-drawing-vector-group-removed:before {
+	content: "\e022";
+}
+.icon-drawing-vector-group:before {
+	content: "\e023";
+}
+.icon-drawing-redo-point:before {
+	content: "\e024";
+}
+.icon-drawing-undo-point:before {
+	content: "\e025";
+}
+.icon-drawing-redo:before {
+	content: "\e026";
+}
+.icon-drawing-undo:before {
+	content: "\e027";
+}
+.icon-drawing-redo-curve:before {
+	content: "\e028";
+}
+.icon-drawing-undo-curve:before {
+	content: "\e029";
+}
+.icon-drawing-transform-rotate-right:before {
+	content: "\e02a";
+}
+.icon-drawing-transform-rotate-left:before {
+	content: "\e02b";
+}
+.icon-drawing-transform-rotate-counterclockwise:before {
+	content: "\e02c";
+}
+.icon-drawing-transform-rotate-clockwise:before {
+	content: "\e02d";
+}
+.icon-drawing-transform-flip-vertical:before {
+	content: "\e02e";
+}
+.icon-drawing-transform-flip-horizontal:before {
+	content: "\e02f";
+}
+.icon-drawing-tiles-plus:before {
+	content: "\e030";
+}
+.icon-drawing-tiles-minus:before {
+	content: "\e031";
+}
+.icon-drawing-tiles-four:before {
+	content: "\e032";
+}
+.icon-drawing-tiles-nine:before {
+	content: "\e033";
+}
+.icon-drawing-tiles-sixteen:before {
+	content: "\e034";
+}
+.icon-drawing-text-bold:before {
+	content: "\e035";
+}
+.icon-drawing-text-italic:before {
+	content: "\e036";
+}
+.icon-drawing-text-underline:before {
+	content: "\e037";
+}
+.icon-drawing-text-strikethrough:before {
+	content: "\e038";
+}
+.icon-drawing-text-overline:before {
+	content: "\e039";
+}
+.icon-drawing-text-size:before {
+	content: "\e03a";
+}
+.icon-drawing-text-size-plus:before {
+	content: "\e03b";
+}
+.icon-drawing-text-size-minus:before {
+	content: "\e03c";
+}
+.icon-drawing-text-size-up:before {
+	content: "\e03d";
+}
+.icon-drawing-text-size-down:before {
+	content: "\e03e";
+}
+.icon-drawing-text-serif:before {
+	content: "\e03f";
+}
+.icon-drawing-text-sans:before {
+	content: "\e040";
+}
+.icon-drawing-text-script:before {
+	content: "\e041";
+}
+.icon-drawing-text-align-left:before {
+	content: "\e042";
+}
+.icon-drawing-text-align-center:before {
+	content: "\e043";
+}
+.icon-drawing-text-align-right:before {
+	content: "\e044";
+}
+.icon-drawing-text-align-justify:before {
+	content: "\e045";
+}
+.icon-drawing-crop:before {
+	content: "\e046";
+}
+.icon-drawing-crosshair:before {
+	content: "\e047";
+}
+.icon-drawing-dimension-line-width-short:before {
+	content: "\e048";
+}
+.icon-drawing-dimension-line-height:before {
+	content: "\e049";
+}
+.icon-drawing-dimension-line-height-short:before {
+	content: "\e04a";
+}
+.icon-drawing-dimension-box-width:before {
+	content: "\e04b";
+}
+.icon-drawing-dimension-box-height:before {
+	content: "\e04c";
+}
+.icon-drawing-dimension-arrow-line-width-thick:before {
+	content: "\e04d";
+}
+.icon-drawing-dimension-arrow-line-width:before {
+	content: "\e04e";
+}
+.icon-drawing-dimension-arrow-line-width-short:before {
+	content: "\e04f";
+}
+.icon-drawing-dimension-arrow-line-height-thick:before {
+	content: "\e050";
+}
+.icon-drawing-dimension-arrow-line-height:before {
+	content: "\e051";
+}
+.icon-drawing-dimension-arrow-line-height-short:before {
+	content: "\e052";
+}
+.icon-drawing-dimension-arrow-box-width:before {
+	content: "\e053";
+}
+.icon-drawing-dimension-arrow-box-height:before {
+	content: "\e054";
+}
+.icon-drawing-dimension-line-width:before {
+	content: "\e055";
+}
+.icon-drawing-layer-arrange-solid-sendtoback:before {
+	content: "\e056";
+}
+.icon-drawing-layer-arrange-solid-bringtofront:before {
+	content: "\e057";
+}
+.icon-drawing-layer-arrange-solid-sendbackward:before {
+	content: "\e058";
+}
+.icon-drawing-layer-arrange-solid-bringforward:before {
+	content: "\e059";
+}
+.icon-drawing-align-left:before {
+	content: "\e05a";
+}
+.icon-drawing-align-center:before {
+	content: "\e05b";
+}
+.icon-drawing-align-right:before {
+	content: "\e05c";
+}
+.icon-drawing-align-justify:before {
+	content: "\e05d";
+}
+.icon-drawing-printer:before {
+	content: "\e05e";
+}
+.icon-drawing-printer-text:before {
+	content: "\e05f";
+}
+.icon-drawing-printer-blank:before {
+	content: "\e060";
+}
+.icon-drawing-layer:before {
+	content: "\e061";
+}
+.icon-drawing-layer-down:before {
+	content: "\e062";
+}
+.icon-drawing-layer-up:before {
+	content: "\e063";
+}
+.icon-drawing-layer-add:before {
+	content: "\e064";
+}
+.icon-drawing-layer-minus:before {
+	content: "\e065";
+}
+.icon-drawing-layer-delete:before {
+	content: "\e066";
+}
+.icon-drawing-image-export:before {
+	content: "\e067";
+}
+.icon-drawing-image-gallery:before {
+	content: "\e068";
+}
+.icon-drawing-list-one:before {
+	content: "\e069";
+}
+.icon-drawing-list-two:before {
+	content: "\e06a";
+}
+.icon-drawing-list:before {
+	content: "\e06b";
+}
+.icon-drawing-list-create:before {
+	content: "\e06c";
+}
+.icon-drawing-list-star:before {
+	content: "\e06d";
+}
+.icon-drawing-list-gear:before {
+	content: "\e06f";
+}
+.icon-drawing-list-select:before {
+	content: "\e070";
+}
+.icon-drawing-list-reorder-down:before {
+	content: "\e076";
+}
+.icon-drawing-list-reorder:before {
+	content: "\e077";
+}
+.icon-drawing-list-reorder-up:before {
+	content: "\e078";
+}
+.icon-drawing-list-hidden:before {
+	content: "\e079";
+}
+.icon-drawing-list-merge:before {
+	content: "\e07a";
+}
+.icon-drawing-section-expand-all:before {
+	content: "\e07b";
+}
+.icon-drawing-section-collapse-all:before {
+	content: "\e07c";
+}
+.icon-drawing-section-expand:before {
+	content: "\e07d";
+}
+.icon-drawing-section-collapse:before {
+	content: "\e07e";
+}
+.icon-drawing-checkmark-cross:before {
+	content: "\e07f";
+}
+.icon-drawing-checkmark-uncrossed:before {
+	content: "\e080";
+}
+.icon-drawing-folder-open:before {
+	content: "\e081";
+}
+.icon-drawing-folder:before {
+	content: "\e082";
+}
+.icon-drawing-folder-lock:before {
+	content: "\e083";
+}
+.icon-drawing-folder-ellipsis:before {
+	content: "\e084";
+}
+.icon-drawing-appbarcursordefault:before {
+	content: "\e06e";
+}
+.icon-drawing-appbarcursordefaultoutline:before {
+	content: "\e071";
+}
+.icon-drawing-appbarcursorhand:before {
+	content: "\e072";
+}

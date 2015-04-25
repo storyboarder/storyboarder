@@ -38,9 +38,12 @@
       <div class="toolset">
         <div class="title">Main</div>
         <div class="tools">
-          <a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>
-          <a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
-          <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
+          <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
+          <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
+          <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
+          <a href="#" class="action" id="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
+          <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
+          <a href="#" class="action" id="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
             <div class="ui checkbox">
                   <input type="checkbox" class="action" data-action="ToggleGrid" name="gridSnap">
@@ -63,15 +66,18 @@
       <div class="toolset">
         <div class="title">Panel</div>
         <div class="tools">
-          <a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>
-          <a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>
+          <!--<a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>/-->
+          <a href="#" class="tool" id="Split" data-content="Split"><i class="icon-drawing-tiles-plus"></i></a>
+          <!--<a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>/-->
+          <a href="#" class="tool" id="Join" data-content="Join"><i class="icon-drawing-tiles-minus"></i></a>
         </div>
       </div>
 
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+          <!--<a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-photo"></i></a>/-->
+          <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
             <label for="drawing-mode-selector">Mode:</label>
             <select id="drawing-mode-selector">
@@ -93,16 +99,19 @@
             <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
           </div>
 
-          <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
-          <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
-          <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+          <!--<a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>/-->
+          <a href="#" class="tool" data-content="Paint Brush"><i class="icon-drawing-draw-paintbrush"></i></a>
+          <!--<a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>/-->
+          <!--<a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>/-->
+          <a href="#" class="tool" data-content="Eyedropper"><i class="icon-drawing-dropper"></i></a>
         </div>
       </div>
 
       <div class="toolset">
         <div class="title">Text</div>
         <div class="tools">
-          <a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
+          <!--<a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>/-->
+          <a href="#" class="tool" id="Text" data-content="Add Text"><i class="icon-drawing-draw-sans"></i></a>
           <br>Borders: <input type="radio" name="text-borders"/>ellipse <input type="radio" name="text-borders"/>rectangle <input type="radio" name="text-borders" checked="true"/>none
         </div>
       </div>
@@ -111,7 +120,7 @@
         <div class="title">Save/Export</div>
         <div class="tools">
           <a href="#" class="modal" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="modal" id="Export" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+          <a href="#" class="modal" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
           <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
