@@ -186,6 +186,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		}, 5000);
 
 
+
+
 		//toolset.test();
 		// console.log("editor tested");
 		// console.log("toolset is now " + toolset);

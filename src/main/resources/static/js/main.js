@@ -36,7 +36,9 @@ require.config({
 //        editor.init("canvas");
         console.log(menu);
         menu.init();
-        editor.test(); /* */
+        console.log("editor:");
+        console.log(editor);
+        //editor.test(); /* */
       });
 //    });
 
