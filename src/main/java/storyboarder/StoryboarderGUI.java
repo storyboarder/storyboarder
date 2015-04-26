@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -47,7 +47,7 @@ final class StoryboarderGUI {
 
   private StoryboarderProject project;
 
-  private List<Path> pathChoices = getPathChoices();
+  private Set<Path> pathChoices = getPathChoices();
 
   StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
@@ -71,19 +71,20 @@ final class StoryboarderGUI {
 
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
+    Spark.post("/saveToDisk", new SaveToDiskHandler());
     Spark.post("/quit", new QuitHandler());
   }
 
-  void startAutoSave() {
-    TimerTask saveTask = new TimerTask() {
-      @Override
-      public void run() {
-        saveToDisk();
-      }
-    };
-    Timer saveTimer = new Timer();
-    saveTimer.scheduleAtFixedRate(saveTask, 0, AUTO_SAVE_TIME);
-  }
+  // void startAutoSave() {
+  // TimerTask saveTask = new TimerTask() {
+  // @Override
+  // public void run() {
+  // saveToDisk();
+  // }
+  // };
+  // Timer saveTimer = new Timer();
+  // saveTimer.scheduleAtFixedRate(saveTask, 0, AUTO_SAVE_TIME);
+  // }
 
   String saveToDisk() {
     if (project != null) {
@@ -93,6 +94,7 @@ final class StoryboarderGUI {
       } catch (IOException e) {
         String msg = "ERROR: saving: " + e.getMessage();
         System.err.println(msg);
+        e.printStackTrace();
         return msg;
       }
     } else {
@@ -112,21 +114,24 @@ final class StoryboarderGUI {
     }
   }
 
-  private static List<Path> getPathChoices() {
+  private static Set<Path> getPathChoices() {
     try {
       Files.createDirectories(PROJECT_FOLDER);
     } catch (IOException e) {
       System.err.println("ERROR: error creating necessary directories: "
           + e.getMessage());
     }
-    List<Path> pathChoices = new ArrayList<Path>();
+    Set<Path> pathChoices = new TreeSet<Path>();
 
     try (DirectoryStream<Path> choicesStream = Files
         .newDirectoryStream(PROJECT_FOLDER)) {
       Iterator<Path> choicesIterator = choicesStream.iterator();
 
       while (choicesIterator.hasNext()) {
-        pathChoices.add(choicesIterator.next());
+        Path nextPath = choicesIterator.next();
+        if (nextPath.toString().endsWith(".txt")) {
+          pathChoices.add(nextPath);
+        }
       }
       System.out.println(pathChoices);
     } catch (IOException e) {
@@ -169,7 +174,8 @@ final class StoryboarderGUI {
     public Object handle(Request req, Response res) {
       List<String> names = new ArrayList<String>();
       for (Path choice : pathChoices) {
-        names.add(choice.getName(choice.getNameCount() - 1).toString());
+        String choiceName = choice.getFileName().toString();
+        names.add(choiceName.replace(".txt", ""));
       }
       System.out.println(names);
       return GSON.toJson(names);
@@ -190,8 +196,12 @@ final class StoryboarderGUI {
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
       int choice = GSON.fromJson(qm.value("choice"), Integer.class);
-      project = new StoryboarderProject(pathChoices.get(choice));
-      startAutoSave();
+      List<Path> pathChoicesList = new ArrayList<Path>(pathChoices.size());
+      pathChoicesList.addAll(pathChoices);
+
+      project = new StoryboarderProject(pathChoicesList.get(choice));
+      System.out.println("current project: " + project);
+      // startAutoSave();
       return "success loading project!";
     }
   }
@@ -214,18 +224,22 @@ final class StoryboarderGUI {
       if (!fileName.endsWith(".txt")) {
         fileName += ".txt";
       }
-      Path newFile = Paths.get(PROJECT_FOLDER.toString(), qm.value("name"));
-      pathChoices.add(newFile);
-      try {
-        Files.createFile(newFile);
-      } catch (IOException e) {
-        System.err.println("ERROR: could not create the file: "
-            + e.getMessage());
-        return "failure creating project!";
+      Path newFile = Paths.get(PROJECT_FOLDER.toString(), fileName);
+      if (pathChoices.add(newFile)) {
+        try {
+          Files.createFile(newFile);
+        } catch (IOException e) {
+          System.err.println("ERROR: could not create the file: "
+              + e.getMessage());
+          return "failure creating project!";
+        }
+        project = new StoryboarderProject(newFile);
+        System.out.println("current project: " + project);
+        // startAutoSave();
+        return "success creating project!";
+      } else {
+        return "project already exists!";
       }
-      project = new StoryboarderProject(newFile);
-      startAutoSave();
-      return "success creating project!";
     }
 
   }
@@ -355,6 +369,14 @@ final class StoryboarderGUI {
         return NULL_PROJ_MSG;
       }
     }
+  }
+
+  private class SaveToDiskHandler implements Route {
+    @Override
+    public Object handle(Request arg0, Response arg1) {
+      return saveToDisk();
+    }
+
   }
 
   private class QuitHandler implements Route {

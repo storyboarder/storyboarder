@@ -83,6 +83,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				console.log(response);
 			});
 		},
+		"SaveToDisk": function() {
+			console.log("save to disk called");
+			$.post("/saveToDisk", {}, function(response) {
+				console.log(response);
+			});
+		},
 		"Export": function(params) {
 			console.log("export called");
 		},
@@ -193,12 +199,33 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		}, 6000);
 
 		window.setTimeout(function() {
-			console.log("Testing loading of projects");
-			actions.LoadProj(0);
-			actions.LoadProj(1);
-			actions.LoadProj(2);
-			actions.LoadProj(3);
-		}, 7000);
+			console.log("Loading project 2");
+			actions.LoadProj({choice: 2});
+		}, 8000);
+
+		window.setTimeout(function() {
+			console.log("Writing to loaded project");
+			actions.Save(0, "foo bar derp");
+		}, 9000)
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 10000)
+
+		window.setTimeout(function() {
+			console.log("Testing creating a new project");
+			actions.CreateProj({name: "newProject.txt"});
+		}, 11000);
+
+		window.setTimeout(function() {
+			console.log("Writing to new project");
+			actions.Save(0, "hello world");
+		}, 12000);
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 13000)
+
 
 
 
