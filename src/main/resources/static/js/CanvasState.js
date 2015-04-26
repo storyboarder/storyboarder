@@ -225,6 +225,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  		load: function(json) {
  		  console.log("loading project...");
  		  console.log(json);
+
+ 		  // TODO replace this with json parsing:
+ 		  init("canvas", 400, 600, function() {});
  		},
 
  		init: function(canvasId, w, h, callback) {

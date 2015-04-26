@@ -176,7 +176,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				});
 			}
 		);
-		canvas.__eventListeners["object:scaling"] = [];
+		console.log(canvas);
+		console.log(canvas.__eventListeners);
+		if (typeof canvas.__eventListeners != "undefined") {
+		  canvas.__eventListeners["object:scaling"] = [];
+    }
 	};
 
 	return {

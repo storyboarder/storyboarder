@@ -1,7 +1,7 @@
 define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	var current;
 
-	var modals = {
+	var views = {
 		"Add Image": function() {
 			console.log("add image called");
 			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
@@ -55,7 +55,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		},
 	};
 
-	var forms = {
+	var actions = {
 	  "CreateProject": function(form) {
       console.log("create project");
       $('.ui.modal.create-project').modal('hide');
@@ -102,7 +102,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		    $("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
 		  }
 		  $("#project-choices .item a").click(function() {
-		    forms["LoadProject"](parseInt($(this).attr("id")));
+		    actions["LoadProject"](parseInt($(this).attr("id")));
 		  });
 		});
 	};
@@ -166,8 +166,8 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		$("a.modal").click(function() {
 			console.log($(this).attr('id'));
 			var id = $(this).attr('id');
-			if (id in modals) {
-				modals[id]();
+			if (id in views) {
+				views[id]();
 			} else {
 				throw "Modal not found: " + name;
 			}
@@ -189,7 +189,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		$(".form-action").click(function() {
 			console.log("form submitted");
 			var id = $(this).attr("id");
-			forms[id]();
+			actions[id]();
 		});
 
 		init_project();
