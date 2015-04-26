@@ -202,7 +202,14 @@ final class StoryboarderGUI {
       project = new StoryboarderProject(pathChoicesList.get(choice));
       System.out.println("current project: " + project);
       // startAutoSave();
-      return "success loading project!";
+      int numPages = project.numberOfPages();
+      String page = "";
+      if (numPages >= 1) {
+        page = project.getPage(0);
+      }
+      Map<String, Object> data = ImmutableMap.of("page", page, "numPages",
+          numPages);
+      return GSON.toJson(data);
     }
   }
 
