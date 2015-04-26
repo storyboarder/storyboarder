@@ -23,7 +23,7 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
-  private static final String DEFAULT_DIRECTORY = "testProject";
+  private static final String DEFAULT_DIRECTORY = "projects/test_0.txt";
 
   private Main() {
   }
