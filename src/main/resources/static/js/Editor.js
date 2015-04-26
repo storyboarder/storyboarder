@@ -41,7 +41,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"LoadProj": function(params) {
 			console.log("loading project with:");
 			console.log(params);
-			$.post("/loadProj", params, function(response) {
+			$.post("/loadProj", {choice: params}, function(response) {
 				console.log(response);
 			});
 		},

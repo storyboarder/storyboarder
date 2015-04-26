@@ -119,9 +119,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
+          <a href="#" class="modal" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
+          <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
           <a href="#" class="modal" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
           <a href="#" class="modal" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
-          <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
     </div>

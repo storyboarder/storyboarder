@@ -7,9 +7,8 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
 			$('.upload').click(function() {
 				$('.ui.modal.add-image').modal('hide');
-
-
 				var imageLoader = document.getElementById('filepath');
+
 				imageLoader.addEventListener('change', handleImage, false);
 
 				function handleImage(e) {
@@ -48,14 +47,18 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		},
 		"Load": function() {
 			console.log("load called");
-		}
+      $('.ui.modal.load-project').modal('show');
+		},
+		"New": function() {
+		  console.log("new called");
+      $('.ui.modal.create-project').modal('show');
+		},
 	};
 
 	var forms = {
 	  "CreateProject": function(form) {
-      console.log($("#page-width").val(), $("#page-height").val());
-      // TODO call editor create project
-      $('.ui.modal.page-setup').modal('hide');
+      console.log("create project");
+      $('.ui.modal.create-project').modal('hide');
       $('#page').width(parseInt($("#page-width").val()));
       $('#page').height(parseInt($("#page-height").val()));
       console.log($('#canvas').width());
@@ -67,37 +70,34 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
         panelMargin: parseInt($("#panel-margin").val())
       }, function() {
         $("input[type='text'].action").each(function(e) {
-          console.log($(this));
           set_value($(this));
         });
       });
 	  },
 	  "LoadProject": function(num) {
-      console.log($("#project-file").val());
-      // TODO call editor load project
+      console.log("load project");
       editor.action("LoadProj", num);
-      $('.ui.modal.page-setup').modal('hide');
-      $('#page').width(parseInt($("#page-width").val()));
-      $('#page').height(parseInt($("#page-height").val()));
-      console.log($('#canvas').width());
-      editor.init({
-        canvas: $("#canvas"),
-        width: parseInt($("#page-width").val()),
-        height: parseInt($("#page-height").val()),
-        pageMargin: parseInt($("#page-margin").val()),
-        panelMargin: parseInt($("#panel-margin").val())
-	    });
+      $("#editor").css("visibility", "visible");
+      $('.ui.modal.load-project').modal('hide');
+//      $('#page').width(parseInt($("#page-width").val()));
+//      $('#page').height(parseInt($("#page-height").val()));
+//      console.log($('#canvas').width());
+
+	  },
+	  "NewProject": function() {
+      console.log("new project");
+//      $('.ui.modal.load-project').modal('hide');
+      $('.ui.modal.create-project').modal('show');
+
 	  },
 	};
 
 
 	var init_project = function() {
-		console.log($('.ui.modal.page-setup'));
-		$('.ui.modal.page-setup')
+		$('.ui.modal.load-project')
 			.modal('setting', 'closable', false)
 			.modal('show');
 		editor.action("GetChoices", function(choices) {
-		  console.log(choices);
 		  for (c in choices) {
 		    $("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
 		  }
@@ -105,18 +105,13 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		    forms["LoadProject"](parseInt($(this).attr("id")));
 		  });
 		});
-
-		console.log(editor);
 	};
 
   var set_value = function(item) {
-    console.log("text action called");
-    console.log(item);
+//    console.log("set value called");
+//    console.log(item);
     var val = item.val();
-    console.log(val);
     val = isNaN(val) ? val : parseInt(val);
-    console.log(typeof val);
-    console.log(isNaN(val) ? val : parseInt(val));
     editor.action(item.attr('data-action'), {
       name: item.attr("name"),
       id: item.attr("id"),
@@ -190,15 +185,11 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			console.log("remove page");
 		});
 
-
 		/* Form inits */
-
 		$(".form-action").click(function() {
 			console.log("form submitted");
 			var id = $(this).attr("id");
-			console.log(id);
 			forms[id]();
-
 		});
 
 		init_project();
