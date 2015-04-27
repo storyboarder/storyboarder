@@ -55,7 +55,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 
 		canvas.on('object:moving', function(options) {
-		  if (canvasState.isSnapActive() && options.target.type != "panel") {
+		  if (canvasState.isSnapActive() && options.target.elmType != "panel") {
 		    target = options.target;
 		    var borders = canvasState.snapBorders({
           left: target.left,
@@ -78,7 +78,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:scaling', function(options) {
-			if (options.target.type == "panel") {
+			if (options.target.elmType == "panel") {
         var panelMargin = canvasState.getPanelMargin();
         options.target.width *= options.target.scaleX;
         options.target.scaleX = 1;
@@ -176,8 +176,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				});
 			}
 		);
-		console.log(canvas);
-		console.log(canvas.__eventListeners);
 		if (typeof canvas.__eventListeners != "undefined") {
 		  canvas.__eventListeners["object:scaling"] = [];
     }

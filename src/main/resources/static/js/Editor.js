@@ -1,5 +1,8 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
+  var currentPage; // index of current page
+  var numPages;
+
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
@@ -43,6 +46,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log(params);
 			$.post("/loadProj", params, function(response) {
 				console.log(JSON.parse(response));
+				numPages = response.numPages;
+				currentPage = 1;
+				canvasState.load(response.page); // parse JSON received
+				return response.numPages;
 			});
 		},
 		"CreateProj": function(params) {
@@ -62,15 +69,20 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				});
 		},
 		"Load": function(pageNum) {
-			console.log("load called");
+			console.log("load called with page", pageNum);
 			$.post("/load", {
 					page: pageNum
 				},
-				function(responseJSON) {
-					responseObject = JSON.parse(responseJSON);
-					console.log("loaded: ");
-					console.log(responseObject);
-					return responseObject;
+				function(response) {
+					if (typeof response == "string") {
+					  throw response;
+					} else {
+            responseObject = JSON.parse(response);
+            console.log("loaded: ");
+            console.log(responseObject);
+            currentPage = pageNum; // TODO check for errors(?)
+            return responseObject;
+					}
 				});
 		},
 		"Save": function(pageNum, pageObject) {
@@ -121,10 +133,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		var panelMargin = spec.panelMargin;
 		canvas.width = width;
 		canvas.height = height;
-		console.log(width, height);
+//		console.log(width, height);
 
 		canvasState.setPageMargin(pageMargin);
-		console.log(canvasState);
+//		console.log(canvasState);
 		canvasState.setPanelMargin(panelMargin);
 		canvasState.init(canvas.attr("id"), width, height, callback);
 //		canvasState.setGridSpacing(40); //TODO un-hardcode
@@ -132,7 +144,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 //		canvasState.setPanelRows(3);
 //		canvasState.setPanelColumns(2);
 
-		console.log("init editor");
+		console.log("finished initing editor");
 
 		/* init all tools in the toolset so they get the canvas state */
 		toolset.init();

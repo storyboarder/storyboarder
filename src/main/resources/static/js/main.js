@@ -34,11 +34,11 @@ require.config({
 
       require(["Menu", "Editor"], function(menu, editor) {
 //        editor.init("canvas");
-        console.log(menu);
+//        console.log(menu);
         menu.init();
         console.log("editor:");
         console.log(editor);
-        editor.test(); /* */
+//        editor.test(); /* */
       });
 //    });
 

@@ -8,7 +8,7 @@
 
     <div id="project-choices" class="ui divided list"></div>
 
-    <div class="ui button form-action" id="NewProject">
+    <div class="ui button view" id="NewProject">
       New Project
     </div>
   </div>

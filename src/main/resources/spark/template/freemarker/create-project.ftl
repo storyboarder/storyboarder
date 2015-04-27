@@ -57,7 +57,7 @@
     </div>
   </div>
 
-  <div class="ui button form-action" id="CreateProject">
+  <div class="ui button view" id="CreateProject">
     Create
   </div>
 

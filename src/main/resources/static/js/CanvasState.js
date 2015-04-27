@@ -115,6 +115,48 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  		}
  	};
 
+ 	var init = function(canvasId, w, h, callback) {
+ 	  console.log("initing page...")
+    width = w;
+    height = h;
+    canvas = new fabric.Canvas(canvasId, {
+      selection: false
+    });
+    canvas.setDimensions({
+      width: w,
+      height: h
+    });
+    elements = [];
+    pageEdges = {
+      left: pageMargin,
+      top: pageMargin,
+      right: canvas.getWidth() - pageMargin,
+      bottom: canvas.getHeight() - pageMargin
+    };
+
+    /* add the first panel */
+    addPanel($.extend({}, pageEdges));
+
+    /* adding a circle because why not */
+    var circle = new fabric.Circle({
+      radius: 20,
+      fill: 'green',
+      left: 100,
+      top: 100
+    });
+    canvas.add(circle);
+
+    var that = this;
+    require(["SnapUtil"], function(snapUtil) {
+      snap = snapUtil;
+      snap.init(that);
+      console.log("init", snap);
+      if (typeof callback != "undefined") {
+        callback();
+      }
+    });
+  };
+
  	var CanvasState = {
  		history: [],
  		historyIdx: -1,
@@ -223,53 +265,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  		deleteElement: deleteElement,
 
  		load: function(json) {
- 		  console.log("loading project...");
+ 		  console.log("loading page...");
  		  console.log(json);
 
  		  // TODO replace this with json parsing:
  		  init("canvas", 400, 600, function() {});
  		},
 
- 		init: function(canvasId, w, h, callback) {
- 			width = w;
- 			height = h;
- 			canvas = new fabric.Canvas(canvasId, {
- 				selection: false
- 			});
- 			canvas.setDimensions({
- 				width: w,
- 				height: h
- 			});
- 			elements = [];
- 			pageEdges = {
- 				left: pageMargin,
- 				top: pageMargin,
- 				right: canvas.getWidth() - pageMargin,
- 				bottom: canvas.getHeight() - pageMargin
- 			};
-
- 			/* add the first panel */
- 			addPanel($.extend({}, pageEdges));
-
- 			/* adding a circle because why not */
- 			var circle = new fabric.Circle({
- 				radius: 20,
- 				fill: 'green',
- 				left: 100,
- 				top: 100
- 			});
- 			canvas.add(circle);
-
-      var that = this;
- 			require(["SnapUtil"], function(snapUtil) {
- 			  snap = snapUtil;
- 			  snap.init(that);
- 			  console.log("init", snap);
- 			  if (typeof callback != "undefined") {
- 			    callback();
- 			  }
- 			});
- 		},
+ 		init: init,
 
  		addElement: addElement,
 
@@ -339,6 +342,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     isSnapActive: function() {
       return snap.isSnapActive();
     },
+
+    // export
  	};
 
  	return CanvasState;
