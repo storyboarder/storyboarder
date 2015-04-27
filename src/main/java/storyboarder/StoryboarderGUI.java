@@ -1,11 +1,16 @@
 package storyboarder;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.NoSuchFileException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -32,13 +37,17 @@ final class StoryboarderGUI {
 
   private static final int AUTO_SAVE_TIME = 60000;
 
+  private static final String NULL_PROJ_MSG = "ERROR: Need to initialize the project!";
+
+  private static final Path PROJECT_FOLDER = Paths.get("projects");
+
   private static final Gson GSON = new Gson();
 
   private final int port;
 
   private StoryboarderProject project;
 
-  private static final String NULL_PROJ_MSG = "ERROR: Need to initialize the project!";
+  private Set<Path> pathChoices = getPathChoices();
 
   StoryboarderGUI(int port, StoryboarderProject project) {
     this.port = port;
@@ -54,23 +63,28 @@ final class StoryboarderGUI {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
-    Spark.post("/init", new InitHandler());
+    Spark.post("/choices", new ProjectChoicesHandler());
+    Spark.post("/loadProj", new LoadProjectHandler());
+    Spark.post("/createProj", new CreateProjectHandler());
+
+    // Spark.post("/init", new InitHandler());
 
     Spark.post("/load", new LoadHandler());
     Spark.post("/save", new SaveHandler());
+    Spark.post("/saveToDisk", new SaveToDiskHandler());
     Spark.post("/quit", new QuitHandler());
   }
 
-  void startAutoSave() {
-    TimerTask saveTask = new TimerTask() {
-      @Override
-      public void run() {
-        saveToDisk();
-      }
-    };
-    Timer saveTimer = new Timer();
-    saveTimer.schedule(saveTask, AUTO_SAVE_TIME);
-  }
+  // void startAutoSave() {
+  // TimerTask saveTask = new TimerTask() {
+  // @Override
+  // public void run() {
+  // saveToDisk();
+  // }
+  // };
+  // Timer saveTimer = new Timer();
+  // saveTimer.scheduleAtFixedRate(saveTask, 0, AUTO_SAVE_TIME);
+  // }
 
   String saveToDisk() {
     if (project != null) {
@@ -80,24 +94,52 @@ final class StoryboarderGUI {
       } catch (IOException e) {
         String msg = "ERROR: saving: " + e.getMessage();
         System.err.println(msg);
+        e.printStackTrace();
         return msg;
       }
     } else {
       System.err.println(NULL_PROJ_MSG);
       return NULL_PROJ_MSG;
     }
-    return "Success!";
+    return "success saving to disk!";
   }
 
   String quit() {
-    System.out.println("Hi");
     try {
       project.saveToDisk();
       Spark.stop();
-      return "success!";
+      return "success quitting!";
     } catch (IOException e) {
-      return "failure!";
+      return "failure quitting!";
     }
+  }
+
+  private static Set<Path> getPathChoices() {
+    try {
+      Files.createDirectories(PROJECT_FOLDER);
+    } catch (IOException e) {
+      System.err.println("ERROR: error creating necessary directories: "
+          + e.getMessage());
+    }
+    Set<Path> pathChoices = new TreeSet<Path>();
+
+    try (DirectoryStream<Path> choicesStream = Files
+        .newDirectoryStream(PROJECT_FOLDER)) {
+      Iterator<Path> choicesIterator = choicesStream.iterator();
+
+      while (choicesIterator.hasNext()) {
+        Path nextPath = choicesIterator.next();
+        if (nextPath.toString().endsWith(".txt")) {
+          pathChoices.add(nextPath);
+        }
+      }
+      System.out.println(pathChoices);
+    } catch (IOException e) {
+      System.err.println("ERROR: error getting possible projects: "
+          + e.getMessage());
+    }
+    return pathChoices;
+
   }
 
   /**
@@ -118,45 +160,141 @@ final class StoryboarderGUI {
     }
   }
 
-  private class InitHandler implements Route {
+  /**
+   * Sends a list of existing projects (in the projects directory) to the spark
+   * server. Does not need any parameters.
+   *
+   * @author fbystric
+   * @author ktsakas
+   * @author narobins
+   * @author yz38
+   */
+  private class ProjectChoicesHandler implements Route {
+    @Override
+    public Object handle(Request req, Response res) {
+      List<String> names = new ArrayList<String>();
+      for (Path choice : pathChoices) {
+        String choiceName = choice.getFileName().toString();
+        names.add(choiceName.replace(".txt", ""));
+      }
+      System.out.println(names);
+      return GSON.toJson(names);
+    }
+  }
 
+  /**
+   * Loads an existing project, given an index in an object of the form:
+   * {choice: i}.
+   *
+   * @author fbystric
+   * @author ktsakas
+   * @author narobins
+   * @author yz38
+   */
+  private class LoadProjectHandler implements Route {
     @Override
     public Object handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      System.out.println("\nGot init request.\npath: " + qm.value("path")
-          + "\ntype: " + qm.value("type"));
+      int choice = GSON.fromJson(qm.value("choice"), Integer.class);
+      List<Path> pathChoicesList = new ArrayList<Path>(pathChoices.size());
+      pathChoicesList.addAll(pathChoices);
 
-      try {
-        project = new StoryboarderProject(qm.value("path"));
-      } catch (IOException e) {
-        return "Failed to create/find the path.";
+      project = new StoryboarderProject(pathChoicesList.get(choice));
+      System.out.println("current project: " + project);
+      // startAutoSave();
+      int numPages = project.numberOfPages();
+      String page = "";
+      if (numPages >= 1) {
+        page = project.getPage(0);
       }
+      Map<String, Object> data = ImmutableMap.of("page", page, "numPages",
+          numPages);
+      return GSON.toJson(data);
+    }
+  }
 
-      if (qm.value("type").equals("create")) {
-        try {
-          project.create();
-        } catch (FileAlreadyExistsException e) {
-          return "Project of the same name already exists!";
-        } catch (IOException e) {
-          return "Failed to create the project.";
-        }
-      } else if (qm.value("type").equals("load")) {
-        try {
-          project.load();
-        } catch (NoSuchFileException e) {
-          return "Could not find the project.";
-        } catch (IOException e) {
-          return "Failed to load the project.";
-        }
+  /**
+   * Creates a project in the projects directory, given an object of the form
+   * {name: "someName"}. If the name does not end in ".txt", ".txt" will be
+   * added to it.
+   *
+   * @author fbystric
+   * @author ktsakas
+   * @author narobins
+   * @author yz38
+   */
+  private class CreateProjectHandler implements Route {
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      String fileName = qm.value("name");
+      if (!fileName.endsWith(".txt")) {
+        fileName += ".txt";
       }
-      startAutoSave();
-      return "Success!";
+      Path newFile = Paths.get(PROJECT_FOLDER.toString(), fileName);
+      if (pathChoices.add(newFile)) {
+        try {
+          Files.createFile(newFile);
+        } catch (IOException e) {
+          System.err.println("ERROR: could not create the file: "
+              + e.getMessage());
+          return "failure creating project!";
+        }
+        project = new StoryboarderProject(newFile);
+        System.out.println("current project: " + project);
+        // startAutoSave();
+        return "success creating project!";
+      } else {
+        return "project already exists!";
+      }
     }
 
   }
 
+  // private class InitHandler implements Route {
+  //
+  // @Override
+  // public Object handle(Request req, Response res) {
+  // QueryParamsMap qm = req.queryMap();
+  //
+  // // In case of reinitialization.
+  // if (project != null) {
+  // saveToDisk();
+  // }
+  //
+  // try {
+  // project = new StoryboarderProject(qm.value("path"));
+  // } catch (IOException e) {
+  // return "Failed to create/find the path.";
+  // }
+  //
+  // if (qm.value("loadOrCreate").equals("create")) {
+  // try {
+  // Path projectPath = Paths.get(qm.value("name"));
+  // project.create();
+  // } catch (FileAlreadyExistsException e) {
+  // return "Project of the same name already exists!";
+  // } catch (IOException e) {
+  // return "Failed to create the project.";
+  // }
+  // } else if (qm.value("loadOrCreate").equals("load")) {
+  // try {
+  // project.load();
+  // } catch (NoSuchFileException e) {
+  // return "Could not find the project.";
+  // } catch (IOException e) {
+  // return "Failed to load the project.";
+  // }
+  // }
+  // startAutoSave();
+  // return "Success initializing!";
+  // }
+  //
+  // }
+
   /**
-   * Loads a Storyboarder project from a given path.
+   * Loads a page with the given index from the project, given an object of the
+   * form: {page: i}.
    *
    * @author fbystric
    * @author ktsakas
@@ -168,7 +306,6 @@ final class StoryboarderGUI {
 
     /**
      * @param req
-     *          The request containing a path to the file to load from.
      * @param res
      *          The response.
      * @return a JSON object with a list of Storyboarder pages, or a JSON object
@@ -198,8 +335,8 @@ final class StoryboarderGUI {
   }
 
   /**
-   * Saves a Storyboarder project to a given path. If a file is present with the
-   * same path, it will be overwritten.
+   * Saves the given json string as a page in the project, given an object of
+   * the form: {page: i, json: "json string"}.
    *
    * @author fbystric
    * @author ktsakas
@@ -233,12 +370,20 @@ final class StoryboarderGUI {
         int page = GSON.fromJson(qm.value("page"), Integer.class);
         String json = qm.value("json");
         project.saveOrAdd(page, json);
-        return "success!";
+        return "success saving!";
       } else {
         System.out.println(msg + NULL_PROJ_MSG);
         return NULL_PROJ_MSG;
       }
     }
+  }
+
+  private class SaveToDiskHandler implements Route {
+    @Override
+    public Object handle(Request arg0, Response arg1) {
+      return saveToDisk();
+    }
+
   }
 
   private class QuitHandler implements Route {

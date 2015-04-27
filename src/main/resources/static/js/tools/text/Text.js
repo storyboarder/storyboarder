@@ -74,21 +74,21 @@ define(["../../CanvasState"], function(canvasState) {
 		var selected;
 
 		canvas.on('mouse:down', function(coor) {
-
+				
 			initialPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
-			}
+			};
 
-			selected = coor.target;
-		});
 
-		canvas.on('mouse:up', function(coor) {
+		}
+			canvas.on('mouse:up', function(coor){
+				
+				finalPos = {
+					x: coor.e.offsetX,
+					y: coor.e.offsetY
+				};
 
-			finalPos = {
-				x: coor.e.offsetX,
-				y: coor.e.offsetY
-			}
 
 			if(selected && selected.type !== "rectext") {
 
@@ -129,7 +129,6 @@ define(["../../CanvasState"], function(canvasState) {
 		console.log("text deactivate");
 		canvas.__eventListeners["mouse:up"] = [];
 		canvas.__eventListeners["mouse:down"] = [];
-		console.log(canvas.__eventListeners);
 	};
 
 

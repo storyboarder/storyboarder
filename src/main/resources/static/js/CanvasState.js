@@ -1,22 +1,19 @@
- define(["jquery", "fabricjs"], function($) {
+define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
  	var canvas;
  	var width;
  	var height;
  	var pageMargin;
  	var panelMargin;
- 	var gridSpacing;
- 	var snapDistance;
  	var pageEdges; // edges of panel area (between pageMargin and panelMargin)
  	var elements;
- 	var snapToGrid = false;
  	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
  	var edgeDirections = ["left", "top", "right", "bottom"];
- 	var grid; // array of grid lines
- 	var gridColor = "#ddd";
 
- 	var addElement = function(e, type) {
- 		e.type = type;
+  var snap; // snapUtil object
+
+ 	var addElement = function(e, elmType) {
+ 		e.elmType = elmType;
  		elements.push(e);
  		canvas.add(e);
  	};
@@ -109,52 +106,81 @@
  	};
 
  	var deleteElement = function(e) {
- 		//	  console.log(e);
  		var idx = elements.indexOf(e);
- 		//		console.log(idx, elements);
  		if (idx >= 0) {
  			el = elements.splice(idx, 1);
- 			//	    console.log(el);
  			canvas.remove(el[0]);
  		} else {
  			throw "couldn't find element:" + e;
  		}
- 		//		console.log(elements.length);
- 	};
-
- 	var drawGrid = function() {
- 		grid = [];
- 		for (var i = 0; i < (width / gridSpacing); i++) {
- 			var line = new fabric.Line(
- 				[i * gridSpacing, 0, i * gridSpacing, height], {
- 					stroke: gridColor,
- 					selectable: false
- 				}
- 			);
- 			canvas.add(line);
- 			line.sendToBack();
- 			grid.push(line);
- 		}
- 		for (var j = 0; j < (height / gridSpacing); j++) {
- 			var line = new fabric.Line(
- 				[0, j * gridSpacing, width, j * gridSpacing], {
- 					stroke: gridColor,
- 					selectable: false
- 				}
- 			);
- 			canvas.add(line);
- 			line.sendToBack();
- 			grid.push(line);
- 		}
  	};
 
  	var CanvasState = {
- 		getCanvas: function() {
- 			return canvas;
+ 		history: [],
+ 		historyIdx: -1,
+ 		previousState: null,
+
+ 		storeState: function () {
+// 			console.log("Diff patch: ", jsondiffpatch);
+//			var state = this.getState();
+//
+//			// If there is history
+//			if (this.canRevert()) {
+//				var delta = jsondiffpatch.diff(state, previousState);
+//	 			this.history.push(delta);
+//			}
+//
+//			this.historyIdx++;
+// 			this.previousState = state;
  		},
 
- 		getSnapToGrid: function() {
- 			return snapToGrid;
+ 		canRevert: function () {
+ 			return this.historyIdx >= 0;
+ 		},
+
+ 		canRestore: function () {
+ 			return (this.historyIdx >= this.history.length-1);
+ 		},
+
+ 		revertState: function () {
+ 			if (!this.canRevert()) return;
+
+ 			// Repaint canvas
+			canvas.clear().renderAll();
+			console.log(this.previousState);
+			canvas.loadFromJSON(this.previousState, canvas.renderAll.bind(canvas));
+
+			// Move previous state one back
+ 			this.historyIdx--;
+ 			if (this.canRevert()) {	
+ 				var prevDelta = this.history[this.historyIdx];
+				this.previousState = jsondiffpatch.patch(this.previousState, prevDelta);	
+ 			} else {
+ 				this.previousState = null;
+ 			}
+ 		},
+
+ 		restoreState: function () {
+ 			if (!this.canRestore()) return;
+
+ 			// Move prebious state one forward
+			this.previousState = this.getState();
+			this.historyIdx++;
+ 			console.log("History: ", this.history);
+ 			var delta = this.history[this.historyIdx];
+ 			var nextState = jsondiffpatch.patch(this.previousState, delta);
+
+ 			// Repaint canvas
+			canvas.clear().renderAll();
+			canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
+ 		},
+
+ 		getState: function () {
+ 			return this.getCanvas().toJSON(["elmType"]);
+ 		},
+
+ 		getCanvas: function() {
+ 			return canvas;
  		},
 
  		getWidth: function() {
@@ -164,6 +190,7 @@
  		getHeight: function() {
  			return canvas.height;
  		},
+
 
  		/* f is a filter function (takes in type/element pair, returns boolean),
  			m is a map function (modifies type/element pair) */
@@ -189,15 +216,23 @@
  			return pageEdges[c];
  		},
 
+ 		getPageEdges: function() {
+ 		  return pageEdges;
+ 		},
+
  		deleteElement: deleteElement,
 
- 		init: function(canvasId, w, h) {
+ 		load: function(json) {
+ 		  console.log("loading project...");
+ 		  console.log(json);
+ 		},
+
+ 		init: function(canvasId, w, h, callback) {
  			width = w;
  			height = h;
  			canvas = new fabric.Canvas(canvasId, {
  				selection: false
  			});
- 			grid = [];
  			canvas.setDimensions({
  				width: w,
  				height: h
@@ -221,6 +256,16 @@
  				top: 100
  			});
  			canvas.add(circle);
+
+      var that = this;
+ 			require(["SnapUtil"], function(snapUtil) {
+ 			  snap = snapUtil;
+ 			  snap.init(that);
+ 			  console.log("init", snap);
+ 			  if (typeof callback != "undefined") {
+ 			    callback();
+ 			  }
+ 			});
  		},
 
  		addElement: addElement,
@@ -228,18 +273,32 @@
  		setPageMargin: function(p) {
  			pageMargin = p;
  		},
+
  		setPanelMargin: function(p) {
  			panelMargin = p;
  		},
+
  		setGridSpacing: function(p) {
- 			gridSpacing = p;
+      snap.setGridSpacing(p);
  		},
- 		setSnapDistance: function(p) {
- 			snapDistance = p;
+
+ 		setPanelRows: function(p) {
+ 			panelRows = p;
  		},
+
+ 		setPanelColumns: function(p) {
+ 			panelColumns = p;
+ 		},
+
+ 		setSnap: function(n, p) {
+ 		  console.log("set snap" + snap);
+      snap.setSnap(n, p);
+ 		},
+
  		getPageMargin: function() {
  			return pageMargin;
  		},
+
  		getPanelMargin: function() {
  			return panelMargin;
  		},
@@ -254,26 +313,29 @@
  			});
  		},
 
- 		drawGrid: drawGrid,
-
- 		snapToGridEnabled: function() {
- 			return grid.length > 0;
+ 		drawGrid: function(name) {
+      snap.drawGrid(name);
  		},
 
- 		clearGrid: function() {
- 			for (g in grid) {
- 				canvas.remove(grid[g]);
- 			}
- 			grid = [];
- 		},
+		clearGrid: function(name) {
+		  snap.clearGrid(name);
+		},
 
- 		getGridSpacing: function() {
- 			return gridSpacing;
- 		},
+    snapPoint: function(pt) {
+      return snap.snapPoint(pt);
+    },
 
- 		getSnapDistance: function() {
- 			return snapDistance;
- 		}
+    snapPointIfClose: function(pt) {
+      return snap.snapPointIfClose(pt);
+    },
+
+    snapBorders: function(b, c) {
+      return snap.snapBorders(b, c);
+    },
+
+    isSnapActive: function() {
+      return snap.isSnapActive();
+    },
  	};
 
  	return CanvasState;

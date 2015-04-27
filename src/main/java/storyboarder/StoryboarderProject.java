@@ -17,12 +17,16 @@ class StoryboarderProject {
 
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  private final Path file;
+  private final Path project;
 
   private List<String> pages = new ArrayList<String>();
 
+  StoryboarderProject(Path project) {
+    this.project = project;
+  }
+
   StoryboarderProject(String path) throws IOException {
-    file = Paths.get(path);
+    project = Paths.get(path);
   }
 
   void load() throws IOException {
@@ -30,13 +34,11 @@ class StoryboarderProject {
   }
 
   void create() throws IOException {
-    Files.createDirectories(file.getParent());
-    Files.createFile(file);
+    Files.createDirectories(project.getParent());
+    Files.createFile(project);
   }
 
   String getPage(int page) {
-    // System.out.println("\ngetting page from this list:");
-    // System.out.println(pages);
     return pages.get(page);
   }
 
@@ -61,10 +63,10 @@ class StoryboarderProject {
   }
 
   void saveToDisk() throws IOException {
-    System.out.println(pages);
+    System.out.println(this);
     OpenOption options = StandardOpenOption.WRITE;
-    PrintWriter writer = new PrintWriter(Files.newBufferedWriter(file, CHARSET,
-        options));
+    PrintWriter writer = new PrintWriter(Files.newBufferedWriter(project,
+        CHARSET, options));
 
     for (String page : pages) {
       writer.println(page);
@@ -73,13 +75,18 @@ class StoryboarderProject {
   }
 
   private void readFile() throws IOException {
-    BufferedReader reader = Files.newBufferedReader(file, CHARSET);
+    BufferedReader reader = Files.newBufferedReader(project, CHARSET);
     pages.clear();
     String line;
     while ((line = reader.readLine()) != null) {
       pages.add(line);
     }
     reader.close();
+  }
+
+  @Override
+  public String toString() {
+    return project.toString() + ": " + pages.toString();
   }
 
 }

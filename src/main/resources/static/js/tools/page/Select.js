@@ -3,23 +3,14 @@
 define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	var canvas;
-	var snap = Snap.snap;
-	var setLeft = Snap.setLeft;
-	var setRight = Snap.setRight;
-	var setTop = Snap.setTop;
-	var setBottom = Snap.setBottom;
-	var getLeft = Snap.getLeft;
-	var getRight = Snap.getRight;
-	var getTop = Snap.getTop;
-	var getDist = Snap.getDist;
-	var getBottom = Snap.getBottom;
+	var snapPoint;
 
 	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
 		var opposite = canvasState.getOppositeDirection(dir);
 		var oldEdges = obj.edges;
 		canvasState.mapElements(
 			function(found) {
-				if (found.type == "panel" &&
+				if (found.elmType == "panel" &&
 					found != obj &&
 					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
 					var e = found;
@@ -53,7 +44,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type == "panel") {
+				if (found.elmType == "panel") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,
@@ -64,72 +55,59 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 
 		canvas.on('object:moving', function(options) {
-		  if (canvasState.snapToGridEnabled() && options.target.type != "panel") {
-		    var gridSpacing = canvasState.getGridSpacing();
-		    var snapTolerance = canvasState.getSnapDistance();
-        var edges = [
-          new Snap.edge(getDist(getLeft(options)), function(opt) {
-              setLeft(opt, snap(getLeft(opt)));
-          }),
-          new Snap.edge(getDist(getRight(options)), function(opt) {
-              setRight(opt, snap(getRight(opt)));
-          }),
-          new Snap.edge(getDist(getTop(options)), function(opt) {
-              setTop(opt, snap(getTop(opt)));
-          }),
-          new Snap.edge(getDist(getBottom(options)), function(opt) {
-              setBottom(opt, snap(getBottom(opt)));
-          }),
-        ];
-
-        edges.sort(function(a, b) {return a.dist - b.dist});
-        edges[0].snap(options);
-        edges[1].snap(options);
-
-        for (var i = 2; i < edges.length; i++) {
-          dif = edges[i].dist - edges[i-1].dist;
-          if (dif < 0.5) {
-            edges[i].snap(options);
+		  if (canvasState.isSnapActive() && options.target.type != "panel") {
+		    target = options.target;
+		    var borders = canvasState.snapBorders({
+          left: target.left,
+          right: target.left + target.width,
+          top: target.top,
+          bottom: target.top + target.height,
+        });
+        for (b in borders) {
+          if (typeof borders[b] != "undefined") {
+            if (b in target) {
+              target[b] = borders[b];
+            } else {
+              var dim = canvasState.getDimension(b);
+              var opposite = canvasState.getOppositeDirection(b);
+              target[opposite] = borders[b] - target[dim];
+            }
           }
         }
       }
 		});
 
 		canvas.on('object:scaling', function(options) {
-      var gridSpacing = canvasState.getGridSpacing();
-      var snapTolerance = canvasState.getSnapDistance();
-      var snapToGrid = canvasState.snapToGridEnabled();
-      var panelMargin = canvasState.getPanelMargin();
-
-			options.target.width *= options.target.scaleX;
-			options.target.scaleX = 1;
-			options.target.height *= options.target.scaleY;
-			options.target.scaleY = 1;
 			if (options.target.type == "panel") {
+        var panelMargin = canvasState.getPanelMargin();
+        options.target.width *= options.target.scaleX;
+        options.target.scaleX = 1;
+        options.target.height *= options.target.scaleY;
+        options.target.scaleY = 1;
+			  console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};
-				if (snapToGrid) {
+				if (canvasState.isSnapActive()) {
 				  console.log("scaling panel with snap");
           if (corner.indexOf('l') >= 0) {
-            newEdges.left = snap(obj.left - panelMargin);
+            newEdges.left = snapPoint({x: obj.left - panelMargin}).x;
             obj.left = newEdges.left + panelMargin;
             obj.width = obj.edges.right - obj.left - panelMargin;
           }
           if (corner.indexOf('t') >= 0) {
-            newEdges.top = snap(obj.top - panelMargin);
+            newEdges.top = snapPoint({y: obj.top - panelMargin}).y;
             obj.top = newEdges.top + panelMargin;
             obj.height = obj.edges.bottom - obj.top - panelMargin;
           }
           if (corner.indexOf('r') >= 0) {
-            newEdges.right = snap(obj.width + obj.left + panelMargin);
+            newEdges.right = snapPoint({x: obj.width + obj.left + panelMargin}).x;
             obj.width = newEdges.right - obj.left - panelMargin;
           }
           if (corner.indexOf('b') >= 0) {
-            newEdges.bottom = snap(obj.height + obj.top + panelMargin);
+            newEdges.bottom = snapPoint({y: obj.height + obj.top + panelMargin}).y;
             obj.height = newEdges.bottom - obj.top - panelMargin;
           }
-          console.log(newEdges);
 				} else {
           if (corner.indexOf('l') >= 0) {
             newEdges.left = obj.left - panelMargin;
@@ -151,13 +129,35 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 					right: newEdges.right || obj.edges.right,
 					bottom: newEdges.bottom || obj.edges.bottom,
 				};
-//				obj.scaleX = 1;
-//				obj.scaleY = 1;
+			} else {
+        if (canvasState.isSnapActive()) {
+          target = options.target;
+          control = target.__corner;
+          var borders = canvasState.snapBorders({
+            left: target.left,
+            right: target.left + target.width,
+            top: target.top,
+            bottom: target.top + target.height,
+          }, control);
+          for (b in borders) {
+            if (typeof borders[b] != 'undefined' && (typeof control == 'undefined' || control.indexOf(b.charAt(0)) >= 0)) {
+              var dim = canvasState.getDimension(b);
+              var opposite = canvasState.getOppositeDirection(b);
+              if (b in target) {
+                target[dim] = target[b] + target[dim] - borders[b];
+                target[b] = borders[b];
+              } else {
+                target[dim] = borders[b] - target[opposite];
+                target[opposite] = borders[b] - target[dim];
+              }
+            }
+          }
+        }
 			}
 		});
 
 		canvas.on('object:selected', function(options) {
-			if (options.type !== 'text') {
+			if (options.elmType !== 'text') {
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}
@@ -183,6 +183,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		name: "Select",
 		init: function() {
 			canvas = canvasState.getCanvas();
+			snapPoint = canvasState.snapPoint;
 		},
 		activate: activate,
 		deactivate: deactivate

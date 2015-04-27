@@ -3,23 +3,63 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
-			console.log("undo called");
+			canvasState.revertState();
 		},
 		"Redo": function(params) {
-			console.log("redo called");
+			canvasState.restoreState();
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
+			console.log(params);
 			if (params.checked) {
-				canvasState.drawGrid();
+				canvasState.drawGrid(params.name);
 			} else {
-				canvasState.clearGrid();
+				canvasState.clearGrid(params.name);
 			}
 		},
-		"GridSpacing": function(params) {
-			canvasState.setGridSpacing(params.value);
-			canvasState.clearGrid();
-			canvasState.drawGrid();
+		"SetSnap": function(params) {
+		  var obj = {};
+		  obj[params.id] = params.value;
+			canvasState.setSnap(params.name, obj);
+		},
+		"PanelRows": function(params) {
+			canvasState.setPanelRows(params.value);
+			canvasState.clearPanelGrid(params.name);
+			canvasState.drawPanelGrid(params.name);
+		},
+		"PanelColumns": function(params) {
+			canvasState.setPanelColumns(params.value);
+			canvasState.clearPanelGrid(params.name);
+			canvasState.drawPanelGrid(params.name);
+		},
+		"GetChoices": function(displayChoices) {
+			console.log("getting project choices");
+			$.post("/choices", {}, function(responseJSON) {
+				displayChoices(JSON.parse(responseJSON));
+			});
+		},
+		"LoadProj": function(params) {
+			console.log("loading project with:");
+			console.log(params);
+			$.post("/loadProj", params, function(response) {
+				console.log(JSON.parse(response));
+			});
+		},
+		"CreateProj": function(params) {
+			console.log("creating project with: ");
+			console.log(params);
+			$.post("/createProj", params, function(response) {
+				console.log(response);
+			});
+		},
+
+		"InitProj": function(params) {
+			console.log("initializing the project with: ");
+			console.log(params);
+			$.post("/init", params,
+				function(responseJSON) {
+					console.log(responseJSON);
+				});
 		},
 		"Load": function(pageNum) {
 			console.log("load called");
@@ -40,6 +80,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				page: pageNum,
 				json: pageJSON
 			}, function(response) {
+				console.log(response);
+			});
+		},
+		"SaveToDisk": function() {
+			console.log("save to disk called");
+			$.post("/saveToDisk", {}, function(response) {
 				console.log(response);
 			});
 		},
@@ -66,7 +112,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		}
 	};
-	var init = function(spec) {
+	var init = function(spec, callback) {
+	  console.log("editor init");
 		var canvas = spec.canvas;
 		var width = spec.width;
 		var height = spec.height;
@@ -77,12 +124,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		console.log(width, height);
 
 		canvasState.setPageMargin(pageMargin);
-		canvasState.setGridSpacing(40); //TODO un-hardcode
-		canvasState.setSnapDistance(10); //TODO un-hardcode
-		console.log(canvasState.getGridSpacing());
 		console.log(canvasState);
 		canvasState.setPanelMargin(panelMargin);
-		canvasState.init(canvas.attr("id"), width, height);
+		canvasState.init(canvas.attr("id"), width, height, callback);
+//		canvasState.setGridSpacing(40); //TODO un-hardcode
+//		canvasState.setSnapDistance(10); //TODO un-hardcode
+//		canvasState.setPanelRows(3);
+//		canvasState.setPanelColumns(2);
 
 		console.log("init editor");
 
@@ -94,6 +142,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
+		canvasState.storeState();
+
 		toolset.activate(toolname);
 	};
 
@@ -140,6 +190,44 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("Expecting {content: Line 2!}. Result:");
 			actions.Load(1);
 		}, 5000);
+
+		window.setTimeout(function() {
+			actions.GetChoices(function(choices) {
+				console.log("Testing getting of choices. Expecting [test_0, test_2, test_3, test_4]");
+				console.log(choices);
+			});
+		}, 6000);
+
+		window.setTimeout(function() {
+			console.log("Loading project 2");
+			actions.LoadProj({choice: 2});
+		}, 8000);
+
+		window.setTimeout(function() {
+			console.log("Writing to loaded project");
+			actions.Save(0, "foo bar derp");
+		}, 9000)
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 10000)
+
+		window.setTimeout(function() {
+			console.log("Testing creating a new project");
+			actions.CreateProj({name: "newProject.txt"});
+		}, 11000);
+
+		window.setTimeout(function() {
+			console.log("Writing to new project");
+			actions.Save(0, "hello world");
+		}, 12000);
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 13000)
+
+
+
 
 
 		//toolset.test();

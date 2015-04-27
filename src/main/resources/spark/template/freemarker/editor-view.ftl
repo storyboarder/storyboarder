@@ -38,17 +38,27 @@
       <div class="toolset">
         <div class="title">Main</div>
         <div class="tools">
-          <a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>
-          <a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>
-          <a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>
+          <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
+          <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
+          <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
+          <a href="#" class="action" id="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
+          <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
+          <a href="#" class="action" id="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
-                <div class="ui checkbox">
-                  <input type="checkbox" class="action" name="ToggleGrid" id="ToggleGrid">
+            <div class="ui checkbox">
+                  <input type="checkbox" class="action" data-action="ToggleGrid" name="gridSnap">
                   <label>Snap to grid</label>
             </div>
-
             <div class="ui mini input">
-                  <label>Spacing</label><input type="text" class="action" id="GridSpacing" value="20">
+                  <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
+            </div>
+            <div class="ui checkbox">
+                  <input type="checkbox" class="action" data-action="ToggleGrid" name="panelGridSnap">
+                  <label>Snap to panel grid</label>
+            </div>
+            <div class="ui mini input">
+                  <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
+                  <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
             </div>
         </div>
       </div>
@@ -56,14 +66,17 @@
       <div class="toolset">
         <div class="title">Panel</div>
         <div class="tools">
-          <a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>
-          <a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>
+          <!--<a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>/-->
+          <a href="#" class="tool" id="Split" data-content="Split"><i class="icon-drawing-tiles-plus"></i></a>
+          <!--<a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>/-->
+          <a href="#" class="tool" id="Join" data-content="Join"><i class="icon-drawing-tiles-minus"></i></a>
         </div>
       </div>
 
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
+
           <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
@@ -76,15 +89,17 @@
               <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
               <input type="color" value="#005E7A" id="drawing-color"><br>
-            </div>  
+          </div>  
         </div>
       </div>
 
       <div class="toolset">
         <div class="title">Text</div>
         <div class="tools">
+
           <a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
           <br>Borders: <br><input type="radio" name="text-borders"/> ellipse <input type="radio" name="text-borders"/> rectangle <input type="radio" name="text-borders" checked="true"/> none
+
         </div>
       </div>
 
@@ -92,7 +107,7 @@
         <div class="title">Save/Export</div>
         <div class="tools">
           <a href="#" class="modal" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="modal" id="Export" data-content="Export"><i class="fa fa-x fa-hdd-o"></i></a>
+          <a href="#" class="modal" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
           <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
         </div>
       </div>
