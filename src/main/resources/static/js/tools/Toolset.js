@@ -6,11 +6,14 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
-		"Text": require("./text/Text")
+		"Text": require("./text/Text"),
+		"Draw": require("./image/Draw")
 	};
 
 	var activate = function(toolname) {
+		console.log(currentTool);
 		if (toolname in toolset) {
+
 			if (currentTool) { //TODO How is currentTool evaluated to a boolean?
 				currentTool.deactivate();
 				console.log("deactivating from toolset:", currentTool.name);

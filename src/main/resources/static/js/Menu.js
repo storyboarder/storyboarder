@@ -157,6 +157,11 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
       $(this).parent().children(".tools").slideToggle();
     });
 
+	$(".submenu").click(function() {
+		console.log($(this).attr('id').toLowerCase());
+		$( "." + $(this).attr("id").toLowerCase()).slideToggle();
+    });
+
     $("a.new-page").click(function() {
       console.log("new page");
     });

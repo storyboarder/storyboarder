@@ -65,30 +65,18 @@
         <div class="title">Image</div>
         <div class="tools">
           <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
-          <div style="display: none;" id="drawing-mode-options">
-            <label for="drawing-mode-selector">Mode:</label>
-            <select id="drawing-mode-selector">
-              <option>Pencil</option>
-              <option>Circle</option>
-              <option>Spray</option>
-              <option>Pattern</option>
-              <option>hline</option>
-              <option>vline</option>
-              <option>square</option>
-              <option>diamond</option>
-              <option>texture</option>
-            </select><br>
-            <label for="drawing-line-width">Line width:</label>
-            <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
-            <label for="drawing-color">Line color:</label>
-            <input type="color" value="#005E7A" id="drawing-color"><br>
-            <label for="drawing-shadow-width">Line shadow width:</label>
-            <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
-          </div>
 
-          <a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
+          <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+           <div class="draw" style="display:none">
+                <a href="#" class="item" id="eraser" data-content="Eraser">Eraser</a>
+
+              <label for="drawing-line-width">Line width:</label>
+              <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
+              <label for="drawing-color">Line color:</label>
+              <input type="color" value="#005E7A" id="drawing-color"><br>
+            </div>  
         </div>
       </div>
 
@@ -96,7 +84,7 @@
         <div class="title">Text</div>
         <div class="tools">
           <a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
-          <br>Borders: <input type="radio" name="text-borders"/>ellipse <input type="radio" name="text-borders"/>rectangle <input type="radio" name="text-borders" checked="true"/>none
+          <br>Borders: <br><input type="radio" name="text-borders"/> ellipse <input type="radio" name="text-borders"/> rectangle <input type="radio" name="text-borders" checked="true"/> none
         </div>
       </div>
 
