@@ -6,9 +6,11 @@
 
   <div class="content">
 
-    <div id="project-choices" class="ui divided list"></div>
+    <div class="load-list">
+      <div id="project-choices" class="ui divided list"></div>
+    </div>
 
-    <div class="ui button view" id="NewProject">
+    <div class="ui small button view" id="NewProject">
       New Project
     </div>
   </div>

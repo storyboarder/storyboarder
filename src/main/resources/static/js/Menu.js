@@ -59,6 +59,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		  var idx = $("#page-thumbs").children("div.page-thumb").length;
       var html = getPageThumb(idx);
       $("#page-thumbs").append(html);
+      editor.action("AddPage");
 		},
 		"GetPage": function(item) {
       var idx = item.attr("data-num");
@@ -92,6 +93,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
           });
         }
       });
+      this.AddPage();
 	  },
 	  "LoadProject": function(item) {
 	    var num = item.attr("id");

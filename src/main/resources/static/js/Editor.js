@@ -63,27 +63,17 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
       var panelMargin = params.panelMargin;
       canvas.width = width;
       canvas.height = height;
-      currentPage = 1;
-      numPages = 1;
-  //		console.log(width, height);
 
       canvasState.setPageMargin(pageMargin);
-  //		console.log(canvasState);
       canvasState.setPanelMargin(panelMargin);
       canvasState.init(canvas.attr("id"), width, height, params.callback);
 
       console.log("finished initing editor");
 
-      /* init all tools in the toolset so they get the canvas state */
-      toolset.init();
-
-      /* activate a tool to start with (esp. helpful for testing) */
-      activate("Select");
 			$.post("/createProj", {name: params.name}, function(response) {
 				console.log(response);
 			});
 		},
-
 		"InitProj": function(params) {
 			console.log("initializing the project with: ");
 			console.log(params);
@@ -160,7 +150,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			} else if (params.file) {
 				console.log(params.file);
 			}
-		}
+		},
+		"AddPage": function() {
+		  currentPage++;
+		  numPages++;
+		  this.Load(currentPage);
+		},
 	};
 	var init = function(spec, callback) {
 	  console.log("editor init");
@@ -181,10 +176,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 //		console.log("finished initing editor");
 //
 //		/* init all tools in the toolset so they get the canvas state */
-//		toolset.init();
+		toolset.init();
 //
 //		/* activate a tool to start with (esp. helpful for testing) */
-//		this.activate("Select");
+		this.activate("Select");
 	};
 
 	var activate = function(toolname) {

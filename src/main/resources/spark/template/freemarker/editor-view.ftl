@@ -73,7 +73,7 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="view" id="AddImage" data-content="AddImage"><i class="icon-drawing-image"></i></a>
+          <a href="#" class="view" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
             <label for="drawing-mode-selector">Mode:</label>
             <select id="drawing-mode-selector">
@@ -109,12 +109,12 @@
 
       <div class="toolset">
         <div class="title">Text</div>
-        <div class="tools">          
+        <div class="tools">
+		      <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
           <div class="ui checkbox">
           <input type="checkbox" data-action="Borders" id="borders">
                   <label>Borders</label>
-          </div>        
-		    <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
+          </div>
 
           <div class="text" style="display:none">  
              <select id="font-family">
@@ -143,10 +143,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="view" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
-          <a href="#" class="view" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
           <a href="#" class="view" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
           <a href="#" class="view" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
+          <a href="#" class="view" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
+          <a href="#" class="view" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
         </div>
       </div>
     </div>
