@@ -7,8 +7,6 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
 			$('.upload').click(function() {
 				$('.ui.modal.add-image').modal('hide');
-
-
 				var imageLoader = document.getElementById('filepath');
 				imageLoader.addEventListener('change', handleImage, false);
 

@@ -15,7 +15,7 @@
 <body>
 
 <#include "/page-setup.ftl">
-
+<#include "/add-image.ftl">
 <#include "/editor-view.ftl">
 
 

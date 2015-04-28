@@ -6,9 +6,6 @@
 
 <div class="content">
 
-
-
-
   <div class="ui two column divided grid">
 
     <div class="column">
