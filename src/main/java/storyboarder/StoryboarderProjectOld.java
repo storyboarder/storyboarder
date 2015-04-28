@@ -13,7 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-class StoryboarderProject {
+class StoryboarderProjectOld {
 
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
@@ -21,11 +21,11 @@ class StoryboarderProject {
 
   private List<String> pages = new ArrayList<String>();
 
-  StoryboarderProject(Path project) {
+  StoryboarderProjectOld(Path project) {
     this.project = project;
   }
 
-  StoryboarderProject(String path) throws IOException {
+  StoryboarderProjectOld(String path) throws IOException {
     project = Paths.get(path);
   }
 
