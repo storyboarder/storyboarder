@@ -1,13 +1,16 @@
 define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	var current;
 
-	var modals = {
-		"Add Image": function() {
+  // views is an object of functions. Each function will be passed the JQuery
+  // object that triggered the view event.
+	var views = {
+		"AddImage": function() {
 			console.log("add image called");
 			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
 			$('.upload').click(function() {
 				$('.ui.modal.add-image').modal('hide');
 				var imageLoader = document.getElementById('filepath');
+
 				imageLoader.addEventListener('change', handleImage, false);
 
 				function handleImage(e) {
@@ -37,26 +40,44 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		},
 		"Save": function() {
 			console.log("save called");
-			// $.post( "/save", {}, function( data ) {
-			// console.log(data);
-			// });
+			//TODO call editor
 		},
 		"Export": function() {
 			console.log("export called");
+			//TODO call editor (and a modal?)
 		},
 		"Load": function() {
 			console.log("load called");
-		}
-	};
-
-	var forms = {
+      $('.ui.modal.load-project').modal('show');
+		},
+		"New": function() {
+		  console.log("new called");
+      $('.ui.modal.create-project').modal('show');
+		},
+		"AddPage": function() {
+		  var idx = $("#page-thumbs").children("div.page-thumb").length;
+      var html = getPageThumb(idx);
+      $("#page-thumbs").append(html);
+		},
+		"GetPage": function(item) {
+      var idx = item.attr("data-num");
+		  console.log("menu getting page" + idx);
+		  //TODO save current page
+      editor.action("Load", idx);
+		},
+		"RemovePage": function(item) {
+      var idx = item.attr("data-num");
+		  console.log("menu removing page" + idx);
+      //TODO call editor
+      item.parent(".page-thumb").remove();
+		},
 	  "CreateProject": function(form) {
-      console.log($("#page-width").val(), $("#page-height").val());
-      // TODO call editor create project
-      $('.ui.modal.page-setup').modal('hide');
+      console.log("create project");
+      $('.ui.modal.create-project').modal('hide');
       $('#page').width(parseInt($("#page-width").val()));
       $('#page').height(parseInt($("#page-height").val()));
       console.log($('#canvas').width());
+      $("#editor").css("visibility", "visible");
       editor.init({
         canvas: $("#canvas"),
         width: parseInt($("#page-width").val()),
@@ -65,61 +86,70 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
         panelMargin: parseInt($("#panel-margin").val())
       }, function() {
         $("input[type='text'].action").each(function(e) {
-          console.log($(this));
           set_value($(this));
         });
       });
 	  },
-	  "LoadProject": function(num) {
-      console.log($("#project-file").val());
-      // TODO call editor load project
-      editor.action("LoadProj", num);
-      $('.ui.modal.page-setup').modal('hide');
-      $('#page').width(parseInt($("#page-width").val()));
-      $('#page').height(parseInt($("#page-height").val()));
-      console.log($('#canvas').width());
-      editor.init({
-        canvas: $("#canvas"),
-        width: parseInt($("#page-width").val()),
-        height: parseInt($("#page-height").val()),
-        pageMargin: parseInt($("#page-margin").val()),
-        panelMargin: parseInt($("#panel-margin").val())
-	    });
+	  "LoadProject": function(item) {
+	    var num = item.attr("id");
+      console.log("load project");
+      var result = editor.action("LoadProj", {choice: num});
+      updatePages(result);
+      $("#editor").css("visibility", "visible");
+      $('.ui.modal.load-project').modal('hide');
+	  },
+	  "NewProject": function(item) {
+      console.log("new project");
+      $('.ui.modal.create-project').modal('show');
 	  },
 	};
 
+	var getPageThumb = function(i) {
+    return '<div class="page-thumb">' +
+        '<a class="page-thumb view" id="GetPage" href="#" data-num=' + i + '>' + i + '</a>' +
+        '<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></div>'
+  };
 
 	var init_project = function() {
-		console.log($('.ui.modal.page-setup'));
-		$('.ui.modal.page-setup')
+		$('.ui.modal.load-project')
 			.modal('setting', 'closable', false)
 			.modal('show');
 		editor.action("GetChoices", function(choices) {
-		  console.log(choices);
 		  for (c in choices) {
 		    $("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
 		  }
 		  $("#project-choices .item a").click(function() {
-		    forms["LoadProject"](parseInt($(this).attr("id")));
+		    views["LoadProject"]($(this));
 		  });
 		});
-
-		console.log(editor);
 	};
 
+	var updatePages = function(num) {
+    $("#page-thumbs").empty();
+    for (var i = 0; i < num; i++) {
+      $("#page-thumbs").append(getPageThumb(i));
+    }
+  };
+
   var set_value = function(item) {
-    console.log("text action called");
-    console.log(item);
+//    console.log("set value called");
+//    console.log(item);
     var val = item.val();
-    console.log(val);
     val = isNaN(val) ? val : parseInt(val);
-    console.log(typeof val);
-    console.log(isNaN(val) ? val : parseInt(val));
     editor.action(item.attr('data-action'), {
       name: item.attr("name"),
       id: item.attr("id"),
       value: val
     });
+  };
+
+  var view = function(item) {
+    var id = item.attr('id');
+    if (id in views) {
+      views[id](item);
+    } else {
+      throw "View not found: " + name;
+    }
   };
 
 	var init = function() {
@@ -166,44 +196,27 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			set_value($(this));
 		});
 
-		$("a.modal").click(function() {
-			console.log($(this).attr('id'));
-			var id = $(this).attr('id');
-			if (id in modals) {
-				modals[id]();
-			} else {
-				throw "Modal not found: " + name;
-			}
+		$(".view").click(function() {
+			view($(this));
+		});
+
+		$("#page-thumbs").on("click", ".view", function() {
+			view($(this));
 		});
 
 		$(".toolset .title").click(function() {
 			$(this).parent().children(".tools").slideToggle();
-		});
-
-	$(".submenu").click(function() {
-		console.log($(this).attr('id').toLowerCase());
-		$( "." + $(this).attr("id").toLowerCase()).slideToggle();
     });
 
-    $("a.new-page").click(function() {
-      console.log("new page");
+    $(".submenu").click(function() {
+      console.log($(this).attr('id').toLowerCase());
+      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
     });
 
-
-	$("a.remove-page").click(function() {
-		console.log("remove page");
-	});
-
-
-		/* Form inits */
-
-		$(".form-action").click(function() {
-			console.log("form submitted");
-			var id = $(this).attr("id");
-			console.log(id);
-			forms[id]();
-
-		});
+    $(".submenu").change(function() {
+      console.log($(this).attr('id').toLowerCase());
+      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
+    });
 
 		init_project();
 	};

@@ -30,8 +30,8 @@ define(function(require) {
 		init: function() {
 			console.log("initing tools");
 			for (var i in toolset) {
-				console.log(i);
-				console.log(toolset[i]);
+//				console.log(i);
+//				console.log(toolset[i]);
 				toolset[i].init();
 			}
 		},

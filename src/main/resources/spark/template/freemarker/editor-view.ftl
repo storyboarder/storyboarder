@@ -1,17 +1,10 @@
 <div id="container">
     <div id="navigator">
-      <div>
-        <div class="page-thumb">
-          <a class="page-thumb" href="#"> </a>
-          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
+      <div id="sub-navigator">
+        <div id="page-thumbs">
         </div>
         <div class="page-thumb">
-          <a class="page-thumb" href="#"> </a>
-          <a href="#" class="remove-page"><i class="fa fa-x fa-remove"></i></a>
-        </div>
-        <div class="page-thumb">
-          <a class="page-thumb" href="#"> </a>
-          <a href="#" class="new-page"><i class="fa fa-x fa-plus"></i></a>
+          <a href="#" class="new-page view" id="AddPage" href="#"><i class="fa fa-x fa-plus"></i></a>
         </div>
       <!--<a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>/-->
       </div>
@@ -46,19 +39,23 @@
           <a href="#" class="action" id="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" data-action="ToggleGrid" name="gridSnap">
+                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
                   <label>Snap to grid</label>
             </div>
-            <div class="ui mini input">
-                  <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
+            <div class="gridsnap" style="display:none">
+              <div class="ui mini input">
+                    <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
+              </div>
             </div>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" data-action="ToggleGrid" name="panelGridSnap">
+                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap">
                   <label>Snap to panel grid</label>
             </div>
-            <div class="ui mini input">
-                  <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
-                  <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
+            <div class="panelgridsnap" style="display:none">
+              <div class="ui mini input">
+                    <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
+                    <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
+              </div>
             </div>
         </div>
       </div>
@@ -76,8 +73,27 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-
-          <a href="#" class="modal" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-plus-circle"></i></a>
+          <a href="#" class="view" id="Add Image" data-content="Add Image"><i class="icon-drawing-image"></i></a>
+          <div style="display: none;" id="drawing-mode-options">
+            <label for="drawing-mode-selector">Mode:</label>
+            <select id="drawing-mode-selector">
+              <option>Pencil</option>
+              <option>Circle</option>
+              <option>Spray</option>
+              <option>Pattern</option>
+              <option>hline</option>
+              <option>vline</option>
+              <option>square</option>
+              <option>diamond</option>
+              <option>texture</option>
+            </select><br>
+            <label for="drawing-line-width">Line width:</label>
+            <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
+            <label for="drawing-color">Line color:</label>
+            <input type="color" value="#005E7A" id="drawing-color"><br>
+            <label for="drawing-shadow-width">Line shadow width:</label>
+            <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
+          </div>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
@@ -119,7 +135,6 @@
               <input type="color" value="#000000" id="font-color"><br>
           </div>  
 
-
           <!--<br>Borders: <input type="radio" name="text-borders" id="rectangle"/> rectangle <input type="radio" name="text-borders" id="none" checked="true"/> none/-->
 
         </div>
@@ -128,9 +143,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="modal" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="modal" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
-          <a href="#" class="modal" id="Load" data-content="Load"><i class="fa fa-x fa-upload"></i></a>
+          <a href="#" class="view" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
+          <a href="#" class="view" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
+          <a href="#" class="view" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="view" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
         </div>
       </div>
     </div>
