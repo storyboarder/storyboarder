@@ -206,7 +206,17 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
 		$(".toolset .title").click(function() {
 			$(this).parent().children(".tools").slideToggle();
-		});
+    });
+
+    $(".submenu").click(function() {
+      console.log($(this).attr('id').toLowerCase());
+      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
+    });
+
+    $(".submenu").change(function() {
+      console.log($(this).attr('id').toLowerCase());
+      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
+    });
 
 		init_project();
 	};

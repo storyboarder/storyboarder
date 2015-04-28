@@ -85,12 +85,12 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					}
 				});
 		},
-		"Save": function(pageNum, pageObject) {
+		"SaveTest": function(pageNum, pageObject) {
 			console.log("save called");
 			pageJSON = JSON.stringify(pageObject);
 			$.post("/save", {
 				page: pageNum,
-				json: pageJSON
+				json: pageJSON,
 			}, function(response) {
 				console.log(response);
 			});
@@ -173,7 +173,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("testing save for empty file. Expecting success!. Result: ");
-			actions.Save(0, {
+			actions.SaveTest(0, {
 				content: "FOOOO!!!"
 			});
 		}, 1000);
@@ -185,10 +185,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("testing save for nonempty file. Expecting success! twice. Result:");
-			actions.Save(0, {
+			actions.SaveTest(0, {
 				content: "New string!"
 			});
-			actions.Save(1, {
+			actions.SaveTest(1, {
 				content: "Line 2!"
 			});
 		}, 3000);
@@ -217,7 +217,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("Writing to loaded project");
-			actions.Save(0, "foo bar derp");
+			actions.SaveTest(0, "foo bar derp");
 		}, 9000)
 
 		window.setTimeout(function() {
@@ -231,7 +231,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("Writing to new project");
-			actions.Save(0, "hello world");
+			actions.SaveTest(0, "hello world");
 		}, 12000);
 
 		window.setTimeout(function() {

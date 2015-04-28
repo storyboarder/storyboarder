@@ -39,19 +39,23 @@
           <a href="#" class="action" id="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" data-action="ToggleGrid" name="gridSnap">
+                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
                   <label>Snap to grid</label>
             </div>
-            <div class="ui mini input">
-                  <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
+            <div class="gridsnap" style="display:none">
+              <div class="ui mini input">
+                    <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
+              </div>
             </div>
             <div class="ui checkbox">
-                  <input type="checkbox" class="action" data-action="ToggleGrid" name="panelGridSnap">
+                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap">
                   <label>Snap to panel grid</label>
             </div>
-            <div class="ui mini input">
-                  <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
-                  <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
+            <div class="panelgridsnap" style="display:none">
+              <div class="ui mini input">
+                    <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">
+                    <label>Columns</label><input type="text" class="action" data-action="SetSnap" id="panelColumns" name="panelGridSnap" value="2">
+              </div>
             </div>
         </div>
       </div>
@@ -69,7 +73,6 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <!--<a href="#" class="view" id="Add Image" data-content="Add Image"><i class="fa fa-x fa-photo"></i></a>/-->
           <a href="#" class="view" id="Add Image" data-content="Add Image"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
             <label for="drawing-mode-selector">Mode:</label>
@@ -92,24 +95,29 @@
             <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
           </div>
 
-          <!--<a href="#" class="tool" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>/-->
-          <a href="#" class="tool" data-content="Paint Brush"><i class="icon-drawing-draw-paintbrush"></i></a>
-          <!--<a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>/-->
-          <!--<a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>/-->
-          <a href="#" class="tool" data-content="Eyedropper"><i class="icon-drawing-dropper"></i></a>
+          <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
+          <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
+          <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+           <div class="draw" style="display:none">
+                <a href="#" class="item" id="eraser" data-content="Eraser">Eraser</a>
+
+              <label for="drawing-line-width">Line width:</label>
+              <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
+              <label for="drawing-color">Line color:</label>
+              <input type="color" value="#005E7A" id="drawing-color"><br>
+          </div>  
         </div>
       </div>
 
       <div class="toolset">
         <div class="title">Text</div>
         <div class="tools">
-          <!--<a href="#" class="tool" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>/-->
+
           <a href="#" class="tool" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
           <br>Borders:
             <a href="#" class="option" data-option="" id="BorderRectangle"><i class="fa fa-x fa-square-o"></i></a>
             <a href="#" class="option" data-option="" id="BorderCircle"><i class="fa fa-x fa-circle-thin"></i></a>
             <a href="#" class="option selected" data-option="" id="BorderNone"><i class="fa fa-x fa-ban"></i></a>
-          <!--<input type="radio" name="text-borders"/>ellipse <input type="radio" name="text-borders"/>rectangle <input type="radio" name="text-borders" checked="true"/>none/-->
         </div>
       </div>
 
