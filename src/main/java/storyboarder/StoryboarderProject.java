@@ -21,6 +21,12 @@ class StoryboarderProject {
   private static final String SAVE_ADD_SQL = "INSERT OR REPLACE INTO "
       + TABLE + " VALUES (?, ?, ?)";
 
+  private static final String DELETE_SQL = "DELETE FROM " + TABLE
+      + "WHERE num = ?";
+
+  private static final String UPDATE_NUMS_SQL = "UPDATE " + TABLE
+      + " SET num = num - 1 where num > ?";
+
   private static final String SIZE_SQL = "SELECT * FROM " + TABLE;
 
   private static final int NUM = 1;
@@ -98,13 +104,31 @@ class StoryboarderProject {
   }
 
   boolean swapPages(int num1, int num2) {
-    // TODO
-    return false;
+    StoryboarderPage page1 = getPage(num1).setNum(num2);
+    StoryboarderPage page2 = getPage(num2).setNum(num1);
+    return savePage(page1) && savePage(page2);
   }
 
   boolean removePage(int pageNum) {
-    // TODO
-    return false;
+    if (!inBounds(pageNum)) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
+    }
+
+    try {
+      PreparedStatement deletePrep = conn.prepareStatement(DELETE_SQL);
+      deletePrep.setInt(NUM, pageNum);
+      deletePrep.execute();
+
+      PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL);
+      prep.setInt(NUM, pageNum);
+      prep.execute();
+
+      return true;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      return false;
+    }
   }
 
   @Override
