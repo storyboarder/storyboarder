@@ -55,7 +55,31 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"CreateProj": function(params) {
 			console.log("creating project with: ");
 			console.log(params);
-			$.post("/createProj", params, function(response) {
+			console.log("editor init");
+      var canvas = params.canvas;
+      var width = params.width;
+      var height = params.height;
+      var pageMargin = params.pageMargin;
+      var panelMargin = params.panelMargin;
+      canvas.width = width;
+      canvas.height = height;
+      currentPage = 1;
+      numPages = 1;
+  //		console.log(width, height);
+
+      canvasState.setPageMargin(pageMargin);
+  //		console.log(canvasState);
+      canvasState.setPanelMargin(panelMargin);
+      canvasState.init(canvas.attr("id"), width, height, params.callback);
+
+      console.log("finished initing editor");
+
+      /* init all tools in the toolset so they get the canvas state */
+      toolset.init();
+
+      /* activate a tool to start with (esp. helpful for testing) */
+      activate("Select");
+			$.post("/createProj", {name: params.name}, function(response) {
 				console.log(response);
 			});
 		},
@@ -65,6 +89,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log(params);
 			$.post("/init", params,
 				function(responseJSON) {
+				  currentPage = 1;
 					console.log(responseJSON);
 				});
 		},
@@ -85,12 +110,25 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					}
 				});
 		},
-		"SaveTest": function(pageNum, pageObject) {
+		"Save": function() {
 			console.log("save called");
+		  pageJSON = canvasState.getState();
+		  console.log(currentPage, pageJSON);
+		  $.post("/save", {
+        page: currentPage,
+        json: pageJSON,
+        thumbnail: ""
+		  }, function(response) {
+		    console.log(response);
+		  });
+		},
+		"SaveTest": function(pageNum, pageObject) {
+			console.log("save test called");
 			pageJSON = JSON.stringify(pageObject);
 			$.post("/save", {
 				page: pageNum,
 				json: pageJSON,
+				thumbnail: ""
 			}, function(response) {
 				console.log(response);
 			});
@@ -126,31 +164,27 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 	var init = function(spec, callback) {
 	  console.log("editor init");
-		var canvas = spec.canvas;
-		var width = spec.width;
-		var height = spec.height;
-		var pageMargin = spec.pageMargin;
-		var panelMargin = spec.panelMargin;
-		canvas.width = width;
-		canvas.height = height;
-//		console.log(width, height);
-
-		canvasState.setPageMargin(pageMargin);
-//		console.log(canvasState);
-		canvasState.setPanelMargin(panelMargin);
-		canvasState.init(canvas.attr("id"), width, height, callback);
-//		canvasState.setGridSpacing(40); //TODO un-hardcode
-//		canvasState.setSnapDistance(10); //TODO un-hardcode
-//		canvasState.setPanelRows(3);
-//		canvasState.setPanelColumns(2);
-
-		console.log("finished initing editor");
-
-		/* init all tools in the toolset so they get the canvas state */
-		toolset.init();
-
-		/* activate a tool to start with (esp. helpful for testing) */
-		this.activate("Select");
+//		var canvas = spec.canvas;
+//		var width = spec.width;
+//		var height = spec.height;
+//		var pageMargin = spec.pageMargin;
+//		var panelMargin = spec.panelMargin;
+//		canvas.width = width;
+//		canvas.height = height;
+////		console.log(width, height);
+//
+//		canvasState.setPageMargin(pageMargin);
+////		console.log(canvasState);
+//		canvasState.setPanelMargin(panelMargin);
+//		canvasState.init(canvas.attr("id"), width, height, callback);
+//
+//		console.log("finished initing editor");
+//
+//		/* init all tools in the toolset so they get the canvas state */
+//		toolset.init();
+//
+//		/* activate a tool to start with (esp. helpful for testing) */
+//		this.activate("Select");
 	};
 
 	var activate = function(toolname) {

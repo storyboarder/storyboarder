@@ -40,6 +40,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 		},
 		"Save": function() {
 			console.log("save called");
+			editor.action("Save", {});
 			//TODO call editor
 		},
 		"Export": function() {
@@ -78,16 +79,18 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
       $('#page').height(parseInt($("#page-height").val()));
       console.log($('#canvas').width());
       $("#editor").css("visibility", "visible");
-      editor.init({
+      editor.action("CreateProj", {
         canvas: $("#canvas"),
         width: parseInt($("#page-width").val()),
         height: parseInt($("#page-height").val()),
         pageMargin: parseInt($("#page-margin").val()),
-        panelMargin: parseInt($("#panel-margin").val())
-      }, function() {
-        $("input[type='text'].action").each(function(e) {
-          set_value($(this));
-        });
+        panelMargin: parseInt($("#panel-margin").val()),
+        name: $("#filename").val(),
+        callback: function() {
+          $("input[type='text'].action").each(function(e) {
+            set_value($(this));
+          });
+        }
       });
 	  },
 	  "LoadProject": function(item) {
@@ -148,7 +151,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
     if (id in views) {
       views[id](item);
     } else {
-      throw "View not found: " + name;
+      throw "View not found: " + id;
     }
   };
 
