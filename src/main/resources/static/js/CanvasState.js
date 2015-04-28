@@ -218,7 +218,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
  		},
 
  		getState: function () {
- 			return this.getCanvas().toJSON(["elmType"]);
+ 			return $.extend(this.getCanvas().toJSON(["elmType"]), {
+                width: width,
+                height: height
+            });
  		},
 
  		getCanvas: function() {
