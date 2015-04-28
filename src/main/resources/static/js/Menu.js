@@ -20,11 +20,11 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 							var imgInstance = new fabric.Image(img, {
 								scaleX: 0.2,
 								scaleY: 0.2
-							})
+							});
 							canvasState.addElement(imgInstance, "image");
-						}
+						};
 						img.src = event.target.result;
-					}
+					};
 					reader.readAsDataURL(e.target.files[0]);
 				}
 
@@ -32,7 +32,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 				var send = {
 					url: $("#image-url").val(),
 					file: $("#filepath").val()
-				}
+				};
 
 				editor.action("Add Image", send);
 			});
