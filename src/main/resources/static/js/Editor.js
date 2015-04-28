@@ -181,7 +181,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 //		console.log("finished initing editor");
 //
 //		/* init all tools in the toolset so they get the canvas state */
-//		toolset.init();
+		toolset.init();
 //
 //		/* activate a tool to start with (esp. helpful for testing) */
 //		this.activate("Select");
