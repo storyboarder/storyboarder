@@ -1,5 +1,8 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
+  var currentPage; // index of current page
+  var numPages;
+
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
@@ -42,7 +45,11 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("loading project with:");
 			console.log(params);
 			$.post("/loadProj", params, function(response) {
-				console.log(response);
+				console.log(JSON.parse(response));
+				numPages = response.numPages;
+				currentPage = 1;
+				canvasState.load(response.page); // parse JSON received
+				return response.numPages;
 			});
 		},
 		"CreateProj": function(params) {
@@ -62,24 +69,35 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				});
 		},
 		"Load": function(pageNum) {
-			console.log("load called");
+			console.log("load called with page", pageNum);
 			$.post("/load", {
 					page: pageNum
 				},
-				function(responseJSON) {
-					responseObject = JSON.parse(responseJSON);
-					console.log("loaded: ");
-					console.log(responseObject);
-					return responseObject;
+				function(response) {
+					if (typeof response == "string") {
+					  throw response;
+					} else {
+            responseObject = JSON.parse(response);
+            console.log("loaded: ");
+            console.log(responseObject);
+            currentPage = pageNum; // TODO check for errors(?)
+            return responseObject;
+					}
 				});
 		},
-		"Save": function(pageNum, pageObject) {
+		"SaveTest": function(pageNum, pageObject) {
 			console.log("save called");
 			pageJSON = JSON.stringify(pageObject);
 			$.post("/save", {
 				page: pageNum,
-				json: pageJSON
+				json: pageJSON,
 			}, function(response) {
+				console.log(response);
+			});
+		},
+		"SaveToDisk": function() {
+			console.log("save to disk called");
+			$.post("/saveToDisk", {}, function(response) {
 				console.log(response);
 			});
 		},
@@ -115,10 +133,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		var panelMargin = spec.panelMargin;
 		canvas.width = width;
 		canvas.height = height;
-		console.log(width, height);
+//		console.log(width, height);
 
 		canvasState.setPageMargin(pageMargin);
-		console.log(canvasState);
+//		console.log(canvasState);
 		canvasState.setPanelMargin(panelMargin);
 		canvasState.init(canvas.attr("id"), width, height, callback);
 //		canvasState.setGridSpacing(40); //TODO un-hardcode
@@ -126,7 +144,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 //		canvasState.setPanelRows(3);
 //		canvasState.setPanelColumns(2);
 
-		console.log("init editor");
+		console.log("finished initing editor");
 
 		/* init all tools in the toolset so they get the canvas state */
 		toolset.init();
@@ -155,7 +173,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("testing save for empty file. Expecting success!. Result: ");
-			actions.Save(0, {
+			actions.SaveTest(0, {
 				content: "FOOOO!!!"
 			});
 		}, 1000);
@@ -167,10 +185,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 		window.setTimeout(function() {
 			console.log("testing save for nonempty file. Expecting success! twice. Result:");
-			actions.Save(0, {
+			actions.SaveTest(0, {
 				content: "New string!"
 			});
-			actions.Save(1, {
+			actions.SaveTest(1, {
 				content: "Line 2!"
 			});
 		}, 3000);
@@ -193,12 +211,33 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		}, 6000);
 
 		window.setTimeout(function() {
-			console.log("Testing loading of projects");
-			actions.LoadProj(0);
-			actions.LoadProj(1);
-			actions.LoadProj(2);
-			actions.LoadProj(3);
-		}, 7000);
+			console.log("Loading project 2");
+			actions.LoadProj({choice: 2});
+		}, 8000);
+
+		window.setTimeout(function() {
+			console.log("Writing to loaded project");
+			actions.SaveTest(0, "foo bar derp");
+		}, 9000)
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 10000)
+
+		window.setTimeout(function() {
+			console.log("Testing creating a new project");
+			actions.CreateProj({name: "newProject.txt"});
+		}, 11000);
+
+		window.setTimeout(function() {
+			console.log("Writing to new project");
+			actions.SaveTest(0, "hello world");
+		}, 12000);
+
+		window.setTimeout(function() {
+			actions.SaveToDisk();
+		}, 13000)
+
 
 
 
@@ -216,8 +255,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action: action,
-		test: test
+		action: action
+		//test: test
 	};
 
 });

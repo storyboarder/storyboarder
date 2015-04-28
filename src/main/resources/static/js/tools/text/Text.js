@@ -1,11 +1,63 @@
 define(["../../CanvasState"], function(canvasState) {
 
+
+	var Rectext = fabric.util.createClass(fabric.IText, {
+
+	  type: 'rectext',
+
+	  initialize: function(text, options) {
+	    options || (options = { });
+	    this.callSuper('initialize', text, options);
+	    this.borderColor = "black";
+	    this.transparentCorners = true;
+	    this.lockRotation = true;
+	  },
+
+	  toObject: function() {
+	    return fabric.util.object.extend(this.callSuper('toObject'), {
+	      //label: this.get('label')
+	    });
+	  },
+
+	  _render: function(ctx) {
+	    this.callSuper('_render', ctx);
+	    this.drawBorders(ctx);
+	  }
+	});
+
+	var Roundtext = fabric.util.createClass(fabric.Circle, {
+
+	  type: 'roundtext',
+
+	  initialize: function(text, options) {
+	    options || (options = { });
+
+	    this.callSuper('initialize', text, options);
+	  },
+
+	  toObject: function() {
+	    return fabric.util.object.extend(this.callSuper('toObject'), {
+	      //label: this.get('label')
+	    });
+	  },
+
+	  _render: function(ctx) {
+	    this.callSuper('_render', ctx);
+
+	    ctx.font = '20px Helvetica';
+	    ctx.fillStyle = '#333';
+	    ctx.fillText(this.label, -this.width/2, -this.height/2 + 20);
+	  }
+	});
+
+
 	var activate = function() {
-/*
+		console.log("text activate");
+
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type === "text") {
+				if (found.type === "rectext" || found.type === "i-text") {
 					found.set({
 						selectable: true
 					});
@@ -17,177 +69,85 @@ define(["../../CanvasState"], function(canvasState) {
 			}
 		);
 
-		console.log("text activate");
-
-		// adding text boxes and editing inside them, basically rect with label
-		//-- can allow for stroke
-
-		// click drag, creating a text box
-
-		// double click, go into text box
-
-		// if click again onto an textbox + text object, allow for resize?
-
-		// toggling? 
 		var initialPos;
 		var finalPos;
 		var selected;
-		var edit;
-		TEXT_PADDING = 20;
 
-<<<<<<< HEAD
-			canvas.on('mouse:down', function(coor) {
-				
-				initialPos = {
-					x: coor.e.offsetX,
-					y: coor.e.offsetY
-				};
-=======
-		canvas.on('mouse:down', function(coor) {
->>>>>>> ea8dd2af02a40e4a3d637fa1bd599908715faf8c
+		canvas.on('mouse:down', function(coor) {		
 
 			initialPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
-			}
-
-<<<<<<< HEAD
-			canvas.on('mouse:up', function(coor){
-				
-				finalPos = {
-					x: coor.e.offsetX,
-					y: coor.e.offsetY
-				};
-
-				// weird bug when I edit and then click out of the box
-				// phantom group box....?
-				if(selected && selected.type === 'group') {
-					if(edit) {
-						console.log("GROUP!!");
-						var pos = {
-							left : selected.left,
-							top : selected.top
-						};
-=======
+			};
 			selected = coor.target;
-			edit = coor.e.shiftKey;
-		});
+			console.log(selected.type);
+		}); // mouse:down
 
-		canvas.on('mouse:up', function(coor) {
->>>>>>> ea8dd2af02a40e4a3d637fa1bd599908715faf8c
-
+		canvas.on('mouse:up', function(coor){
 			finalPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
+			};
+
+			if(!selected || selected && selected.type !== "rectext") {
+				console.log("create");
+				if(!selected || selected && selected.type !== "i-text") {
+					if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
+
+						var test = new Rectext('Text', {
+							fontFamily: $('#font-family :selected').val(),
+							fontSize: $('#font-size')[0].value,
+							left: initialPos.x,
+							top: initialPos.y
+						});
+
+						canvasState.addElement(test, 'rectext');
+					} // if within range
+				}
+
+			} else if(selected && (selected.type === "rectext" || selected.type === "i-text")) {
+
+				$("#font-family").change(function () {
+			        var firstDropVal = $('#font-family').val();
+			        console.log(firstDropVal);
+			    });
+
+			    $("#font-size").change(function () {
+			        var firstDropVal = $('#font-size').val();
+			        console.log(firstDropVal);
+			    });
+
+			    $("#font-color").change(function () {
+			        var firstDropVal = $('#font-color').val();
+			        console.log(firstDropVal);
+			    });
+
 			}
 
-			// weird bug when I edit and then click out of the box
-			// phantom group box....?
-			if (selected && selected.type === 'text') {
-				if (edit) {
-					console.log("GROUP!!");
-					var pos = {
-						left: selected.left,
-						top: selected.top
-					}
+			console.log("2 " + $('#font-family :selected').val());
+			if($("#borders").is(":checked")){
+				console.log("YEP");
+			}
 
-					var items = selected._objects;
-					var isText = false;
-					var iText;
-					console.log(items);
-					for (i in items) {
-						if (items[i].type === 'i-text') {
-							isText = true;
-							iText = items[i];
-						}
-					}
-
-					if (isText) {
-						console.log('checked text');
-						selected._restoreObjectsState();
-						canvasState.deleteElement(selected);
-						for (var i = 0; i < items.length; i++) {
-							canvas.add(items[i]);
-							//canvas.item(canvas.size()-1).hasControls = true;
-						}
-
-						canvas.on("text:editing:exited", function(e) {
-							console.log('finished editing');
-							var group = new fabric.Group([items[0], items[1]], {
-								left: pos.left,
-								top: pos.top
-							});
-
-							canvasState.deleteElement(items[0]);
-							canvasState.deleteElement(items[1]);
-							canvasState.addElement(group, 'text');
-						});
-					}
-				}
-			} else {
-				console.log('creating new group');
-
-				if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
-					width = Math.abs(initialPos.x - finalPos.x);
-					height = Math.abs(initialPos.y - finalPos.y);
-
-					var input = new fabric.IText('Text', {
-						fontFamily: 'arial black',
-						fontSize: 14,
-						left: initialPos.x,
-						top: initialPos.y
-					});
-
-
-					// var textBox = new fabric.Rect({
-					// 	width : width,
-					// 	height: height,
-					// 	fill: 'white',
-					// 	stroke: '#C0C0C0',
-					// 	strokeDashArray: [5, 5]
-					// });
-
-					// var group = new fabric.Group([ textBox, input ], {
-					//   left: initialPos.x,
-					//   top: initialPos.y
-					// });
-
-
-					canvas.on('after:render', function() {
-						canvas.contextContainer.strokeStyle = '#555';
-
-						var bound = input.getBoundingRect();
-						bound.strokeDashArray = [5, 5];
-						canvas.contextContainer.strokeRect(
-							bound.left + 0.7,
-							bound.top + 0.7,
-							bound.width,
-							bound.height
-						);
-					});
-
-					canvasState.addElement(input, 'text');
-
-				} // if within range				
-			} // else
 		}); // mouseup
 
 		document.onkeydown = function(e) {
 			console.log("pressed");
 			var key = e.keyCode;
-			console.log(key);
-			console.log(selected.type);
-			if (key === 8 && selected.type === 'text') {
+			if (key === 8 && selected.type === 'rectext') {
 				console.log("delete");
 				console.log(selected.type);
 				canvasState.deleteElement(selected);
 			}
 		};
-	*/
+
+		return this;
 	};
 
 	var deactivate = function() {
 		console.log("text deactivate");
+		canvas.__eventListeners["mouse:up"] = [];
+		canvas.__eventListeners["mouse:down"] = [];
 	};
 
 
