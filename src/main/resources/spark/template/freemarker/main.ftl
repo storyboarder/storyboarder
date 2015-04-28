@@ -14,9 +14,9 @@
 </head>
 <body>
 
+<#include "/add-image.ftl">
 <#include "/create-project.ftl">
 <#include "/load-project.ftl">
-
 <#include "/editor-view.ftl">
 
 

@@ -52,11 +52,12 @@ define(["../../CanvasState"], function(canvasState) {
 
 
 	var activate = function() {
+		console.log("text activate");
 
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type === "text") {
+				if (found.type === "rectext" || found.type === "i-text") {
 					found.set({
 						selectable: true
 					});
@@ -68,53 +69,71 @@ define(["../../CanvasState"], function(canvasState) {
 			}
 		);
 
-		console.log("text activate"); 
 		var initialPos;
 		var finalPos;
 		var selected;
 
-		canvas.on('mouse:down', function(coor) {
-				
+		canvas.on('mouse:down', function(coor) {		
+
 			initialPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
 			};
+			selected = coor.target;
+			console.log(selected.type);
+		}); // mouse:down
 
+		canvas.on('mouse:up', function(coor){
+			finalPos = {
+				x: coor.e.offsetX,
+				y: coor.e.offsetY
+			};
 
-		});
-			canvas.on('mouse:up', function(coor){
-				
-				finalPos = {
-					x: coor.e.offsetX,
-					y: coor.e.offsetY
-				};
+			if(!selected || selected && selected.type !== "rectext") {
+				console.log("create");
+				if(!selected || selected && selected.type !== "i-text") {
+					if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
 
+						var test = new Rectext('Text', {
+							fontFamily: $('#font-family :selected').val(),
+							fontSize: $('#font-size')[0].value,
+							left: initialPos.x,
+							top: initialPos.y
+						});
 
-			if(selected && selected.type !== "rectext") {
+						canvasState.addElement(test, 'rectext');
+					} // if within range
+				}
 
-				if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
-					width = Math.abs(initialPos.x - finalPos.x);
-					height = Math.abs(initialPos.y - finalPos.y);
+			} else if(selected && (selected.type === "rectext" || selected.type === "i-text")) {
 
-					var test = new Rectext('Text', {
-						fontFamily: 'arial black',
-						fontSize: 14,
-						left: initialPos.x,
-						top: initialPos.y
-					});
+				$("#font-family").change(function () {
+			        var firstDropVal = $('#font-family').val();
+			        console.log(firstDropVal);
+			    });
 
-					canvasState.addElement(test, 'rectext');
-					console.log(test.type);
+			    $("#font-size").change(function () {
+			        var firstDropVal = $('#font-size').val();
+			        console.log(firstDropVal);
+			    });
 
-				} // if within range
+			    $("#font-color").change(function () {
+			        var firstDropVal = $('#font-color').val();
+			        console.log(firstDropVal);
+			    });
+
 			}
+
+			console.log("2 " + $('#font-family :selected').val());
+			if($("#borders").is(":checked")){
+				console.log("YEP");
+			}
+
 		}); // mouseup
 
 		document.onkeydown = function(e) {
 			console.log("pressed");
 			var key = e.keyCode;
-			console.log(key);
-			console.log(selected.type);
 			if (key === 8 && selected.type === 'rectext') {
 				console.log("delete");
 				console.log(selected.type);
@@ -139,7 +158,7 @@ define(["../../CanvasState"], function(canvasState) {
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,
-		deactivate: deactivate,
+		deactivate: deactivate
 	};
 
 });

@@ -19,6 +19,7 @@ define(function(require) {
 				console.log("deactivating from toolset:", currentTool.name);
 			}
 			console.log("activating from toolset:", toolname);
+			console.log(toolset[toolname]);
 			currentTool = toolset[toolname].activate();
 		} else {
 			throw "Tool not found: " + toolname;

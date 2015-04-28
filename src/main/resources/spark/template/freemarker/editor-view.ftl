@@ -99,8 +99,6 @@
           <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
            <div class="draw" style="display:none">
-                <a href="#" class="item" id="eraser" data-content="Eraser">Eraser</a>
-
               <label for="drawing-line-width">Line width:</label>
               <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
@@ -111,13 +109,34 @@
 
       <div class="toolset">
         <div class="title">Text</div>
-        <div class="tools">
+        <div class="tools">          
+          <div class="ui checkbox">
+          <input type="checkbox" data-action="Borders" id="borders">
+                  <label>Borders</label>
+          </div>        
+		    <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="fa fa-x fa-plus-circle"></i></a>
 
-          <a href="#" class="tool" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
-          <br>Borders:
-            <a href="#" class="option" data-option="" id="BorderRectangle"><i class="fa fa-x fa-square-o"></i></a>
-            <a href="#" class="option" data-option="" id="BorderCircle"><i class="fa fa-x fa-circle-thin"></i></a>
-            <a href="#" class="option selected" data-option="" id="BorderNone"><i class="fa fa-x fa-ban"></i></a>
+          <div class="text" style="display:none">  
+             <select id="font-family">
+                <option value="arial">Arial</option>
+                <option value="comic sans">Comic Sans</option>
+                <option value="courier">Courier</option>
+                <option value="georgia">Georgia</option>
+                <option value="helvetica">Helvetica</option>
+                <option value="impact">Impact</option>
+                <option value="myriad pro">Myriad Pro</option>
+                <option value="times new roman" selected>Times New Roman</option>
+                <option value="verdana">Verdana</option>
+              </select><br>
+              
+              <label for="font-size">Font size:</label>
+              <input type="range" value="10" min="0" max="150" id="font-size"><br>
+              <label for="font-color">Font color:</label>
+              <input type="color" value="#000000" id="font-color"><br>
+          </div>  
+
+          <!--<br>Borders: <input type="radio" name="text-borders" id="rectangle"/> rectangle <input type="radio" name="text-borders" id="none" checked="true"/> none/-->
+
         </div>
       </div>
 
