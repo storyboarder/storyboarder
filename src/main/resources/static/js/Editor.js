@@ -44,9 +44,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"LoadProj": function(params) {
 			console.log("loading project with:");
 			console.log(params);
-			$.post("/loadProj", params, function(responseJSON) {
-				var response = JSON.parse(responseJSON);
-				console.log(response);
+
+			$.post("/loadProj", params, function(response) {
+				response = JSON.parse(repsonse);
 				numPages = response.numPages;
 				currentPage = 1;
 				canvasState.load(response.page); // parse JSON received
@@ -112,11 +112,11 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					// if (typeof response == "string") {
 					// 	throw response;
 					// } else {
-						responseObject = JSON.parse(response);
-						console.log("got: ");
-						console.log(responseObject);
-						currentPage = pageNum; // TODO check for errors(?)
-						return responseObject;
+					responseObject = JSON.parse(response);
+					console.log("got: ");
+					console.log(responseObject);
+					currentPage = pageNum; // TODO check for errors(?)
+					return responseObject;
 					// }
 				});
 		},
@@ -182,6 +182,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		}
 	};
 	var init = function(spec, callback) {
+
 		console.log("editor init");
 		//		var canvas = spec.canvas;
 		//		var width = spec.width;
@@ -200,7 +201,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		//		console.log("finished initing editor");
 		//
 		//		/* init all tools in the toolset so they get the canvas state */
-		//		toolset.init();
+		toolset.init();
 		//
 		//		/* activate a tool to start with (esp. helpful for testing) */
 		//		this.activate("Select");
