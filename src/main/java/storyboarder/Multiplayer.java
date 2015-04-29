@@ -29,7 +29,7 @@ class Multiplayer extends WebSocketServer {
 
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
-    this.sendToAll("new connection: " + handshake.getResourceDescriptor());
+//    this.sendToAll("new connection: " + handshake.getResourceDescriptor());
     System.out.println(conn.getRemoteSocketAddress().getAddress()
         .getHostAddress()
         + " entered the room!");
@@ -37,7 +37,7 @@ class Multiplayer extends WebSocketServer {
 
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-    this.sendToAll(conn + " has left the room!");
+//    this.sendToAll(conn + " has left the room!");
     System.out.println(conn + " has left the room!");
   }
 

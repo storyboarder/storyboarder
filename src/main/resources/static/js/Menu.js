@@ -227,7 +227,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$("a.action").click(function() {
 			console.log("action called");
-			editor.action($(this).attr('data-action'), {
+			editor.action($(this).attr('id'), {
 				name: $(this).attr('name')
 			});
 		});

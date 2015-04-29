@@ -45,8 +45,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("loading project with:");
 			console.log(params);
 
-			$.post("/loadProj", params, function(response) {
-				response = JSON.parse(response);
+			$.post("/loadProj", params, function(responseJSON) {
+				response = JSON.parse(responseJSON);
 				numPages = response.numPages;
 				currentPage = 0;
 				canvasState.load(response.page); // parse JSON received
@@ -201,8 +201,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
-		canvasState.storeState();
-
 		toolset.activate(toolname);
 	};
 

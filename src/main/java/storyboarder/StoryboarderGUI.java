@@ -70,6 +70,7 @@ final class StoryboarderGUI {
 
     Spark.post("/getPage", new GetPageHandler());
     Spark.post("/savePage", new SavePageHandler());
+    Spark.post("/movePage", new MovePageHandler());
     Spark.post("/addPage", new AddPageHandler());
   }
 
@@ -101,21 +102,27 @@ final class StoryboarderGUI {
 
   }
 
+  /**
+   * Serializes the current project.
+   *
+   * @return The number of pages in a project, and the first page of the
+   *         project. The first page element will be null if the number of pages
+   *         is zero.
+   */
   private Object stringifyProject() {
-    int numPages = project.numberOfPages();
-    StoryboarderPage firstPage = StoryboarderPage.emptyPage();
-    if (numPages >= 1) {
+    int numPages = project.getPageCount();
+    StoryboarderPage firstPage = null;
+    if (numPages > 0) {
       firstPage = project.getPage(1);
     }
     Map<String, Object> data = ImmutableMap.of("page", firstPage, "numPages",
         numPages);
     System.out.println("current project: " + project + ", data: " + data);
-
     return GSON.toJson(data);
   }
 
   /**
-   * Sends set up data to the spark site.
+   * Sends set-up data to the spark site. No parameters needed.
    *
    * @author fbystric
    * @author ktsakas
@@ -291,6 +298,23 @@ final class StoryboarderGUI {
     }
   }
 
+  private class MovePageHandler implements Route {
+
+    @Override
+    public Object handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      int pageNum = Integer.parseInt(qm.value("pageNum"));
+      int newSpot = Integer.parseInt(qm.value("newSpot"));
+
+      if (project.movePage(pageNum, newSpot)) {
+        return GSON.toJson("Success moving page! :)");
+      } else {
+        return GSON.toJson("Failure moving page... :(");
+      }
+    }
+
+  }
+
   private StoryboarderPage getPageFromReq(Request req) {
     QueryParamsMap qm = req.queryMap();
     int num = Integer.parseInt(qm.value("num"));
@@ -300,7 +324,6 @@ final class StoryboarderGUI {
   }
 
   private class AddPageHandler implements Route {
-
     @Override
     public Object handle(Request req, Response res) {
       System.out.println("\n got add page request\n");

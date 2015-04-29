@@ -1,6 +1,8 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var canvas;
+    var helperCanvas;
     var socket;
+
     var width;
     var height;
     var pageMargin;
@@ -10,11 +12,17 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
     var edgeDirections = ["left", "top", "right", "bottom"];
     var snap; // snapUtil object
+
+    var history = [];
+    var historyIdx = -1;
+    var previousState = null;
+
     var addElement = function(e, elmType) {
         e.elmType = elmType;
         elements.push(e);
         canvas.add(e);
     };
+
     var setControls = function(panel) {
         var bounds = [];
         var options = {};
@@ -108,20 +116,40 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var init = function(canvasId, w, h, callback) {
         console.log("initing page...");
 
-        socket = new WebSocket("ws://localhost:8887");
+        socket = new WebSocket("ws://localhost:8888");
         socket.onmessage = function (e) {
-            CanvasState.applyDeltaToState(e);
+            console.log("State change: ", JSON.parse(e.data));
+            // CanvasState.applyDeltaToState(JSON.parse(e.data));
         };
 
         width = w;
         height = h;
+        $canvas = $("#" + canvasId);
         canvas = new fabric.Canvas(canvasId, {
+            selection: false
+        });
+        // Create helper canvas
+        $('<canvas id="helperCanvas"></canvas>').css({
+            position: "absolute",
+            top: $canvas.offset().top,
+            left: $canvas.offset().left
+        }).insertAfter($canvas);
+
+        helperCanvas = new fabric.Canvas("helperCanvas", {
             selection: false
         });
         canvas.setDimensions({
             width: w,
             height: h
         });
+        helperCanvas.setDimensions({
+            width: w,
+            height: h
+        });
+        canvas.on('change', function () {
+            CanvasState.storeState();
+        });
+        previousState = CanvasState.getState();
         elements = [];
         pageEdges = {
             left: pageMargin,
@@ -150,57 +178,46 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     };
 
     var CanvasState = {
-        history: [],
-        historyIdx: -1,
-        previousState: null,
         storeState: function() {
-            console.log("Diff patch: ", jsondiffpatch);
+            console.log("storing a new state...");
             var state = this.getState();
-            // If there is history
-            if (this.canRevert() && typeof previousState != "undefined") {
-                var delta = jsondiffpatch.diff(state, previousState);
-                socket.send(delta);
-                this.history.push(delta);
-            }
-            this.historyIdx++;
-            this.previousState = state;
+
+            var delta = jsondiffpatch.diff(state, previousState);
+            socket.send(JSON.stringify(delta));
+            history[ ++historyIdx ] = delta;
+            previousState = state;
         },
         canRevert: function() {
-            console.log(this.historyIdx);
-            return this.historyIdx >= 0;
+            return historyIdx >= 0;
         },
         canRestore: function() {
-            return (this.historyIdx >= this.history.length - 1);
+            return (historyIdx >= history.length - 1);
         },
         revertState: function() {
             console.log("reverting state");
             if (!this.canRevert()) return;
             // Repaint canvas
             canvas.clear().renderAll();
-            console.log(this.previousState);
-            canvas.loadFromJSON(this.previousState, canvas.renderAll.bind(canvas));
+            canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
             // Move previous state one back
-            this.historyIdx--;
-            if (this.canRevert()) {
-                var prevDelta = this.history[this.historyIdx];
-                this.previousState = jsondiffpatch.patch(this.previousState, prevDelta);
-            } else {
-                this.previousState = null;
-            }
+            var delta = history[historyIdx];
+            previousState = jsondiffpatch.patch(previousState, delta);
+            historyIdx--;
         },
         restoreState: function() {
             if (!this.canRestore()) return;
             // Move prebious state one forward
-            this.previousState = this.getState();
-            this.historyIdx++;
-            console.log("History: ", this.history);
-            var delta = this.history[this.historyIdx];
-            var nextState = jsondiffpatch.patch(this.previousState, delta);
+            state = this.getState();
+            historyIdx++;
+            console.log("History: ", history);
+            var delta = history[historyIdx];
+            var nextState = jsondiffpatch.patch(state, delta);
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
         },
         getState: function() {
+            console.log("canvas", this.getCanvas());
             return $.extend(this.getCanvas().toJSON(["elmType"]), {
                 width: width,
                 height: height
@@ -208,11 +225,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         },
         applyDeltaToState: function(delta) {
             var state = this.getState();
-            this.previousState = state;
-            canvas.loadFromJSON(jsondiffpatch.patch(state, delta), canvas.renderAll.bind(canvas));
+            previousState = jsondiffpatch.patch(state, delta);
+            canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
         },
         getCanvas: function() {
             return canvas;
+        },
+        getHelperCanvas: function() {
+            return helperCanvas;
         },
         getWidth: function() {
             return canvas.width;
