@@ -1,7 +1,7 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
-  var currentPage; // index of current page
-  var numPages;
+	var currentPage; // index of current page
+	var numPages;
 
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
@@ -21,8 +21,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		},
 		"SetSnap": function(params) {
-		  var obj = {};
-		  obj[params.id] = params.value;
+			var obj = {};
+			obj[params.id] = params.value;
 			canvasState.setSnap(params.name, obj);
 		},
 		"PanelRows": function(params) {
@@ -44,8 +44,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"LoadProj": function(params) {
 			console.log("loading project with:");
 			console.log(params);
+
 			$.post("/loadProj", params, function(response) {
-				console.log(JSON.parse(response));
+				response = JSON.parse(response);
 				numPages = response.numPages;
 				currentPage = 1;
 				canvasState.load(response.page); // parse JSON received
@@ -56,23 +57,39 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("creating project with: ");
 			console.log(params);
 			console.log("editor init");
-      var canvas = params.canvas;
-      var width = params.width;
-      var height = params.height;
-      var pageMargin = params.pageMargin;
-      var panelMargin = params.panelMargin;
-      canvas.width = width;
-      canvas.height = height;
+			var canvas = params.canvas;
+			var width = params.width;
+			var height = params.height;
+			var pageMargin = params.pageMargin;
+			var panelMargin = params.panelMargin;
+			canvas.width = width;
+			canvas.height = height;
+			currentPage = 1;
+			numPages = 1;
+			//		console.log(width, height);
 
-      canvasState.setPageMargin(pageMargin);
-      canvasState.setPanelMargin(panelMargin);
-      canvasState.init(canvas.attr("id"), width, height, params.callback);
+			canvasState.setPageMargin(pageMargin);
+			//		console.log(canvasState);
+			canvasState.setPanelMargin(panelMargin);
+			canvasState.init(canvas.attr("id"), width, height, params.callback);
 
-      console.log("finished initing editor");
-      toolset.init();
-      activate("Select");
+			console.log("finished initing editor");
 
-			$.post("/createProj", {name: params.name}, function(response) {
+			/* init all tools in the toolset so they get the canvas state */
+			toolset.init();
+
+			/* activate a tool to start with (esp. helpful for testing) */
+			activate("Select");
+			$.post("/createProj", {
+				name: params.name
+			}, function(response) {
+				console.log(response);
+			});
+		},
+		"CreateProjTest": function(params) {
+			$.post("/createProj", {
+				name: params.name
+			}, function(response) {
 				console.log(response);
 			});
 		},
@@ -81,53 +98,62 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log(params);
 			$.post("/init", params,
 				function(responseJSON) {
-				  currentPage = 1;
+					currentPage = 1;
 					console.log(responseJSON);
 				});
 		},
-		"Load": function(pageNum) {
-			console.log("load called with page", pageNum);
-			$.post("/load", {
+		"GetPage": function(pageNum) {
+			console.log("get page called with page", pageNum);
+			$.post("/getPage", {
 					page: pageNum
 				},
 				function(response) {
-					if (typeof response == "string") {
-					  throw response;
-					} else {
-            responseObject = JSON.parse(response);
-            console.log("loaded: ");
-            console.log(responseObject);
-            currentPage = pageNum; // TODO check for errors(?)
-            return responseObject;
-					}
+					// if (typeof response == "string") {
+					// 	throw response;
+					// } else {
+					responseObject = JSON.parse(response);
+					console.log("got: ");
+					console.log(responseObject);
+					currentPage = pageNum; // TODO check for errors(?)
+					return responseObject;
+					// }
 				});
 		},
-		"Save": function() {
+		"SavePage": function() {
 			console.log("save called");
-		  pageJSON = canvasState.getState();
-		  console.log(currentPage, pageJSON);
-		  $.post("/save", {
-        page: currentPage,
-        json: pageJSON,
-        thumbnail: ""
-		  }, function(response) {
-		    console.log(response);
-		  });
+			pageJSON = canvasState.getState();
+			console.log(currentPage, pageJSON);
+			$.post("/savePage", {
+				num: currentPage,
+				json: pageJSON,
+				thumbnail: ""
+			}, function(response) {
+				console.log(JSON.parse(response));
+			});
 		},
-		"SaveTest": function(pageNum, pageObject) {
-			console.log("save test called");
-			pageJSON = JSON.stringify(pageObject);
-			$.post("/save", {
-				page: pageNum,
+		"SavePageTest": function(params) {
+			console.log("save page test called with:");
+			console.log(params);
+			$.post("/savePage", params, function(response) {
+				console.log(response);
+			});
+		},
+		"AddPage": function() {
+			console.log("add page called");
+			currentPage++;
+			pageJSON = canvasState.getState();
+			console.log(currentPage, pageJSON);
+			$.post("/addPage", {
+				num: currentPage,
 				json: pageJSON,
 				thumbnail: ""
 			}, function(response) {
 				console.log(response);
 			});
 		},
-		"SaveToDisk": function() {
-			console.log("save to disk called");
-			$.post("/saveToDisk", {}, function(response) {
+		"AddPageTest": function(params) {
+			console.log("add page test called");
+			$.post("/addPage", params, function(response) {
 				console.log(response);
 			});
 		},
@@ -160,28 +186,28 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		},
 	};
 	var init = function(spec, callback) {
-	  console.log("editor init");
-//		var canvas = spec.canvas;
-//		var width = spec.width;
-//		var height = spec.height;
-//		var pageMargin = spec.pageMargin;
-//		var panelMargin = spec.panelMargin;
-//		canvas.width = width;
-//		canvas.height = height;
-////		console.log(width, height);
-//
-//		canvasState.setPageMargin(pageMargin);
-////		console.log(canvasState);
-//		canvasState.setPanelMargin(panelMargin);
-//		canvasState.init(canvas.attr("id"), width, height, callback);
-//
-//		console.log("finished initing editor");
-//
-//		/* init all tools in the toolset so they get the canvas state */
-//		toolset.init();
-//
-//		/* activate a tool to start with (esp. helpful for testing) */
-//		this.activate("Select");
+		console.log("editor init");
+		//		var canvas = spec.canvas;
+		//		var width = spec.width;
+		//		var height = spec.height;
+		//		var pageMargin = spec.pageMargin;
+		//		var panelMargin = spec.panelMargin;
+		//		canvas.width = width;
+		//		canvas.height = height;
+		////		console.log(width, height);
+		//
+		//		canvasState.setPageMargin(pageMargin);
+		////		console.log(canvasState);
+		//		canvasState.setPanelMargin(panelMargin);
+		//		canvasState.init(canvas.attr("id"), width, height, callback);
+		//
+		//		console.log("finished initing editor");
+		//
+		//		/* init all tools in the toolset so they get the canvas state */
+		toolset.init();
+		//
+		//		/* activate a tool to start with (esp. helpful for testing) */
+		//		this.activate("Select");
 	};
 
 	var activate = function(toolname) {
@@ -199,78 +225,116 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var test = function() {
-		console.log("testing load on empty file. Expecting index out of bounds. Result: ");
-		actions.Load(0);
+		console.log(" ");
+		console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
+		actions.GetPage(0);
 
 		window.setTimeout(function() {
-			console.log("testing save for empty file. Expecting success!. Result: ");
-			actions.SaveTest(0, {
-				content: "FOOOO!!!"
+			console.log(" ");
+			console.log("testing save for empty file. Expecting index out of bounds. Result: ");
+			actions.SavePageTest({
+				num: 1,
+				json: "",
+				thumbnail: ""
 			});
 		}, 1000);
 
 		window.setTimeout(function() {
-			console.log("testing load after addition of FOOOO!!!. Expecing {content: FOOOO!!!}. Result:");
-			actions.Load(0);
+			console.log(" ");
+			console.log("testing add for empty file. Expecting success. Result: ");
+			actions.AddPageTest({
+				num: 1,
+				json: "FOOOO!",
+				thumbnail: ""
+			});
 		}, 2000);
 
+
 		window.setTimeout(function() {
-			console.log("testing save for nonempty file. Expecting success! twice. Result:");
-			actions.SaveTest(0, {
-				content: "New string!"
-			});
-			actions.SaveTest(1, {
-				content: "Line 2!"
-			});
+			console.log(" ");
+			console.log("testing get page after addition of FOOOO!. Expecing something with FOOOO!. Result:");
+			actions.GetPage(1);
 		}, 3000);
 
 		window.setTimeout(function() {
-			console.log("testing load after previous changes. Expecting {content: New string!}. Result:");
-			actions.Load(0);
+			console.log(" ");
+			console.log("testing save for nonempty file. Expecting success!. Result:");
+			actions.SavePageTest({
+				num: 1,
+				json: "new String!",
+				thumbnail: "foo"
+			});
 		}, 4000);
 
 		window.setTimeout(function() {
-			console.log("Expecting {content: Line 2!}. Result:");
-			actions.Load(1);
+			console.log(" ");
+			console.log("testing add for nonempty file. Expecting success!. Result:");
+			actions.AddPageTest({
+				num: 2,
+				json: "page 2",
+				thumbnail: "goo"
+			});
 		}, 5000);
 
 		window.setTimeout(function() {
-			actions.GetChoices(function(choices) {
-				console.log("Testing getting of choices. Expecting [test_0, test_2, test_3, test_4]");
-				console.log(choices);
-			});
+			console.log(" ");
+			console.log("testing GetPage after previous changes. Expecting {content: New string!}. Result:");
+			actions.GetPage(1);
 		}, 6000);
 
 		window.setTimeout(function() {
-			console.log("Loading project 2");
-			actions.LoadProj({choice: 2});
+			console.log(" ");
+			console.log("Expecting {content: page 2}. Result:");
+			actions.GetPage(2);
+		}, 7000);
+
+		window.setTimeout(function() {
+			console.log(" ");
+			console.log("Testing creating a new project");
+			actions.CreateProjTest({
+				name: "newProject"
+			});
 		}, 8000);
 
 		window.setTimeout(function() {
-			console.log("Writing to loaded project");
-			actions.SaveTest(0, "foo bar derp");
-		}, 9000)
+			console.log(" ");
+			console.log("Adding hello world to new project");
+			actions.AddPageTest({
+				num: 1,
+				json: "hello world",
+				thumbnail: "akjfbad"
+			});
+		}, 9000);
 
 		window.setTimeout(function() {
-			actions.SaveToDisk();
-		}, 10000)
+			console.log(" ");
+			console.log("Getting hello world from new project");
+			actions.GetPage(1);
+		}, 10000);
 
 		window.setTimeout(function() {
-			console.log("Testing creating a new project");
-			actions.CreateProj({name: "newProject.txt"});
+			console.log(" ");
+			console.log("Loading project 2");
+			actions.LoadProj({
+				choice: 2
+			});
 		}, 11000);
 
 		window.setTimeout(function() {
-			console.log("Writing to new project");
-			actions.SaveTest(0, "hello world");
+			console.log(" ");
+			console.log("Writing hey there to loaded project");
+			actions.SavePageTest({
+				num: 1,
+				json: "hey there",
+				thumbnail: "garg"
+			});
 		}, 12000);
 
 		window.setTimeout(function() {
-			actions.SaveToDisk();
-		}, 13000)
-
-
-
+			console.log(" ");
+			console.log("Reading hey there from loaded project");
+			actions.GetPage(1);
+		}, 13000);
 
 
 		//toolset.test();
@@ -286,8 +350,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	return {
 		init: init,
 		activate: activate,
-		action: action
-		//test: test
+		action: action,
+		test: test
 	};
 
 });

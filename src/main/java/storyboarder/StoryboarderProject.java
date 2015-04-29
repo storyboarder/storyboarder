@@ -1,92 +1,159 @@
 package storyboarder;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 class StoryboarderProject {
 
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
+  private static final String TABLE = "pages";
 
-  private final Path project;
+  private static final String TABLE_SQL = "CREATE TABLE IF NOT EXISTS "
+      + TABLE + " (num INTEGER primary key, json TEXT, thumbnail TEXT)";
 
-  private List<String> pages = new ArrayList<String>();
+  private static final String GET_SQL = "SELECT * FROM " + TABLE
+      + " WHERE num = ?";
 
-  StoryboarderProject(Path project) {
-    this.project = project;
-  }
+  private static final String SAVE_ADD_SQL = "INSERT OR REPLACE INTO "
+      + TABLE + " VALUES (?, ?, ?)";
 
-  StoryboarderProject(String path) throws IOException {
-    project = Paths.get(path);
-  }
+  private static final String DELETE_SQL = "DELETE FROM " + TABLE
+      + "WHERE num = ?";
 
-  void load() throws IOException {
-    readFile();
-  }
+  private static final String UPDATE_NUMS_SQL = "UPDATE " + TABLE
+      + " SET num = num - 1 where num > ?";
 
-  void create() throws IOException {
-    Files.createDirectories(project.getParent());
-    Files.createFile(project);
-  }
+  private static final String SIZE_SQL = "SELECT * FROM " + TABLE;
 
-  String getPage(int page) {
-    return pages.get(page);
+  private static final int NUM = 1;
+  private static final int JSON = 2;
+  private static final int THUMBNAIL = 3;
+
+  private static final String OUT_OF_BOUNDS_MSG =
+      "pageNum must be at least 1 and less than or equal to the number of pages.";
+
+  private final Connection conn;
+  private final Path path;
+
+  StoryboarderProject(Path path) throws SQLException, ClassNotFoundException {
+    this.path = path;
+    Class.forName("org.sqlite.JDBC");
+    conn = DriverManager.getConnection("jdbc:sqlite:" + path);
+    Statement stat = conn.createStatement();
+    stat.executeUpdate(TABLE_SQL);
+    stat.close();
   }
 
   int numberOfPages() {
-    return pages.size();
-  }
-
-  String savePage(int page, String newContent) {
-    return pages.set(page, newContent);
-  }
-
-  boolean addPage(String newPage) {
-    return pages.add(newPage);
-  }
-
-  void saveOrAdd(int page, String newContent) {
-    if (page >= numberOfPages()) {
-      addPage(newContent);
-    } else {
-      savePage(page, newContent);
+    try (PreparedStatement prep = conn.prepareStatement(SIZE_SQL)) {
+      ResultSet rs = prep.executeQuery();
+      int i = 0;
+      while (rs.next()) {
+        i++;
+      }
+      return i;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
+    return -1;
   }
 
-  void saveToDisk() throws IOException {
-    System.out.println(this);
-    OpenOption options = StandardOpenOption.WRITE;
-    PrintWriter writer = new PrintWriter(Files.newBufferedWriter(project,
-        CHARSET, options));
-
-    for (String page : pages) {
-      writer.println(page);
+  StoryboarderPage getPage(int pageNum) {
+    if (!inBounds(pageNum)) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
     }
-    writer.close();
+
+    try (PreparedStatement prep = conn.prepareStatement(GET_SQL)) {
+      prep.setInt(NUM, pageNum);
+      ResultSet rs = prep.executeQuery();
+      if (rs.next()) {
+        int num = rs.getInt(1);
+        String json = rs.getString(2);
+        String thumbnail = rs.getString(3);
+        return new StoryboarderPage(num, json, thumbnail);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
-  private void readFile() throws IOException {
-    BufferedReader reader = Files.newBufferedReader(project, CHARSET);
-    pages.clear();
-    String line;
-    while ((line = reader.readLine()) != null) {
-      pages.add(line);
+  boolean savePage(StoryboarderPage page) {
+    if (!inBounds(page.getNum())) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
     }
-    reader.close();
+    return saveOrAddPage(page);
+  }
+
+  boolean addPage(String json, String thumbnail) {
+    int nextIndex = numberOfPages() + 1;
+    StoryboarderPage newPage = new StoryboarderPage(nextIndex, json, thumbnail);
+    return saveOrAddPage(newPage);
+  }
+
+  boolean addPage(StoryboarderPage page) {
+    if (page.getNum() != numberOfPages() + 1) {
+      throw new IndexOutOfBoundsException("page num is incorrect");
+    }
+    return saveOrAddPage(page);
+  }
+
+  boolean swapPages(int num1, int num2) {
+    StoryboarderPage page1 = getPage(num1).setNum(num2);
+    StoryboarderPage page2 = getPage(num2).setNum(num1);
+    return savePage(page1) && savePage(page2);
+  }
+
+  boolean removePage(int pageNum) {
+    if (!inBounds(pageNum)) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
+    }
+
+    try {
+      PreparedStatement deletePrep = conn.prepareStatement(DELETE_SQL);
+      deletePrep.setInt(NUM, pageNum);
+      deletePrep.execute();
+
+      PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL);
+      prep.setInt(NUM, pageNum);
+      prep.execute();
+
+      return true;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      return false;
+    }
   }
 
   @Override
   public String toString() {
-    return project.toString() + ": " + pages.toString();
+    return path + ", number of pages: " + numberOfPages();
+  }
+
+  private boolean saveOrAddPage(StoryboarderPage page) {
+    if (page.getNum() >= 1 && page.getNum() <= numberOfPages() + 1) {
+      try (PreparedStatement prep = conn.prepareStatement(SAVE_ADD_SQL)) {
+        prep.setInt(NUM, page.getNum());
+        prep.setString(JSON, page.getJson());
+        prep.setString(THUMBNAIL, page.getThumbnail());
+        prep.execute();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean inBounds(int index) {
+    return index >= 1 && index <= numberOfPages();
   }
 
 }
