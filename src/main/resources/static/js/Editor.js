@@ -48,7 +48,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			$.post("/loadProj", params, function(response) {
 				response = JSON.parse(response);
 				numPages = response.numPages;
-				currentPage = 1;
+				currentPage = 0;
 				canvasState.load(response.page); // parse JSON received
 				return response.numPages;
 			});
@@ -64,7 +64,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
 			canvas.height = height;
-			currentPage = 1;
+			currentPage = 0;
 			numPages = 1;
 			//		console.log(width, height);
 
@@ -93,15 +93,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				console.log(response);
 			});
 		},
-		"InitProj": function(params) {
-			console.log("initializing the project with: ");
-			console.log(params);
-			$.post("/init", params,
-				function(responseJSON) {
-					currentPage = 1;
-					console.log(responseJSON);
-				});
-		},
 		"GetPage": function(pageNum) {
 			console.log("get page called with page", pageNum);
 			$.post("/getPage", {
@@ -114,6 +105,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					responseObject = JSON.parse(response);
 					console.log("got: ");
 					console.log(responseObject);
+					console.log("setting currentpage to " + currentPage);
 					currentPage = pageNum; // TODO check for errors(?)
 					return responseObject;
 					// }
@@ -123,11 +115,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("save called");
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			$.post("/savePage", {
-				num: currentPage,
-				json: pageJSON,
-				thumbnail: ""
-			}, function(response) {
+			var params = {
+        num: currentPage,
+        json: JSON.stringify(pageJSON), // pages should be sent stringified
+        thumbnail: ""
+      };
+      console.log(params);
+			$.post("/savePage", params, function(response) {
 				console.log(JSON.parse(response));
 			});
 		},
@@ -141,6 +135,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"AddPage": function() {
 			console.log("add page called");
 			currentPage++;
+			numPages++;
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
 			$.post("/addPage", {
@@ -178,11 +173,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			} else if (params.file) {
 				console.log(params.file);
 			}
-		},
-		"AddPage": function() {
-		  currentPage++;
-		  numPages++;
-		  this.Load(currentPage);
 		},
 	};
 	var init = function(spec, callback) {

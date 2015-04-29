@@ -143,7 +143,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         require(["SnapUtil"], function(snapUtil) {
             snap = snapUtil;
             snap.init(that);
-            console.log("init", snap);
             if (typeof callback != "undefined") {
                 callback();
             }
@@ -158,7 +157,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             console.log("Diff patch: ", jsondiffpatch);
             var state = this.getState();
             // If there is history
-            if (this.canRevert()) {
+            if (this.canRevert() && typeof previousState != "undefined") {
                 var delta = jsondiffpatch.diff(state, previousState);
                 socket.send(delta);
                 this.history.push(delta);
@@ -167,12 +166,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             this.previousState = state;
         },
         canRevert: function() {
+            console.log(this.historyIdx);
             return this.historyIdx >= 0;
         },
         canRestore: function() {
             return (this.historyIdx >= this.history.length - 1);
         },
         revertState: function() {
+            console.log("reverting state");
             if (!this.canRevert()) return;
             // Repaint canvas
             canvas.clear().renderAll();
@@ -243,7 +244,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             console.log("loading page...");
             console.log(json);
             // TODO replace this with json parsing:
-            init("canvas", 400, 600, function() {});
+            //init("canvas", 400, 600, function() {});
         },
         init: init,
         addElement: addElement,
@@ -263,7 +264,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             panelColumns = p;
         },
         setSnap: function(n, p) {
-            console.log("set snap" + snap);
             snap.setSnap(n, p);
         },
         getPageMargin: function() {

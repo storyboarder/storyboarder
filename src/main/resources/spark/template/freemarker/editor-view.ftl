@@ -1,11 +1,12 @@
 <div id="container">
     <div id="navigator">
       <div id="sub-navigator">
-        <div id="page-thumbs">
-        </div>
-        <div class="page-thumb">
+        <ul id="page-thumbs">
+
+        </ul>
+        <li class="page-thumb">
           <a href="#" class="new-page view" id="AddPage" href="#"><i class="fa fa-x fa-plus"></i></a>
-        </div>
+        </li>
       <!--<a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>/-->
       </div>
     </div>
