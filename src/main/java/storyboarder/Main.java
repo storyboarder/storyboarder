@@ -68,7 +68,7 @@ public final class Main {
         socketPort = options.valueOf(socketSpec);
       }
       Multiplayer server = new Multiplayer(socketPort);
-      // server.start();
+      server.start();
     } catch (UnknownHostException e) {
       exit("could not start the multiplayer server: " + e.getMessage());
     }

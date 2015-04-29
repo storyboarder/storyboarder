@@ -1,6 +1,7 @@
 define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	var previewDivideLine;
 	var canvas;
+	var helperCanvas;
 	var threshold = 2;
 	var snap = Snap.snap;
 
@@ -14,7 +15,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				y2: y
 			};
 			previewDivideLine.set(coords);
-			canvas.renderAll();
+			helperCanvas.renderAll();
 		}
 	};
 
@@ -28,7 +29,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				y2: obj.edges.bottom - canvasState.getPanelMargin()
 			};
 			previewDivideLine.set(coords);
-			canvas.renderAll();
+			helperCanvas.renderAll();
 		}
 	};
 
@@ -81,7 +82,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			strokeWidth: 1,
 			selectable: false
 		});
-		canvas.add(previewDivideLine); /* do not add to elements array */
+		helperCanvas.add(previewDivideLine); /* do not add to elements array */
 		previewDivideLine.bringToFront();
 	};
 
@@ -134,10 +135,12 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				if (!vertical &&
 					obj.edges.bottom - y > 3 * canvasState.getPanelMargin() &&
 					y - obj.edges.top > 3 * canvasState.getPanelMargin()) {
+					canvas.trigger("change");
 					divideY(obj, y);
 				} else if (vertical &&
 					obj.edges.right - x > 3 * canvasState.getPanelMargin() &&
 					x - obj.edges.left > 3 * canvasState.getPanelMargin()) {
+					canvas.trigger("change");
 					divideX(obj, x);
 				}
 			}
@@ -161,6 +164,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		name: "Split",
 		init: function() {
 			canvas = canvasState.getCanvas();
+			helperCanvas = canvasState.getHelperCanvas();
 		},
 		activate: activate,
 		deactivate: deactivate,
