@@ -208,8 +208,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	};
 
 	var activate = function(toolname) {
-		canvasState.storeState();
-
 		toolset.activate(toolname);
 	};
 
