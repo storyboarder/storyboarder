@@ -18,12 +18,12 @@
       <div class="ui right labeled field">
         <label>Upload by file</label>
         <div class="ui right labeled input">
-          <input type="file" id="filepath" name="imageLoader">  
+          <input type="file" id="filepath">  
         </div>
       </div>
     </div>
 
-    <div class="ui button upload">
+    <div class="ui button view" id="AddImageButton">
       Add Image
     </div>
 

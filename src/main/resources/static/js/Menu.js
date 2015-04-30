@@ -1,4 +1,4 @@
-define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
+define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, semanticui, editor) {
 	var current;
 
 	// views is an object of functions. Each function will be passed the JQuery
@@ -6,41 +6,22 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 	var views = {
 		"AddImage": function() {
 			console.log("add image called");
-			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
-			$('.upload').click(function() {
-				$('.ui.modal.add-image').modal('hide');
-				var imageLoader = document.getElementById('filepath');
+			$('.ui.modal.add-image').modal('setting', 'closable', true).modal('show');
+		},
+		"AddImageButton": function() {
+			console.log("UPLOAD CLICKED");
+			$('.ui.modal.add-image').modal('hide');
 
-				imageLoader.addEventListener('change', handleImage, false);
+			var group = {
+				url: $("#image-url").val(),
+				active: canvas.getActiveObject()
+			}
 
-				function handleImage(e) {
-					var reader = new FileReader();
-					reader.onload = function(event) {
-						var img = new Image();
-						img.onload = function() {
-							var imgInstance = new fabric.Image(img, {
-								scaleX: 0.2,
-								scaleY: 0.2
-							});
-							canvasState.addElement(imgInstance, "image");
-						};
-						img.src = event.target.result;
-					};
-					reader.readAsDataURL(e.target.files[0]);
-				}
-
-				console.log("ADDING");
-				var send = {
-					url: $("#image-url").val(),
-					file: $("#filepath").val()
-				};
-
-				editor.action("Add Image", send);
-			});
+			editor.action("AddURL", group);
 		},
 		"Save": function() {
 			console.log("save called");
-			editor.action("Save", {});
+			editor.action("SavePage", {});
 			//TODO call editor
 		},
 		"Export": function() {
@@ -56,9 +37,11 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			$('.ui.modal.create-project').modal('show');
 		},
 		"AddPage": function() {
-			var idx = $("#page-thumbs").children("div.page-thumb").length;
+			var idx = $("#page-thumbs").children(".page-thumb").length;
+			console.log(idx);
 			var html = getPageThumb(idx);
 			$("#page-thumbs").append(html);
+			editor.action("AddPage");
 		},
 		"GetPage": function(item) {
 			var idx = item.attr("data-num");
@@ -107,12 +90,53 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			console.log("new project");
 			$('.ui.modal.create-project').modal('show');
 		},
+		"CreateProject": function(form) {
+			console.log("create project");
+			$('.ui.modal.create-project').modal('hide');
+			$('#page').width(parseInt($("#page-width").val()));
+			$('#page').height(parseInt($("#page-height").val()));
+			console.log($('#canvas').width());
+			$("#editor").css("visibility", "visible");
+			editor.action("CreateProj", {
+				canvas: $("#canvas"),
+				width: parseInt($("#page-width").val()),
+				height: parseInt($("#page-height").val()),
+				pageMargin: parseInt($("#page-margin").val()),
+				panelMargin: parseInt($("#panel-margin").val()),
+				name: $("#project-name").val(),
+				callback: function() {
+					$("input[type='text'].action").each(function(e) {
+						set_value($(this));
+					});
+				}
+			});
+			this.AddPage();
+		},
+		"LoadProject": function(item) {
+			var num = item.attr("id");
+			console.log("load project");
+			var result = editor.action("LoadProj", {
+				choice: num
+			});
+			updatePages(result);
+			$("#editor").css("visibility", "visible");
+			$('.ui.modal.load-project').modal('hide');
+		},
+		"NewProject": function(item) {
+			console.log("new project");
+			$('.ui.modal.create-project').modal('show');
+		},
+		"ReorderPages": function() {
+			console.log("reordering pages");
+			var arr = $("#page-thumbs").sortable("toArray");
+			console.log(arr);
+		},
 	};
 
 	var getPageThumb = function(i) {
-		return '<div class="page-thumb">' +
+		return '<li class="page-thumb" id="' + i + '">' +
 			'<a class="page-thumb view" id="GetPage" href="#" data-num=' + i + '>' + i + '</a>' +
-			'<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></div>'
+			'<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></li>';
 	};
 
 	var init_project = function() {
@@ -219,10 +243,35 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			$("." + $(this).attr("id").toLowerCase()).slideToggle();
 		});
 
-		$(".submenu").change(function() {
-			console.log($(this).attr('id').toLowerCase());
-			$("." + $(this).attr("id").toLowerCase()).slideToggle();
+		$('#filepath').change(function(e) {
+			var reader = new FileReader();
+			reader.onload = function(event) {
+				var imgObj = new Image();
+				imgObj.src = event.target.result;
+				imgObj.onload = function() {
+					var image = new fabric.Image(imgObj);
+					var group = {
+						img: image,
+						active: canvas.getActiveObject()
+					}
+					editor.action("AddImage", group);
+				}
+			}
+			reader.readAsDataURL(e.target.files[0]);
 		});
+
+
+		$("#page-thumbs").sortable({
+			placeholder: "ui-state-placeholder",
+			cancel: "a.remove-page",
+			change: function(event, ui) {
+				console.log(event);
+				console.log(ui);
+				views.ReorderPages();
+			}
+		});
+		$("#page-thumbs").disableSelection();
+
 
 		init_project();
 	};

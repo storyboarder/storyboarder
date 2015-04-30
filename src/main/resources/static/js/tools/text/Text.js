@@ -1,16 +1,70 @@
+//TODO make textbox fill width and height of border box
+//TODO check bug where sometimes text isn't editable (possibly b/c of above/below layers)
+
 define(["../../CanvasState"], function(canvasState) {
 
+  var fontFamily;
+  var fontSize;
+  var padding = 3;
 
 	var Rectext = fabric.util.createClass(fabric.IText, {
 
-	  type: 'rectext',
+    type: "rectext",
 
 	  initialize: function(text, options) {
 	    options || (options = { });
+	    options.selectable = false;
+	    options.hasRotatingPoint = false;
+	    options.padding = 3;
+
 	    this.callSuper('initialize', text, options);
-	    this.borderColor = "black";
 	    this.transparentCorners = true;
 	    this.lockRotation = true;
+	    this.border = new fabric.Rect({
+        left: options.left - padding,
+        top: options.top - padding,
+        width: options.width,
+        height: options.height,
+        fill: "rgba(0, 0, 0, 0)", // transparent
+        stroke: "black",
+        strokeWeight: 2,
+        hasRotatingPoint: false,
+      });
+      this.border.textbox = this; // give textborder a reference back to text
+      this.border.elmType = "textBorder";
+      canvas.add(this.border);
+      this.selectable = true;
+	  },
+
+	  remove: function() {
+	    canvas.remove(this.border);
+      canvasState.deleteElement(this);
+	  },
+
+	  adjustScale: function(x, y, l, t) {
+	    this.width *= x;
+	    this.height *= y;
+	    this.left = l;
+	    this.top = t;
+	    this.scaleX = 1; // this keeps the font size the same (probably what we want?)
+	    this.scaleY = 1;
+	    this.border.set({
+	      width: this.width + 2 * padding,
+	      height: this.height + 2 * padding,
+	      left: l - padding,
+	      top: t - padding,
+	      scaleX: 1,
+	      scaleY: 1,
+	    });
+	  },
+
+	  adjustPosition: function(l, t) {
+	    this.border.set({
+	      left: l - padding,
+	      top: t - padding,
+	    });
+	    this.left = l;
+	    this.top = t;
 	  },
 
 	  toObject: function() {
@@ -21,33 +75,11 @@ define(["../../CanvasState"], function(canvasState) {
 
 	  _render: function(ctx) {
 	    this.callSuper('_render', ctx);
-	    this.drawBorders(ctx);
 	  }
 	});
 
-	var Roundtext = fabric.util.createClass(fabric.Circle, {
+	var Roundtext = fabric.util.createClass(fabric.IText, {
 
-	  type: 'roundtext',
-
-	  initialize: function(text, options) {
-	    options || (options = { });
-
-	    this.callSuper('initialize', text, options);
-	  },
-
-	  toObject: function() {
-	    return fabric.util.object.extend(this.callSuper('toObject'), {
-	      //label: this.get('label')
-	    });
-	  },
-
-	  _render: function(ctx) {
-	    this.callSuper('_render', ctx);
-
-	    ctx.font = '20px Helvetica';
-	    ctx.fillStyle = '#333';
-	    ctx.fillText(this.label, -this.width/2, -this.height/2 + 20);
-	  }
 	});
 
 
@@ -57,7 +89,7 @@ define(["../../CanvasState"], function(canvasState) {
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.type === "rectext" || found.type === "i-text") {
+				if (found.type === "rectext") {
 					found.set({
 						selectable: true
 					});
@@ -72,15 +104,13 @@ define(["../../CanvasState"], function(canvasState) {
 		var initialPos;
 		var finalPos;
 		var selected;
+		var time;
 
-		canvas.on('mouse:down', function(coor) {		
-
+		canvas.on('mouse:down', function(coor) {
 			initialPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
 			};
-			selected = coor.target;
-			console.log(selected.type);
 		}); // mouse:down
 
 		canvas.on('mouse:up', function(coor){
@@ -88,56 +118,63 @@ define(["../../CanvasState"], function(canvasState) {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
 			};
+			selected = coor.target;
 
-			if(!selected || selected && selected.type !== "rectext") {
-				console.log("create");
-				if(!selected || selected && selected.type !== "i-text") {
+			if(typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
 					if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
-
 						var test = new Rectext('Text', {
 							fontFamily: $('#font-family :selected').val(),
 							fontSize: $('#font-size')[0].value,
+							fill: $("#font-color").val(),
+							backgroundColor: 'white',
 							left: initialPos.x,
-							top: initialPos.y
+							top: initialPos.y,
+							width: finalPos.x - initialPos.x,
+							height: finalPos.y - initialPos.y,
 						});
-
 						canvasState.addElement(test, 'rectext');
-					} // if within range
-				}
 
-			} else if(selected && (selected.type === "rectext" || selected.type === "i-text")) {
+					} else if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
+					    typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
+            var test = new Rectext('Text', {
+              fontFamily: $('#font-family :selected').val(),
+              fontSize: $('#font-size')[0].value,
+              left: initialPos.x,
+              top: initialPos.y,
+              width:40,
+              height:20,
+            });
 
-				$("#font-family").change(function () {
-			        var firstDropVal = $('#font-family').val();
-			        console.log(firstDropVal);
-			    });
-
-			    $("#font-size").change(function () {
-			        var firstDropVal = $('#font-size').val();
-			        console.log(firstDropVal);
-			    });
-
-			    $("#font-color").change(function () {
-			        var firstDropVal = $('#font-color').val();
-			        console.log(firstDropVal);
-			    });
-
+            canvasState.addElement(test, 'rectext');
+          }
+          time = coor.e.timeStamp;
 			}
-
-			console.log("2 " + $('#font-family :selected').val());
-			if($("#borders").is(":checked")){
-				console.log("YEP");
-			}
-
 		}); // mouseup
 
+		canvas.on("object:scaling", function(e) {
+		  var selected = e.target;
+		  if (selected.elmType == "rectext") {
+		    selected.adjustScale(selected.scaleX, selected.scaleY, selected.left, selected.top);
+		  } else if (selected.elmType == "textBorder") {
+		    selected.textbox.adjustScale(selected.scaleX, selected.scaleY, selected.left + padding, selected.top + padding);
+		  }
+		});
+
+		canvas.on("object:moving", function(e) {
+		  var selected = e.target;
+		  if (selected.elmType == "rectext") {
+		    selected.adjustPosition(selected.left, selected.top);
+		  } else if (selected.elmType == "textBorder") {
+		    selected.textbox.adjustPosition(selected.left + padding, selected.top + padding);
+		  }
+		});
+
 		document.onkeydown = function(e) {
-			console.log("pressed");
 			var key = e.keyCode;
-			if (key === 8 && selected.type === 'rectext') {
-				console.log("delete");
-				console.log(selected.type);
-				canvasState.deleteElement(selected);
+			if (key === 8 && selected.elmType == 'rectext') {
+				selected.remove();
+			} else if (key === 8 && selected.elmType == 'textBorder') {
+				selected.textbox.remove();
 			}
 		};
 

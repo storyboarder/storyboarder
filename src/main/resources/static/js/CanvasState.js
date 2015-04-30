@@ -23,6 +23,47 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.add(e);
     };
 
+    var addImage = function(params) {
+      var img = params.img;
+      img.set({
+        left: 100,
+        top: 100,
+        scaleX: 0.2,
+        scaleY: 0.2
+      });
+
+      img.setControlsVisibility({
+          mt: false,
+          mb: false,
+          ml: false,
+          mr: false
+    });
+
+      if(params.active && params.active.elmType === "panel") {
+        var panel = params.active;
+
+        img.clipTo = function (ctx) {
+          ctx.save();
+
+          ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+          ctx.rect(
+            panel.left, panel.top, // Just x, y position starting from top left corner of canvas
+            panel.width, panel.height // Width and height of clipping rect
+          );
+
+          ctx.restore();
+        };
+
+        img.set({
+          left: panel.left + 15,
+          top: panel.top + 15
+        });
+      }
+
+      addElement(img, "image");
+      canvas.renderAll();
+  }
+
     var setControls = function(panel) {
         var bounds = [];
         var options = {};
@@ -117,11 +158,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var init = function(canvasId, w, h, callback) {
         console.log("initing page...");
 
-        socket = new WebSocket("ws://localhost:8888");
-        socket.onmessage = function (e) {
-            CanvasState.applyDeltaToState(JSON.parse(e.data));
-        };
-
         width = w;
         height = h;
         $canvas = $("#" + canvasId);
@@ -171,7 +207,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         require(["SnapUtil"], function(snapUtil) {
             snap = snapUtil;
             snap.init(that);
-            console.log("init", snap);
             if (typeof callback != "undefined") {
                 callback();
             }
@@ -184,9 +219,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             var state = this.getState();
 
             var delta = jsondiffpatch.diff(state, previousState);
-            socket.send(JSON.stringify(jsondiffpatch.reverse(delta)));
             history[ ++historyIdx ] = delta;
             previousState = state;
+            canvas.trigger('stateUpdated', jsondiffpatch.reverse(delta));
+
+            return delta;
         },
         canRevert: function() {
             return historyIdx >= 0;
@@ -195,6 +232,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return (historyIdx <= history.length - 1);
         },
         revertState: function() {
+            console.log("reverting state");
             if (!this.canRevert()) return;
 
             // Move previous state one back
@@ -206,10 +244,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
+
+            canvas.trigger('stateUpdated', delta);
         },
         restoreState: function() {
             if (!this.canRestore()) return;
-            console.log("reached restore");
 
             // Move prebious state one forward
             state = this.getState();
@@ -222,6 +261,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
+
+            canvas.trigger('stateUpdated', delta);
         },
         listenCanvas: function () {
             canvas.on('change', this.storeState.bind(this));
@@ -276,6 +317,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         getDimension: getDimension,
         contains: contains,
         addPanel: addPanel,
+        addImage: addImage,
         setControls: setControls,
         getPageEdge: function(c) {
             return pageEdges[c];
@@ -288,7 +330,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             console.log("loading page...");
             console.log(json);
             // TODO replace this with json parsing:
-            // init("canvas", 400, 600, function() {});
+            //init("canvas", 400, 600, function() {});
         },
         init: init,
         addElement: addElement,
@@ -308,7 +350,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             panelColumns = p;
         },
         setSnap: function(n, p) {
-            console.log("set snap" + snap);
             snap.setSnap(n, p);
         },
         getPageMargin: function() {

@@ -7,19 +7,17 @@ define(function(require) {
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
 		"Text": require("./text/Text"),
-		"Draw": require("./image/Draw")
+		"Draw": require("./image/Draw"),
+		"Fill": require("./image/Fill")
 	};
 
 	var activate = function(toolname) {
-		console.log(currentTool);
 		if (toolname in toolset) {
 
-			if (currentTool) { //TODO How is currentTool evaluated to a boolean?
+			if (typeof currentTool != "undefined") { //TODO How is currentTool evaluated to a boolean?
 				currentTool.deactivate();
-				console.log("deactivating from toolset:", currentTool.name);
 			}
 			console.log("activating from toolset:", toolname);
-			console.log(toolset[toolname]);
 			currentTool = toolset[toolname].activate();
 		} else {
 			throw "Tool not found: " + toolname;

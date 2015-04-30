@@ -1,17 +1,26 @@
 define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
-
+	var projectName;
 	var currentPage; // index of current page
 	var numPages;
+	var socket;
 
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
-			// deactivate
 			canvasState.revertState();
-			// activate
+			actions.SyncPage();
 		},
 		"Redo": function(params) {
 			canvasState.restoreState();
+			actions.SyncPage();
+		},
+		"SyncPage": function(delta) {
+			socket.send(JSON.stringify($.extend(
+				delta, {
+					"projectName": projectName,
+					"currentPage": currentPage
+				}
+			)));
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
@@ -50,7 +59,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			$.post("/loadProj", params, function(responseJSON) {
 				response = JSON.parse(responseJSON);
 				numPages = response.numPages;
-				currentPage = 1;
+				currentPage = 0;
 				canvasState.load(response.page); // parse JSON received
 				return response.numPages;
 			});
@@ -66,12 +75,11 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
 			canvas.height = height;
-			currentPage = 1;
+			currentPage = 0;
 			numPages = 1;
-			//		console.log(width, height);
+			projectName = params.name;
 
 			canvasState.setPageMargin(pageMargin);
-			//		console.log(canvasState);
 			canvasState.setPanelMargin(panelMargin);
 			canvasState.init(canvas.attr("id"), width, height, params.callback);
 
@@ -87,6 +95,8 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}, function(response) {
 				console.log(response);
 			});
+
+			init();
 		},
 		"CreateProjTest": function(params) {
 			$.post("/createProj", {
@@ -94,16 +104,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}, function(response) {
 				console.log(response);
 			});
-		},
-
-		"InitProj": function(params) {
-			console.log("initializing the project with: ");
-			console.log(params);
-			$.post("/init", params,
-				function(responseJSON) {
-					currentPage = 1;
-					console.log(responseJSON);
-				});
 		},
 		"GetPage": function(pageNum) {
 			console.log("get page called with page", pageNum);
@@ -117,6 +117,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					responseObject = JSON.parse(response);
 					console.log("got: ");
 					console.log(responseObject);
+					console.log("setting currentpage to " + currentPage);
 					currentPage = pageNum; // TODO check for errors(?)
 					return responseObject;
 					// }
@@ -126,11 +127,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("save called");
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			$.post("/savePage", {
+			var params = {
 				num: currentPage,
-				json: pageJSON,
+				json: JSON.stringify(pageJSON), // pages should be sent stringified
 				thumbnail: ""
-			}, function(response) {
+			};
+			console.log(params);
+			$.post("/savePage", params, function(response) {
 				console.log(JSON.parse(response));
 			});
 		},
@@ -144,6 +147,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"AddPage": function() {
 			console.log("add page called");
 			currentPage++;
+			numPages++;
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
 			$.post("/addPage", {
@@ -164,27 +168,25 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("export called");
 		},
 		"AddImage": function(params) {
+			canvasState.addImage(params);
+		},
+		"AddURL": function(params) {
 			console.log("ADDING IMAGE!!!");
-			console.log(params);
-			if (params.url && params.url != "http://") { //TODO this doesn't seem right
-				console.log(params.url);
+			if (params.url && params.url != "http://") {
+				/*				var nameArray = params.url.match(/\/(?:.(?!\/))+$/igm);
+								var picName = nameArray[0].substring(1);
+				*/
 				fabric.Image.fromURL(params.url, function(img) {
-					img.set({
-						left: 30,
-						top: 40,
-						scaleX: 0.3,
-						scaleY: 0.3
-					});
-					canvasState.addElement(img, "image");
+					var group = {
+						img: img,
+						active: params.active
+					}
+					canvasState.addImage(group);
 				});
-
-			} else if (params.file) {
-				console.log(params.file);
 			}
-		}
+		},
 	};
 	var init = function(spec, callback) {
-
 		console.log("editor init");
 		//		var canvas = spec.canvas;
 		//		var width = spec.width;
@@ -207,6 +209,16 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		//
 		//		/* activate a tool to start with (esp. helpful for testing) */
 		//		this.activate("Select");
+
+		socket = new WebSocket("ws://localhost:8888");
+		socket.onmessage = function(e) {
+			var data = JSON.parse(e.data);
+			if (data.projectName == projectName && data.currentPage == currentPage) {
+				canvasState.applyDeltaToState(data);
+			}
+		};
+
+		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
 	};
 
 	var activate = function(toolname) {
@@ -332,7 +344,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
 		}, 13000);
-
 
 		//toolset.test();
 		// console.log("editor tested");
