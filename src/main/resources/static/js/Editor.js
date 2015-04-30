@@ -161,10 +161,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"Export": function(params) {
 			console.log("export called");
 		},
-		"Add Image": function(params) {
+		"AddImage": function(params) {
 			canvasState.addImage(params);
 		},
-		"Add URL": function(params) {
+		"AddURL": function(params) {
 			console.log("ADDING IMAGE!!!");
 			if (params.url && params.url != "http://") {
 /*				var nameArray = params.url.match(/\/(?:.(?!\/))+$/igm);
