@@ -214,7 +214,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         require(["SnapUtil"], function(snapUtil) {
             snap = snapUtil;
             snap.init(that);
-            console.log("init", snap);
             if (typeof callback != "undefined") {
                 callback();
             }
@@ -238,6 +237,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return (historyIdx <= history.length - 1);
         },
         revertState: function() {
+            console.log("reverting state");
             if (!this.canRevert()) return;
 
             // Move previous state one back
@@ -317,7 +317,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             console.log("loading page...");
             console.log(json);
             // TODO replace this with json parsing:
-            // init("canvas", 400, 600, function() {});
+            //init("canvas", 400, 600, function() {});
         },
         init: init,
         addElement: addElement,
@@ -337,7 +337,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             panelColumns = p;
         },
         setSnap: function(n, p) {
-            console.log("set snap" + snap);
             snap.setSnap(n, p);
         },
         getPageMargin: function() {
