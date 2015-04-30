@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,7 +23,7 @@ public class StoryboarderProjectTest {
     SQLException, IOException {
     Files.deleteIfExists(dbPath);
     testProj = new StoryboarderProject(dbPath);
-    assertEquals(0, testProj.numberOfPages());
+    assertEquals(0, testProj.getPageCount());
   }
 
   @AfterClass
@@ -40,10 +38,10 @@ public class StoryboarderProjectTest {
     StoryboarderPage page4 = new StoryboarderPage(4, "page four!", "nurp");
 
     assertTrue(testProj.addPage("foo bar", "derp"));
-    assertEquals(1, testProj.numberOfPages());
+    assertEquals(1, testProj.getPageCount());
 
     assertTrue(testProj.addPage(page2));
-    assertEquals(2, testProj.numberOfPages());
+    assertEquals(2, testProj.getPageCount());
 
     // will not add page4 since there is no page 3
     boolean thrown = false;
@@ -54,7 +52,7 @@ public class StoryboarderProjectTest {
     }
     assertTrue(thrown);
 
-    assertEquals(2, testProj.numberOfPages());
+    assertEquals(2, testProj.getPageCount());
 
     assertEquals(page1, testProj.getPage(1));
     assertEquals(page2, testProj.getPage(2));
@@ -74,14 +72,38 @@ public class StoryboarderProjectTest {
     }
     assertTrue(thrown);
 
-  }
-
-  private List<StoryboarderPage> getAllPages() throws SQLException {
-    List<StoryboarderPage> pages = new ArrayList<StoryboarderPage>();
-    for (int i = 1; i <= testProj.numberOfPages(); i++) {
-      pages.add(testProj.getPage(i));
+    for (int i = 0; i < 10; i++) {
+      assertTrue(testProj.addPage("foo", "derp"));
     }
-    return pages;
+
+    assertEquals(12, testProj.getPageCount());
+
+    StoryboarderPage page10 = new StoryboarderPage(10, "garf!", "bar");
+
+    assertTrue(testProj.savePage(page10));
+
+    assertTrue(testProj.movePage(10, 2));
+
+    StoryboarderPage newPage2 = testProj.getPage(2);
+    StoryboarderPage newPage3 = testProj.getPage(3);
+
+    assertEquals(page10.getJson(), newPage2.getJson());
+    assertEquals(page10.getThumbnail(), newPage2.getThumbnail());
+
+    assertEquals(page2.getJson(), newPage3.getJson());
+    assertEquals(page2.getThumbnail(), newPage3.getThumbnail());
+
+    for (int i = 4; i <= testProj.getPageCount(); i++) {
+      StoryboarderPage correctPage = new StoryboarderPage(i, "foo", "derp");
+      StoryboarderPage curPage = testProj.getPage(i);
+      assertEquals(correctPage, curPage);
+    }
+
+    assertTrue(testProj.movePage(2, 10));
+
+    assertEquals(page2, testProj.getPage(2));
+    assertEquals(page10, testProj.getPage(10));
+
   }
 
 }

@@ -25,7 +25,10 @@ class StoryboarderProject {
       + "WHERE num = ?";
 
   private static final String UPDATE_NUMS_SQL = "UPDATE " + TABLE
-      + " SET num = num - 1 where num > ?";
+      + " SET num = num - 1 WHERE num > ? AND num < ?";
+
+  private static final String CHANGE_NUM_SQL = "UPDATE " + TABLE
+      + " SET num = ? WHERE num = ?";
 
   private static final String SIZE_SQL = "SELECT * FROM " + TABLE;
 
@@ -39,6 +42,8 @@ class StoryboarderProject {
   private final Connection conn;
   private final Path path;
 
+  private int pageCount;
+
   StoryboarderProject(Path path) throws SQLException, ClassNotFoundException {
     this.path = path;
     Class.forName("org.sqlite.JDBC");
@@ -46,9 +51,10 @@ class StoryboarderProject {
     Statement stat = conn.createStatement();
     stat.executeUpdate(TABLE_SQL);
     stat.close();
+    pageCount = countPages();
   }
 
-  int numberOfPages() {
+  private int countPages() {
     try (PreparedStatement prep = conn.prepareStatement(SIZE_SQL)) {
       ResultSet rs = prep.executeQuery();
       int i = 0;
@@ -57,16 +63,13 @@ class StoryboarderProject {
       }
       return i;
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      return -1;
     }
-    return -1;
   }
 
   StoryboarderPage getPage(int pageNum) {
-    if (!inBounds(pageNum)) {
-      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
-    }
+    throwIfOutOfBounds(pageNum);
 
     try (PreparedStatement prep = conn.prepareStatement(GET_SQL)) {
       prep.setInt(NUM, pageNum);
@@ -83,61 +86,149 @@ class StoryboarderProject {
     return null;
   }
 
+  int getPageCount() {
+    assert pageCount == countPages();
+    return pageCount;
+  }
+
   boolean savePage(StoryboarderPage page) {
-    if (!inBounds(page.getNum())) {
-      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
-    }
+    throwIfOutOfBounds(page.getNum());
     return saveOrAddPage(page);
   }
 
   boolean addPage(String json, String thumbnail) {
-    int nextIndex = numberOfPages() + 1;
-    StoryboarderPage newPage = new StoryboarderPage(nextIndex, json, thumbnail);
-    return saveOrAddPage(newPage);
+    assert pageCount == countPages();
+    StoryboarderPage newPage = new StoryboarderPage(pageCount + 1, json,
+        thumbnail);
+    boolean result = saveOrAddPage(newPage);
+    pageCount++;
+    return result;
   }
 
   boolean addPage(StoryboarderPage page) {
-    if (page.getNum() != numberOfPages() + 1) {
-      throw new IndexOutOfBoundsException("page num is incorrect");
+    if (page.getNum() != pageCount + 1) {
+      throw new IndexOutOfBoundsException(
+          "When adding, index must be pageCount + 1");
     }
-    return saveOrAddPage(page);
-  }
-
-  boolean swapPages(int num1, int num2) {
-    StoryboarderPage page1 = getPage(num1).setNum(num2);
-    StoryboarderPage page2 = getPage(num2).setNum(num1);
-    return savePage(page1) && savePage(page2);
+    boolean result = saveOrAddPage(page);
+    pageCount++;
+    return result;
   }
 
   boolean removePage(int pageNum) {
-    if (!inBounds(pageNum)) {
-      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
-    }
-
-    try {
-      PreparedStatement deletePrep = conn.prepareStatement(DELETE_SQL);
+    throwIfOutOfBounds(pageNum);
+    // delete the page
+    try (PreparedStatement deletePrep = conn.prepareStatement(DELETE_SQL)) {
       deletePrep.setInt(NUM, pageNum);
       deletePrep.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
 
-      PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL);
+    // update the other pages' indices
+    try (PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL)) {
       prep.setInt(NUM, pageNum);
+      prep.setInt(NUM + 1, pageCount + 1);
       prep.execute();
-
+      pageCount--;
       return true;
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       return false;
     }
   }
 
+  boolean swapPages(int num1, int num2) {
+    StoryboarderPage page1 = getPage(num1);
+    StoryboarderPage page2 = getPage(num2);
+    StoryboarderPage newPage1 = new StoryboarderPage(num1, page2.getJson(),
+        page2.getThumbnail());
+    StoryboarderPage newPage2 = new StoryboarderPage(num2, page1.getJson(),
+        page1.getThumbnail());
+    return savePage(newPage1) && savePage(newPage2);
+  }
+
+  boolean movePage(int pageNum, int newSpot) {
+    throwIfOutOfBounds(pageNum);
+    throwIfOutOfBounds(newSpot);
+
+    if (pageNum > newSpot) {
+      return movePageDown(pageNum, newSpot);
+    } else if (pageNum < newSpot) {
+      return movePageUp(pageNum, newSpot);
+    } else {
+      return true;
+    }
+  }
+
+  private void changeNum(PreparedStatement prep, int oldNum, int newNum)
+      throws SQLException {
+    prep.setInt(1, newNum);
+    prep.setInt(2, oldNum);
+  }
+
+  private boolean movePageDown(int pageNum, int newSpot) {
+    assert pageNum > newSpot;
+
+    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
+      changeNum(prep, pageNum, pageCount + 1);
+      prep.addBatch();
+      int index = pageNum;
+      while (index >= newSpot) {
+        changeNum(prep, index, index + 1);
+        prep.addBatch();
+        index--;
+      }
+      changeNum(prep, pageCount + 1, newSpot);
+      prep.addBatch();
+      prep.executeBatch();
+      return true;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  private boolean movePageUp(int pageNum, int newSpot) {
+    assert pageNum < newSpot;
+    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
+      changeNum(prep, pageNum, -1);
+      prep.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+
+    try (PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL)) {
+      prep.setInt(NUM, pageNum);
+      prep.setInt(NUM + 1, newSpot + 1);
+      prep.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+
+    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
+      changeNum(prep, -1, newSpot);
+      prep.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+
+    return true;
+  }
+
   @Override
   public String toString() {
-    return path + ", number of pages: " + numberOfPages();
+    assert pageCount == countPages();
+    return path + ", number of pages: " + pageCount;
   }
 
   private boolean saveOrAddPage(StoryboarderPage page) {
-    if (page.getNum() >= 1 && page.getNum() <= numberOfPages() + 1) {
+    assert pageCount == countPages();
+    if (page.getNum() >= 1 && page.getNum() <= pageCount + 1) {
       try (PreparedStatement prep = conn.prepareStatement(SAVE_ADD_SQL)) {
         prep.setInt(NUM, page.getNum());
         prep.setString(JSON, page.getJson());
@@ -148,12 +239,22 @@ class StoryboarderProject {
       }
       return true;
     } else {
+      System.out.println("huh?");
+
       return false;
     }
   }
 
+  private void throwIfOutOfBounds(int index) {
+    if (!inBounds(index)) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
+    }
+  }
+
   private boolean inBounds(int index) {
-    return index >= 1 && index <= numberOfPages();
+    assert pageCount == countPages();
+
+    return index >= 1 && index <= pageCount;
   }
 
 }
