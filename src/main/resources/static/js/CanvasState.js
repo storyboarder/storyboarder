@@ -146,9 +146,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             width: w,
             height: h
         });
-        canvas.on('change', function () {
-            CanvasState.storeState();
-        });
         elements = [];
         pageEdges = {
             left: pageMargin,
@@ -168,6 +165,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.add(circle);
 
         previousState = CanvasState.getState();
+        CanvasState.listenCanvas();
 
         var that = this;
         require(["SnapUtil"], function(snapUtil) {
@@ -225,19 +223,34 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             canvas.clear().renderAll();
             canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
         },
+        listenCanvas: function () {
+            canvas.on('change', this.storeState.bind(this));
+            /*canvas.on('object:modified', this.storeState.bind(this));
+            canvas.on('object:added', this.storeState.bind(this));
+            canvas.on('object:removed', this.storeState.bind(this));*/
+        },
+        unlistenCanvas: function () {
+            canvas.off('change', this.storeState.bind(this));
+            /*canvas.off('object:modified');
+            canvas.off('object:added');
+            canvas.off('object:removed');*/
+        },
         getState: function() {
-            console.log("canvas", this.getCanvas());
             return $.extend(this.getCanvas().toJSON(["elmType", "edges"]), {
                 width: width,
                 height: height
             });
         },
         applyDeltaToState: function(delta) {
+            this.unlistenCanvas();
+
             console.log("Delta: ", delta);
             console.log("Old state: ", previousState);
             previousState = jsondiffpatch.patch(previousState, delta);
             console.log("New state: ", previousState);
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
+
+            this.listenCanvas();
         },
         getCanvas: function() {
             return canvas;

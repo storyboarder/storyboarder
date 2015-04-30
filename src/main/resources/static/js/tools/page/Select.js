@@ -1,3 +1,4 @@
+
 //TODO: fix bug with resizing panels outside of valid page area
 
 define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
@@ -24,8 +25,8 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 					}
 					found.setCoords();
 				}
-	    }
-	  );
+			}
+		);
 	};
 
 	var resizePanels = function(obj, newEdges) {
@@ -55,72 +56,80 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 
 		canvas.on('object:moving', function(options) {
-		  if (canvasState.isSnapActive() && options.target.elmType != "panel") {
-		    target = options.target;
-		    var borders = canvasState.snapBorders({
-          left: target.left,
-          right: target.left + target.width,
-          top: target.top,
-          bottom: target.top + target.height,
-        });
-        for (b in borders) {
-          if (typeof borders[b] != "undefined") {
-            if (b in target) {
-              target[b] = borders[b];
-            } else {
-              var dim = canvasState.getDimension(b);
-              var opposite = canvasState.getOppositeDirection(b);
-              target[opposite] = borders[b] - target[dim];
-            }
-          }
-        }
-      }
+			if (canvasState.isSnapActive() && options.target.elmType != "panel") {
+				target = options.target;
+				var borders = canvasState.snapBorders({
+					left: target.left,
+					right: target.left + target.width,
+					top: target.top,
+					bottom: target.top + target.height,
+				});
+				for (b in borders) {
+					if (typeof borders[b] != "undefined") {
+						if (b in target) {
+							target[b] = borders[b];
+						} else {
+							var dim = canvasState.getDimension(b);
+							var opposite = canvasState.getOppositeDirection(b);
+							target[opposite] = borders[b] - target[dim];
+						}
+					}
+				}
+			}
 		});
 
 		canvas.on('object:scaling', function(options) {
 			if (options.target.elmType == "panel") {
-        var panelMargin = canvasState.getPanelMargin();
-        options.target.width *= options.target.scaleX;
-        options.target.scaleX = 1;
-        options.target.height *= options.target.scaleY;
-        options.target.scaleY = 1;
-			  console.log("panel");
+				var panelMargin = canvasState.getPanelMargin();
+				options.target.width *= options.target.scaleX;
+				options.target.scaleX = 1;
+				options.target.height *= options.target.scaleY;
+				options.target.scaleY = 1;
+				console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};
 				if (canvasState.isSnapActive()) {
-				  console.log("scaling panel with snap");
-          if (corner.indexOf('l') >= 0) {
-            newEdges.left = snapPoint({x: obj.left - panelMargin}).x;
-            obj.left = newEdges.left + panelMargin;
-            obj.width = obj.edges.right - obj.left - panelMargin;
-          }
-          if (corner.indexOf('t') >= 0) {
-            newEdges.top = snapPoint({y: obj.top - panelMargin}).y;
-            obj.top = newEdges.top + panelMargin;
-            obj.height = obj.edges.bottom - obj.top - panelMargin;
-          }
-          if (corner.indexOf('r') >= 0) {
-            newEdges.right = snapPoint({x: obj.width + obj.left + panelMargin}).x;
-            obj.width = newEdges.right - obj.left - panelMargin;
-          }
-          if (corner.indexOf('b') >= 0) {
-            newEdges.bottom = snapPoint({y: obj.height + obj.top + panelMargin}).y;
-            obj.height = newEdges.bottom - obj.top - panelMargin;
-          }
+					console.log("scaling panel with snap");
+					if (corner.indexOf('l') >= 0) {
+						newEdges.left = snapPoint({
+							x: obj.left - panelMargin
+						}).x;
+						obj.left = newEdges.left + panelMargin;
+						obj.width = obj.edges.right - obj.left - panelMargin;
+					}
+					if (corner.indexOf('t') >= 0) {
+						newEdges.top = snapPoint({
+							y: obj.top - panelMargin
+						}).y;
+						obj.top = newEdges.top + panelMargin;
+						obj.height = obj.edges.bottom - obj.top - panelMargin;
+					}
+					if (corner.indexOf('r') >= 0) {
+						newEdges.right = snapPoint({
+							x: obj.width + obj.left + panelMargin
+						}).x;
+						obj.width = newEdges.right - obj.left - panelMargin;
+					}
+					if (corner.indexOf('b') >= 0) {
+						newEdges.bottom = snapPoint({
+							y: obj.height + obj.top + panelMargin
+						}).y;
+						obj.height = newEdges.bottom - obj.top - panelMargin;
+					}
 				} else {
-          if (corner.indexOf('l') >= 0) {
-            newEdges.left = obj.left - panelMargin;
-          }
-          if (corner.indexOf('t') >= 0) {
-            newEdges.top = obj.top - panelMargin;
-          }
-          if (corner.indexOf('r') >= 0) {
-            newEdges.right = obj.width + obj.left + panelMargin;
-          }
-          if (corner.indexOf('b') >= 0) {
-            newEdges.bottom = obj.height + obj.top + panelMargin;
-          }
+					if (corner.indexOf('l') >= 0) {
+						newEdges.left = obj.left - panelMargin;
+					}
+					if (corner.indexOf('t') >= 0) {
+						newEdges.top = obj.top - panelMargin;
+					}
+					if (corner.indexOf('r') >= 0) {
+						newEdges.right = obj.width + obj.left + panelMargin;
+					}
+					if (corner.indexOf('b') >= 0) {
+						newEdges.bottom = obj.height + obj.top + panelMargin;
+					}
 				}
 				resizePanels(obj, newEdges);
 				obj.edges = {
@@ -130,29 +139,29 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 					bottom: newEdges.bottom || obj.edges.bottom,
 				};
 			} else {
-        if (canvasState.isSnapActive()) {
-          target = options.target;
-          control = target.__corner;
-          var borders = canvasState.snapBorders({
-            left: target.left,
-            right: target.left + target.width,
-            top: target.top,
-            bottom: target.top + target.height,
-          }, control);
-          for (b in borders) {
-            if (typeof borders[b] != 'undefined' && (typeof control == 'undefined' || control.indexOf(b.charAt(0)) >= 0)) {
-              var dim = canvasState.getDimension(b);
-              var opposite = canvasState.getOppositeDirection(b);
-              if (b in target) {
-                target[dim] = target[b] + target[dim] - borders[b];
-                target[b] = borders[b];
-              } else {
-                target[dim] = borders[b] - target[opposite];
-                target[opposite] = borders[b] - target[dim];
-              }
-            }
-          }
-        }
+				if (canvasState.isSnapActive()) {
+					target = options.target;
+					control = target.__corner;
+					var borders = canvasState.snapBorders({
+						left: target.left,
+						right: target.left + target.width,
+						top: target.top,
+						bottom: target.top + target.height,
+					}, control);
+					for (b in borders) {
+						if (typeof borders[b] != 'undefined' && (typeof control == 'undefined' || control.indexOf(b.charAt(0)) >= 0)) {
+							var dim = canvasState.getDimension(b);
+							var opposite = canvasState.getOppositeDirection(b);
+							if (b in target) {
+								target[dim] = target[b] + target[dim] - borders[b];
+								target[b] = borders[b];
+							} else {
+								target[dim] = borders[b] - target[opposite];
+								target[opposite] = borders[b] - target[dim];
+							}
+						}
+					}
+				}
 			}
 		});
 
@@ -177,8 +186,8 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			}
 		);
 		if (typeof canvas.__eventListeners != "undefined") {
-		  canvas.__eventListeners["object:scaling"] = [];
-    }
+			canvas.__eventListeners["object:scaling"] = [];
+		}
 	};
 
 	return {
