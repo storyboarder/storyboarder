@@ -109,7 +109,7 @@ final class StoryboarderGUI {
     }
     Map<String, Object> data = ImmutableMap.of("page", firstPage, "numPages",
         numPages);
-    System.out.println("current project: " + project + ", data: " + data);
+//    System.out.println("current project: " + project + ", data: " + data);
 
     return GSON.toJson(data);
   }
