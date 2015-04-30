@@ -2,6 +2,9 @@ package storyboarder;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -23,7 +26,8 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
-  private static final String DEFAULT_DIRECTORY = "projects/test_0.txt";
+  private static final Path DEFAULT_DIRECTORY =
+      Paths.get("projects/test_0.sqlite3");
 
   private Main() {
   }
@@ -49,16 +53,14 @@ public final class Main {
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
-    StoryboarderProject testProj = new StoryboarderProject(DEFAULT_DIRECTORY);
-    // try {
-    // testProj.create();
-    // } catch (FileAlreadyExistsException e) {
-    // testProj.load();
-    // } catch (NoSuchFileException e) {
-    // exit("this shouldn't be happening...");
-    // }
-    StoryboarderGUI gui = new StoryboarderGUI(sparkPort, testProj);
-    gui.start();
+    try {
+      StoryboarderProject testProj = new StoryboarderProject(DEFAULT_DIRECTORY);
+      StoryboarderGUI gui = new StoryboarderGUI(sparkPort, testProj);
+      gui.start();
+    } catch (ClassNotFoundException | SQLException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
 
     try {
       int socketPort = DEFAULT_SOCKET_PORT;
@@ -66,10 +68,9 @@ public final class Main {
         socketPort = options.valueOf(socketSpec);
       }
       Multiplayer server = new Multiplayer(socketPort);
-      // server.start();
+      server.start();
     } catch (UnknownHostException e) {
       exit("could not start the multiplayer server: " + e.getMessage());
     }
   }
-
 }

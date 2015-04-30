@@ -34,9 +34,9 @@
           <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
           <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
           <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
-          <a href="#" class="action" id="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
+          <a href="#" class="action" id="Undo" data-action="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
           <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
-          <a href="#" class="action" id="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
+          <a href="#" class="action" id="Redo" data-action="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
             <div class="ui checkbox">
                   <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
@@ -73,7 +73,7 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="view" id="Add Image" data-content="Add Image"><i class="icon-drawing-image"></i></a>
+          <a href="#" class="view" id="AddImage" data-content="AddImage"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
             <label for="drawing-line-width">Line width:</label>
             <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
