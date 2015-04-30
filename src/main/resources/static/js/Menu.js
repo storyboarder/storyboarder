@@ -160,8 +160,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	var set_value = function(item) {
 		//    console.log("set value called");
-		//    console.log(item);
+		    console.log(item);
 		var val = item.val();
+		console.log(item.attr('data-action'), item.attr('name'), item.attr('id'));
 		val = isNaN(val) ? val : parseInt(val);
 		editor.action(item.attr('data-action'), {
 			name: item.attr("name"),

@@ -44,7 +44,8 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.elmType == "panel") {
+			  console.log(found.elmType);
+				if (found.elmType == "panel" || found.elmType == "draw" || found.elmType == "rectext") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,

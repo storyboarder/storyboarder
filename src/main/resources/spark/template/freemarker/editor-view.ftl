@@ -77,7 +77,7 @@
           <a href="#" class="view" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
             <label for="drawing-line-width">Line width:</label>
-            <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
+            <input type="range" class="slider action" value="20" min="0" max="150" id="drawing-line-width" data-action="SetToolSettings" name="Draw" /><br>
             <label for="drawing-color">Line color:</label>
             <input type="color" value="#005E7A" id="drawing-color"><br>
             <label for="drawing-shadow-width">Line shadow width:</label>

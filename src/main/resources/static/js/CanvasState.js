@@ -8,7 +8,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var pageMargin;
     var panelMargin;
     var pageEdges; // edges of panel area (between pageMargin and panelMargin)
-    var elements;
+//    var elements;
     var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
     var edgeDirections = ["left", "top", "right", "bottom"];
     var snap; // snapUtil object
@@ -19,7 +19,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
     var addElement = function(e, elmType) {
         e.elmType = elmType;
-        elements.push(e);
+//        elements.push(e);
         canvas.add(e);
     };
 
@@ -147,13 +147,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         return between(min, x, max);
     };
     var deleteElement = function(e) {
-        var idx = elements.indexOf(e);
-        if (idx >= 0) {
-            el = elements.splice(idx, 1);
-            canvas.remove(el[0]);
-        } else {
-            throw "couldn't find element:" + e;
-        }
+        canvas.remove(e);
     };
     var init = function(canvasId, w, h, callback) {
         console.log("initing page...");
@@ -190,7 +184,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.on('change', function () {
             CanvasState.storeState();
         });
-        elements = [];
+//        elements = [];
         pageEdges = {
             left: pageMargin,
             top: pageMargin,
@@ -295,10 +289,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         /* f is a filter function (takes in type/element pair, returns boolean),
             m is a map function (modifies type/element pair) */
         mapElements: function(m) {
-            elements.map(m);
+            //elements.map(m);
+            canvas._objects.map(m);
         },
         filterElements: function(e) {
-            return elements.filter(e);
+//            return elements.filter(e);
+            return canvas._objects.filter(e);
         },
         getOppositeDirection: getOppositeDirection,
         getDimension: getDimension,
