@@ -6,7 +6,6 @@ define(["../../CanvasState"], function (canvasState) {
     var times = 0;
 
 		var activate = function() {
-
       start = canvas._objects.length;
       console.log("start " + start);
 
@@ -17,7 +16,13 @@ define(["../../CanvasState"], function (canvasState) {
 
       canvas.freeDrawingBrush.color = $('#drawing-color').val();
       canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
-      
+    
+
+      canvas.on("mouse:up", function () {
+        times++;
+        console.log(times);
+      });
+
       $('#drawing-color').change(function () {
         console.log('color!');
         canvas.freeDrawingBrush.color = $('#drawing-color').val();
@@ -26,11 +31,6 @@ define(["../../CanvasState"], function (canvasState) {
       $('#drawing-line-width').change(function () {
         console.log('width!');
         canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
-      });
-
-      canvas.on("mouse:up", function () {
-        times++;
-        console.log(times);
       });
 
       return this;
@@ -61,6 +61,7 @@ define(["../../CanvasState"], function (canvasState) {
       canvas.isDrawingMode = false;
       fabric.Object.prototype.transparentCorners = true;
       canvas.__eventListeners["mouse:up"] = [];
+      times = 0;
 
 		};
 
