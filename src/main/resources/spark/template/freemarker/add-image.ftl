@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="ui button view" id="Add Image Button">
+    <div class="ui button view" id="AddImageButton">
       Add Image
     </div>
 

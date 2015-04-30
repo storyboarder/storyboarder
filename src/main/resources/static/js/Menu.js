@@ -4,11 +4,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	// views is an object of functions. Each function will be passed the JQuery
 	// object that triggered the view event.
 	var views = {
-		"Add Image": function() {
+		"AddImage": function() {
 			console.log("add image called");
 			$('.ui.modal.add-image').modal('setting', 'closable', true).modal('show');
 		},
-		"Add Image Button": function() {
+		"AddImageButton": function() {
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
 
@@ -17,7 +17,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				active : canvas.getActiveObject()
 			}
 
-			editor.action("Add URL", group);
+			editor.action("AddURL", group);
 		},
 		"Save": function() {
 			console.log("save called");
@@ -253,7 +253,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		            	img : image,
 		            	active : canvas.getActiveObject()
 		            }
-		            editor.action("Add Image", group);
+		            editor.action("AddImage", group);
 		        }
 		    }
 		    reader.readAsDataURL(e.target.files[0]);
