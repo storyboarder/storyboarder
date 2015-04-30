@@ -43,7 +43,7 @@ class Multiplayer extends WebSocketServer {
 
   @Override
   public void onMessage(WebSocket conn, String message) {
-    this.sendToAll(message);
+    this.sendToOthers(conn, message);
     System.out.println(conn + ": " + message);
   }
 
@@ -67,7 +67,7 @@ class Multiplayer extends WebSocketServer {
     BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
     while (true) {
       String in = sysin.readLine();
-      s.sendToAll(in);
+//      s.sendToOthers(in);
       if (in.equals("exit")) {
         s.stop();
         break;
@@ -96,11 +96,15 @@ class Multiplayer extends WebSocketServer {
    * @throws InterruptedException
    *           When socket related I/O errors occur.
    */
-  public void sendToAll(String text) {
+  public void sendToOthers(WebSocket origin, String text) {
     Collection<WebSocket> con = connections();
     synchronized (con) {
       for (WebSocket c : con) {
-        c.send(text);
+        if ( !origin.equals(c) ) {
+        	c.send(text);
+        } else {
+        	System.out.println("Do not send to self!");
+        }
       }
     }
   }

@@ -55,7 +55,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             lockMovementY: true,
             lockScalingX: true,
             lockScalingY: true,
-            hasRotatingPoint: false,
+            hasRotatingPoint: false//,
+            // edges: edges
         });
         panel.edges = edges;
         setControls(panel);
@@ -118,8 +119,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
         socket = new WebSocket("ws://localhost:8888");
         socket.onmessage = function (e) {
-            console.log("State change: ", JSON.parse(e.data));
-            // CanvasState.applyDeltaToState(JSON.parse(e.data));
+            CanvasState.applyDeltaToState(JSON.parse(e.data));
         };
 
         width = w;
@@ -149,7 +149,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.on('change', function () {
             CanvasState.storeState();
         });
-        previousState = CanvasState.getState();
         elements = [];
         pageEdges = {
             left: pageMargin,
@@ -167,6 +166,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             top: 100
         });
         canvas.add(circle);
+
+        previousState = CanvasState.getState();
+
         var that = this;
         require(["SnapUtil"], function(snapUtil) {
             snap = snapUtil;
@@ -183,7 +185,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             var state = this.getState();
 
             var delta = jsondiffpatch.diff(state, previousState);
-            socket.send(JSON.stringify(delta));
+            socket.send(JSON.stringify(jsondiffpatch.reverse(delta)));
             history[ ++historyIdx ] = delta;
             previousState = state;
         },
@@ -191,41 +193,50 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return historyIdx >= 0;
         },
         canRestore: function() {
-            return (historyIdx >= history.length - 1);
+            return (historyIdx <= history.length - 1);
         },
         revertState: function() {
             console.log("reverting state");
             if (!this.canRevert()) return;
+
+            // Move previous state one back
+            var delta = history[historyIdx];
+            socket.send(JSON.stringify(delta));
+            previousState = jsondiffpatch.patch(previousState, delta);
+            historyIdx--;
+
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
-            // Move previous state one back
-            var delta = history[historyIdx];
-            previousState = jsondiffpatch.patch(previousState, delta);
-            historyIdx--;
         },
         restoreState: function() {
             if (!this.canRestore()) return;
+            console.log("reached restore");
+
             // Move prebious state one forward
             state = this.getState();
             historyIdx++;
-            console.log("History: ", history);
-            var delta = history[historyIdx];
+            var delta = jsondiffpatch.reverse(history[historyIdx]);
+            socket.send(JSON.stringify(delta));
             var nextState = jsondiffpatch.patch(state, delta);
+            console.log("Restore state: ", delta, " - Idx: ", historyIdx);
+
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
         },
         getState: function() {
             console.log("canvas", this.getCanvas());
-            return $.extend(this.getCanvas().toJSON(["elmType"]), {
+            return $.extend(this.getCanvas().toJSON(["elmType", "edges"]), {
                 width: width,
                 height: height
             });
         },
         applyDeltaToState: function(delta) {
-            var state = this.getState();
-            previousState = jsondiffpatch.patch(state, delta);
+            console.log("Delta: ", delta);
+            console.log("Old state: ", previousState);
+            previousState = jsondiffpatch.patch(previousState, delta);
+            console.log("New state: ", previousState);
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
         },
         getCanvas: function() {

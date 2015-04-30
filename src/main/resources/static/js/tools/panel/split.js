@@ -105,12 +105,12 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		canvas.deactivateAll();
 
 		var vertical = true;
-		canvas.on("mouse:move", function(options) {
+		canvas.on("mouse:move", function(options) {			
 			canvas.deactivateAll();
-      pt = canvasState.snapPoint({x: options.e.offsetX, y: options.e.offsetY});
-      var x = pt.x;
-      var y = pt.y;
-      if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
+    		pt = canvasState.snapPoint({x: options.e.offsetX, y: options.e.offsetY});
+    		var x = pt.x;
+    		var y = pt.y;
+    		if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
 				previewDivideY(options.target, y);
 				vertical = false;
 			} else if (Math.abs(options.e.movementX) - Math.abs(options.e.movementY) > threshold) {
@@ -135,13 +135,13 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				if (!vertical &&
 					obj.edges.bottom - y > 3 * canvasState.getPanelMargin() &&
 					y - obj.edges.top > 3 * canvasState.getPanelMargin()) {
-					canvas.trigger("change");
 					divideY(obj, y);
+					canvas.trigger("change");
 				} else if (vertical &&
 					obj.edges.right - x > 3 * canvasState.getPanelMargin() &&
 					x - obj.edges.left > 3 * canvasState.getPanelMargin()) {
-					canvas.trigger("change");
 					divideX(obj, x);
+					canvas.trigger("change");
 				}
 			}
 			canvas.deactivateAll();
