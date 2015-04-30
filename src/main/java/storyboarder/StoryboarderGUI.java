@@ -46,11 +46,11 @@ final class StoryboarderGUI {
 
   private final int port;
 
-  private StoryboarderProject project;
+  private Project project;
 
   private Set<Path> pathChoices = getPathChoices();
 
-  StoryboarderGUI(int port, StoryboarderProject project) {
+  StoryboarderGUI(int port, Project project) {
     this.port = port;
     this.project = project;
   }
@@ -111,7 +111,7 @@ final class StoryboarderGUI {
    */
   private Object stringifyProject() {
     int numPages = project.getPageCount();
-    StoryboarderPage firstPage = null;
+    Page firstPage = null;
     if (numPages > 0) {
       firstPage = project.getPage(1);
     }
@@ -179,7 +179,7 @@ final class StoryboarderGUI {
       pathChoicesList.addAll(pathChoices);
 
       try {
-        project = new StoryboarderProject(pathChoicesList.get(choice));
+        project = new Project(pathChoicesList.get(choice));
       } catch (ClassNotFoundException | SQLException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -211,7 +211,7 @@ final class StoryboarderGUI {
       Path newFile = Paths.get(PROJECT_FOLDER.toString(), fileName);
       if (pathChoices.add(newFile)) {
         try {
-          project = new StoryboarderProject(newFile);
+          project = new Project(newFile);
         } catch (ClassNotFoundException | SQLException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
@@ -315,12 +315,12 @@ final class StoryboarderGUI {
 
   }
 
-  private StoryboarderPage getPageFromReq(Request req) {
+  private Page getPageFromReq(Request req) {
     QueryParamsMap qm = req.queryMap();
     int num = Integer.parseInt(qm.value("num"));
     String json = qm.value("json");
     String thumbnail = qm.value("thumbnail");
-    return new StoryboarderPage(num, json, thumbnail);
+    return new Page(num, json, thumbnail);
   }
 
   private class AddPageHandler implements Route {
