@@ -155,23 +155,22 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		"Export": function(params) {
 			console.log("export called");
 		},
-		"AddImage": function(params) {
+		"Add Image": function(params) {
+			canvasState.addImage(params);
+		},
+		"Add URL": function(params) {
 			console.log("ADDING IMAGE!!!");
-			console.log(params);
-			if (params.url && params.url != "http://") { //TODO this doesn't seem right
-				console.log(params.url);
+			if (params.url && params.url != "http://") {
+/*				var nameArray = params.url.match(/\/(?:.(?!\/))+$/igm);
+				var picName = nameArray[0].substring(1);
+*/				
 				fabric.Image.fromURL(params.url, function(img) {
-					img.set({
-						left: 30,
-						top: 40,
-						scaleX: 0.3,
-						scaleY: 0.3
-					});
-					canvasState.addElement(img, "image");
+					var group = {
+						img: img,
+						active: params.active
+					}
+					canvasState.addImage(group);
 				});
-
-			} else if (params.file) {
-				console.log(params.file);
 			}
 		},
 	};

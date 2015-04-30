@@ -125,6 +125,8 @@ define(["../../CanvasState"], function(canvasState) {
 						var test = new Rectext('Text', {
 							fontFamily: $('#font-family :selected').val(),
 							fontSize: $('#font-size')[0].value,
+							fill: $("#font-color").val(),
+							backgroundColor: 'white',
 							left: initialPos.x,
 							top: initialPos.y,
 							width: finalPos.x - initialPos.x,

@@ -1,33 +1,37 @@
 define(["../../CanvasState"], function (canvasState) {
-		
-    
+
+    //bug: clicking on draw right after
+
+    var start = 0;
+    var times = 0;
+
 		var activate = function() {
+
+      start = canvas._objects.length;
+      console.log("start " + start);
 
       console.log("draw activated");
 
       canvas.isDrawingMode = true;
-      fabric.Object.prototype.transparentCorners = false;
-      var drawingColor = $('#drawing-color'),
-      drawingLineWidth = $('#drawing-line-width')
+      //fabric.Object.prototype.transparentCorners = false;
 
-      canvas.freeDrawingBrush.color = drawingColor[0].value;
-      canvas.freeDrawingBrush.width = parseInt(drawingLineWidth[0].value, 10) || 1;
-
-      $('#eraser').click(function() {
-        console.log('eraser!');
-        canvas.freeDrawingBrush.color = 'white';
-      });
-
-      $('#drawing-color').click(function() {
+      canvas.freeDrawingBrush.color = $('#drawing-color').val();
+      canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+      
+      $('#drawing-color').change(function () {
         console.log('color!');
-        canvas.freeDrawingBrush.color = drawingColor[0].value;
+        canvas.freeDrawingBrush.color = $('#drawing-color').val();
       });
 
-      $('#drawing-line-width').click(function() {
+      $('#drawing-line-width').change(function () {
         console.log('width!');
-        canvas.freeDrawingBrush.width = parseInt(drawingLineWidth[0].value, 10);
+        canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
       });
 
+      canvas.on("mouse:up", function () {
+        times++;
+        console.log(times);
+      });
 
       return this;
 
@@ -35,8 +39,29 @@ define(["../../CanvasState"], function (canvasState) {
 
 		var deactivate = function() {
 			console.log("draw deactivate");
+      console.log("CANVAS");
+      console.log(canvas);
+      console.log("times " + times);
+      var group = [];
+      var i;
+
+      for(i = start; i <= times + 1; i++) {
+        group.push(canvas._objects[i]);
+      }
+
+      var toAdd = new fabric.Group(group);
+      canvas._objects.splice(start, times);
+      console.log(toAdd);
+      // DOESN'T LIKE ADDELEMENT FOR SOME REASON
+      //canvas.add(toAdd);
+      canvasState.addElement(toAdd, "draw");
+      toAdd.hasControls = true;
+      //canvas.renderAll();
+
       canvas.isDrawingMode = false;
       fabric.Object.prototype.transparentCorners = true;
+      canvas.__eventListeners["mouse:up"] = [];
+
 		};
 
 	

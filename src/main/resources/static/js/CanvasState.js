@@ -23,6 +23,47 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.add(e);
     };
 
+    var addImage = function(params) {
+      var img = params.img;
+      img.set({
+        left: 100,
+        top: 100,
+        scaleX: 0.2,
+        scaleY: 0.2
+      });
+
+      img.setControlsVisibility({
+          mt: false,
+          mb: false,
+          ml: false,
+          mr: false
+    });
+
+      if(params.active && params.active.elmType === "panel") {
+        var panel = params.active;
+
+        img.clipTo = function (ctx) {
+          ctx.save();
+
+          ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+          ctx.rect(
+            panel.left, panel.top, // Just x, y position starting from top left corner of canvas
+            panel.width, panel.height // Width and height of clipping rect
+          );
+
+          ctx.restore();
+        };
+
+        img.set({
+          left: panel.left + 15,
+          top: panel.top + 15
+        });
+      }
+
+      addElement(img, "image");
+      canvas.renderAll();
+  }
+
     var setControls = function(panel) {
         var bounds = [];
         var options = {};
@@ -263,6 +304,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         getDimension: getDimension,
         contains: contains,
         addPanel: addPanel,
+        addImage: addImage,
         setControls: setControls,
         getPageEdge: function(c) {
             return pageEdges[c];
