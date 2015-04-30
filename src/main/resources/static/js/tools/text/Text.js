@@ -15,7 +15,6 @@ define(["../../CanvasState"], function(canvasState) {
 	    options || (options = { });
 	    options.selectable = false;
 	    options.hasRotatingPoint = false;
-	    options.padding = 3;
 
 	    this.callSuper('initialize', text, options);
 	    this.transparentCorners = true;

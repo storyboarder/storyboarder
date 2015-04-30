@@ -154,7 +154,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	var deactivate = function() {
 		console.log("split deactivated");
-		canvas.remove(previewDivideLine);
+		helperCanvas.remove(previewDivideLine);
 		canvas.__eventListeners["mouse:move"] = [];
 		canvas.__eventListeners["object:selected"] = [];
 	};
