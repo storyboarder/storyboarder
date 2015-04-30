@@ -75,29 +75,20 @@
         <div class="title">Image</div>
         <div class="tools">
           <a href="#" class="view" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
-          <div style="display: none;" id="drawing-mode-options">
-            <label for="drawing-line-width">Line width:</label>
-            <input type="range" class="slider action" value="20" min="0" max="150" id="drawing-line-width" data-action="SetToolSettings" name="Draw" /><br>
-            <label for="drawing-color">Line color:</label>
-            <input type="color" value="#005E7A" id="drawing-color"><br>
-            <label for="drawing-shadow-width">Line shadow width:</label>
-            <input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
-          </div>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
           <a href="#" class="tool submenu" data-content="Fill" id="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
-          <div class="fill" style="display:none">
-              <label for="fill-color">Fill color:</label>
-              <input type="color" value="#005E7A" id="fill-color"><br>
-          </div>  
-
-           <div class="draw" style="display:none">
+          <div class="draw" style="display:none">
               <label for="drawing-line-width">Line width:</label>
               <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
               <input type="color" value="#005E7A" id="drawing-color"><br>
-          </div>  
+          </div>
+          <div class="fill" style="display:none">
+              <label for="fill-color">Fill color:</label>
+              <input type="color" value="#005E7A" id="fill-color"><br>
+          </div>    
         </div>
       </div>
 
@@ -105,10 +96,11 @@
         <div class="title">Text</div>
         <div class="tools">
 		      <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
-          <div class="ui checkbox">
-          <input type="checkbox" data-action="Borders" id="borders">
-                  <label>Borders</label>
-          </div>
+         
+          <div id="None">No border</div>
+          <div id="Rectangle">Rectangle</div>
+          <div id="Ellipse">Ellipse</div>
+
 
           <div class="text" style="display:none">  
              <select id="font-family">
@@ -123,8 +115,8 @@
                 <option value="verdana">Verdana</option>
               </select><br>
               
-              <label for="font-size">Font size:</label>
-              <input type="range" value="10" min="0" max="150" id="font-size"><br>
+              <label for="font-size">Font size: </label><span id="fsize">10</span>
+              <input type="range" value="10" min="0" max="100" id="font-size"><br>
               <label for="font-color">Font color:</label>
               <input type="color" value="#000000" id="font-color"><br>
           </div>  
