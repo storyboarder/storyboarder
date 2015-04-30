@@ -75,18 +75,6 @@
         <div class="tools">
           <a href="#" class="view" id="Add Image" data-content="Add Image"><i class="icon-drawing-image"></i></a>
           <div style="display: none;" id="drawing-mode-options">
-            <label for="drawing-mode-selector">Mode:</label>
-            <select id="drawing-mode-selector">
-              <option>Pencil</option>
-              <option>Circle</option>
-              <option>Spray</option>
-              <option>Pattern</option>
-              <option>hline</option>
-              <option>vline</option>
-              <option>square</option>
-              <option>diamond</option>
-              <option>texture</option>
-            </select><br>
             <label for="drawing-line-width">Line width:</label>
             <input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
             <label for="drawing-color">Line color:</label>
@@ -96,8 +84,13 @@
           </div>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
-          <a href="#" class="tool" data-content="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
+          <a href="#" class="tool submenu" data-content="Fill" id="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+          <div class="fill" style="display:none">
+              <label for="fill-color">Fill color:</label>
+              <input type="color" value="#005E7A" id="fill-color"><br>
+          </div>  
+
            <div class="draw" style="display:none">
               <label for="drawing-line-width">Line width:</label>
               <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>

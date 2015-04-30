@@ -1,4 +1,4 @@
-define(["../../CanvasState"], function(canvasState) {
+define(["../../CanvasState"], function (canvasState) {
 
 
 	var Rectext = fabric.util.createClass(fabric.IText, {
@@ -24,32 +24,6 @@ define(["../../CanvasState"], function(canvasState) {
 	    this.drawBorders(ctx);
 	  }
 	});
-
-	var Roundtext = fabric.util.createClass(fabric.Circle, {
-
-	  type: 'roundtext',
-
-	  initialize: function(text, options) {
-	    options || (options = { });
-
-	    this.callSuper('initialize', text, options);
-	  },
-
-	  toObject: function() {
-	    return fabric.util.object.extend(this.callSuper('toObject'), {
-	      //label: this.get('label')
-	    });
-	  },
-
-	  _render: function(ctx) {
-	    this.callSuper('_render', ctx);
-
-	    ctx.font = '20px Helvetica';
-	    ctx.fillStyle = '#333';
-	    ctx.fillText(this.label, -this.width/2, -this.height/2 + 20);
-	  }
-	});
-
 
 	var activate = function() {
 		console.log("text activate");
@@ -97,6 +71,8 @@ define(["../../CanvasState"], function(canvasState) {
 						var test = new Rectext('Text', {
 							fontFamily: $('#font-family :selected').val(),
 							fontSize: $('#font-size')[0].value,
+							fill: $("#font-color").val(),
+							backgroundColor: 'white',
 							left: initialPos.x,
 							top: initialPos.y
 						});

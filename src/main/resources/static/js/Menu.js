@@ -4,39 +4,20 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
   // views is an object of functions. Each function will be passed the JQuery
   // object that triggered the view event.
 	var views = {
-		"AddImage": function() {
+		"Add Image": function() {
 			console.log("add image called");
-			$('.ui.modal.add-image').modal('setting', 'closable', false).modal('show');
-			$('.upload').click(function() {
-				$('.ui.modal.add-image').modal('hide');
-				var imageLoader = document.getElementById('filepath');
+			$('.ui.modal.add-image').modal('setting', 'closable', true).modal('show');
+		},
+		"Add Image Button": function() {
+			console.log("UPLOAD CLICKED");
+			$('.ui.modal.add-image').modal('hide');
 
-				imageLoader.addEventListener('change', handleImage, false);
+			var group = {
+				url : $("#image-url").val(),
+				active : canvas.getActiveObject()
+			}
 
-				function handleImage(e) {
-					var reader = new FileReader();
-					reader.onload = function(event) {
-						var img = new Image();
-						img.onload = function() {
-							var imgInstance = new fabric.Image(img, {
-								scaleX: 0.2,
-								scaleY: 0.2
-							})
-							canvasState.addElement(imgInstance, "image");
-						}
-						img.src = event.target.result;
-					}
-					reader.readAsDataURL(e.target.files[0]);
-				}
-
-				console.log("ADDING");
-				var send = {
-					url: $("#image-url").val(),
-					file: $("#filepath").val()
-				}
-
-				editor.action("Add Image", send);
-			});
+			editor.action("Add URL", group);
 		},
 		"Save": function() {
 			console.log("save called");
@@ -206,17 +187,30 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 
 		$(".toolset .title").click(function() {
 			$(this).parent().children(".tools").slideToggle();
-    });
+   		});
 
-    $(".submenu").click(function() {
-      console.log($(this).attr('id').toLowerCase());
-      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
-    });
+	    $(".submenu").click(function() {
+	      console.log($(this).attr('id').toLowerCase());
+	      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
+	    });
 
-    $(".submenu").change(function() {
-      console.log($(this).attr('id').toLowerCase());
-      $( "." + $(this).attr("id").toLowerCase()).slideToggle();
-    });
+		$('#filepath').change(function (e) {
+		    var reader = new FileReader();
+		    reader.onload = function (event) { 
+		        var imgObj = new Image();
+		        imgObj.src = event.target.result;
+		        imgObj.onload = function () {
+		            var image = new fabric.Image(imgObj);
+		            var group = {
+		            	img : image,
+		            	active : canvas.getActiveObject()
+		            }
+		            editor.action("Add Image", group);
+		        }
+		    }
+		    reader.readAsDataURL(e.target.files[0]);
+		});
+
 
 		init_project();
 	};
