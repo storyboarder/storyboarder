@@ -171,8 +171,7 @@ define(["jquery", "semanticui", "./Editor"], function($, semanticui, editor) {
 			padding: "4px",
 		});
 
-		$('.ui.checkbox')
-			.checkbox();
+		$('.ui.checkbox').checkbox();
 
 		$("a.tool").click(function() {
 			if (current) {

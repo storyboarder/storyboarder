@@ -6,7 +6,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
+			// deactivate
 			canvasState.revertState();
+			// activate
 		},
 		"Redo": function(params) {
 			canvasState.restoreState();
