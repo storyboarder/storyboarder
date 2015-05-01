@@ -1,26 +1,24 @@
 define(["../../CanvasState"], function (canvasState) {
 
-		var activate = function() {
-      var selected;
-      canvas.on("mouse:down", function(coor) {
-        selected = coor.target;
+	var activate = function() {
+		var selected;
+		canvas.on("mouse:down", function(coor) {
+			selected = coor.target;
 
-        if(selected && selected.elmType === "panel") {
-          console.log(selected);
-          console.log("YAY!");
-          selected["fill"] = $("#fill-color").val();
-          canvas.renderAll();
-        }
+			if(selected && selected.elmType === "panel") {
+				console.log(selected);
+				console.log("YAY!");
+				selected["fill"] = $("#fill-color").val();
+				canvas.renderAll();
+			}
+		});
 
-      });
+		return this;
+	};
 
-      return this;
-
-		};
-
-		var deactivate = function() {
-      canvas.__eventListeners["mouse:down"] = [];
-		};
+	var deactivate = function() {
+    	canvas.__eventListeners["mouse:down"] = [];
+	};
 
 	
 	return {

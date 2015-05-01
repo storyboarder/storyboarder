@@ -1,15 +1,26 @@
-define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
-
+define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasState, toolset) {
+	var projectName;
 	var currentPage; // index of current page
 	var numPages;
+	var socket;
 
 	/* Actions are one-time functions, unlike tools. */
 	var actions = {
 		"Undo": function(params) {
 			canvasState.revertState();
+			actions.SyncPage();
 		},
 		"Redo": function(params) {
 			canvasState.restoreState();
+			actions.SyncPage();
+		},
+		"SyncPage": function(delta) {
+			socket.send(JSON.stringify($.extend(
+				delta, {
+					"projectName": projectName,
+					"currentPage": currentPage
+				}
+			)));
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
@@ -47,9 +58,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 			$.post("/projects/load", params, function(responseJSON) {
 				response = JSON.parse(responseJSON);
+				console.log("Project json: ", response);
 				numPages = response.numPages;
 				currentPage = 0;
-				canvasState.load(response.page); // parse JSON received
+				canvasState.load(canvas.attr("id"), response.page); // parse JSON received
 				return response.numPages;
 			});
 		},
@@ -66,10 +78,9 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			canvas.height = height;
 			currentPage = 0;
 			numPages = 1;
-			//		console.log(width, height);
+			projectName = params.name;
 
 			canvasState.setPageMargin(pageMargin);
-			//		console.log(canvasState);
 			canvasState.setPanelMargin(panelMargin);
 			canvasState.init(canvas.attr("id"), width, height, params.callback);
 
@@ -85,51 +96,60 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}, function(response) {
 				console.log(response);
 			});
+
+			init();
 		},
 		"CreateProjTest": function(params) {
 			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
-				console.log(response);
+				console.log("create called with: ", params);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"GetPage": function(pageNum) {
 			$.post("/pages/get", {
-					page: pageNum
+					pageNum: pageNum
 				},
 				function(response) {
 					// if (typeof response == "string") {
 					// 	throw response;
 					// } else {
-					console.log("get page called with page", pageNum);
-					responseObject = JSON.parse(response);
-					console.log("got: ");
-					console.log(responseObject);
+					console.log("get page called with page " + pageNum);
+					console.log("response: ", JSON.parse(response));
+					var responseObject = JSON.parse(response);
 					console.log("setting currentpage to " + currentPage);
 					currentPage = pageNum; // TODO check for errors(?)
 					return responseObject;
 					// }
 				});
 		},
+		"GetAllPages": function(callback) {
+			$.post("/pages/getAll", {}, function(responseJSON){
+				console.log("get all pages called");
+				console.log("response: ", JSON.parse(responseJSON));
+				callback(JSON.parse(responseJSON));
+			});
+		},
 		"SavePage": function() {
 			console.log("save called");
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			var params = {
-				num: currentPage,
-				json: JSON.stringify(pageJSON), // pages should be sent stringified
-				thumbnail: ""
-			};
-			console.log(params);
-			$.post("/pages/save", params, function(response) {
-				console.log(JSON.parse(response));
+
+			var page = makePage(currentPage, pageJSON, "");
+
+			console.log(page);
+
+			$.post("/pages/save", page, function(response) {
+				console.log("response: ", JSON.parse(response));
 			});
 		},
-		"SavePageTest": function(params) {
-			$.post("/pages/save", params, function(response) {
+		"SavePageTest": function(page) {
+			checkPage(page);
+			$.post("/pages/save", page, function(response) {
 				console.log("save page test called with:");
-				console.log(params);
-				console.log(response);
+				console.log(page);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"AddPage": function() {
@@ -137,23 +157,34 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			numPages++;
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			$.post("/pages/add", {
-				num: currentPage,
-				json: pageJSON,
-				thumbnail: ""
-			}, function(response) {
+			$.post("/pages/add", makePage(currentPage, pageJSON, ""), function(response) {
 				console.log("add page called");
-				console.log(response);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
-		"AddPageTest": function(params) {
-			$.post("/pages/add", params, function(response) {
-				console.log("add page test called");
-				console.log(response);
+		"AddPageTest": function(page) {
+			checkPage(page);
+			$.post("/pages/add", page, function(response) {
+				console.log("add page test called with: ", page);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"Export": function(params) {
-			console.log("export called");
+			var pdf = new jsPDF();
+			var dummyCanvas = new fabric.Canvas();
+
+			actions.GetAllPages(function (response) {
+				console.log(response);
+
+				for (var i= 0; i < response.length; i++) {
+					var page = response[i];
+					var img = dummyCanvas.loadFromJson(page, canvas.renderAll.bind(canvas));
+
+					pdf.addImage(img, 'JPEG', 0, 0);
+				}
+
+				pdf.save("download.pdf");
+			});
 		},
 		"AddImage": function(params) {
 			canvasState.addImage(params);
@@ -174,6 +205,25 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		},
 	};
+
+	var checkPage = function(page) {
+		if (!("pageNum" in page)) {
+			throw "Need a field pageNum";
+		} else if (!("json" in page)) {
+			throw "Need a field params";
+		} else if (!("thumbnail" in page)) {
+			throw "Need a field thumbnail";
+		}
+	}
+
+	var makePage = function(pageNum, json, thumbnail) {
+		return {
+			pageNum: pageNum,
+			json: json,
+			thumbnail: thumbnail
+		}
+	};
+
 	var init = function(spec, callback) {
 		console.log("editor init");
 		//		var canvas = spec.canvas;
@@ -197,6 +247,16 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		//
 		//		/* activate a tool to start with (esp. helpful for testing) */
 		//		this.activate("Select");
+
+		socket = new WebSocket("ws://localhost:8888");
+		socket.onmessage = function(e) {
+			var data = JSON.parse(e.data);
+			if (data.projectName == projectName && data.currentPage == currentPage) {
+				canvasState.applyDeltaToState(data);
+			}
+		};
+
+		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
 	};
 
 	var activate = function(toolname) {
@@ -219,21 +279,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for empty file. Expecting index out of bounds. Result: ");
-			actions.SavePageTest({
-				num: 1,
-				json: "",
-				thumbnail: ""
-			});
+			actions.SavePageTest(makePage(1, "", ""));
 		}, 1000);
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for empty file. Expecting success. Result: ");
-			actions.AddPageTest({
-				num: 1,
-				json: "FOOOO!",
-				thumbnail: ""
-			});
+			actions.AddPageTest(makePage(1, "FOOOO!", ""));
 		}, 2000);
 
 
@@ -246,21 +298,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for nonempty file. Expecting success!. Result:");
-			actions.SavePageTest({
-				num: 1,
-				json: "new String!",
-				thumbnail: "foo"
-			});
+			actions.SavePageTest(makePage(1, "new String!", "foo"));
 		}, 4000);
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for nonempty file. Expecting success!. Result:");
-			actions.AddPageTest({
-				num: 2,
-				json: "page 2",
-				thumbnail: "goo"
-			});
+			actions.AddPageTest(makePage(2, "page 2", "goo"));
 		}, 5000);
 
 		window.setTimeout(function() {
@@ -286,11 +330,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Adding hello world to new project");
-			actions.AddPageTest({
-				num: 1,
-				json: "hello world",
-				thumbnail: "akjfbad"
-			});
+			actions.AddPageTest(makePage(1, "hello world", "akjfbad"));
 		}, 9000);
 
 		window.setTimeout(function() {
@@ -310,11 +350,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Writing hey there to loaded project");
-			actions.SavePageTest({
-				num: 1,
-				json: "hey there",
-				thumbnail: "garg"
-			});
+			actions.SavePageTest(makePage(1, "hey there", "garg"));
 		}, 12000);
 
 		window.setTimeout(function() {
@@ -322,7 +358,6 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
 		}, 13000);
-
 
 		//toolset.test();
 		// console.log("editor tested");

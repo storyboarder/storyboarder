@@ -152,11 +152,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var init = function(canvasId, w, h, callback) {
         console.log("initing page...");
 
-        socket = new WebSocket("ws://localhost:8888");
-        socket.onmessage = function (e) {
-            CanvasState.applyDeltaToState(JSON.parse(e.data));
-        };
-
         width = w;
         height = h;
         $canvas = $("#" + canvasId);
@@ -181,9 +176,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             width: w,
             height: h
         });
-        canvas.on('change', function () {
-            CanvasState.storeState();
-        });
 //        elements = [];
         pageEdges = {
             left: pageMargin,
@@ -203,6 +195,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         canvas.add(circle);
 
         previousState = CanvasState.getState();
+        CanvasState.listenCanvas();
 
         var that = this;
         require(["SnapUtil"], function(snapUtil) {
@@ -220,9 +213,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             var state = this.getState();
 
             var delta = jsondiffpatch.diff(state, previousState);
-            socket.send(JSON.stringify(jsondiffpatch.reverse(delta)));
             history[ ++historyIdx ] = delta;
             previousState = state;
+            canvas.trigger('stateUpdated', jsondiffpatch.reverse(delta));
+
+            return delta;
         },
         canRevert: function() {
             return historyIdx >= 0;
@@ -243,10 +238,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
+
+            canvas.trigger('stateUpdated', delta);
         },
         restoreState: function() {
             if (!this.canRestore()) return;
-            console.log("reached restore");
 
             // Move prebious state one forward
             state = this.getState();
@@ -259,20 +255,37 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             // Repaint canvas
             canvas.clear().renderAll();
             canvas.loadFromJSON(nextState, canvas.renderAll.bind(canvas));
+
+            canvas.trigger('stateUpdated', delta);
+        },
+        listenCanvas: function () {
+            canvas.on('change', this.storeState.bind(this));
+            /*canvas.on('object:modified', this.storeState.bind(this));
+            canvas.on('object:added', this.storeState.bind(this));
+            canvas.on('object:removed', this.storeState.bind(this));*/
+        },
+        unlistenCanvas: function () {
+            canvas.off('change', this.storeState.bind(this));
+            /*canvas.off('object:modified');
+            canvas.off('object:added');
+            canvas.off('object:removed');*/
         },
         getState: function() {
-            console.log("canvas", this.getCanvas());
             return $.extend(this.getCanvas().toJSON(["elmType", "edges"]), {
                 width: width,
                 height: height
             });
         },
         applyDeltaToState: function(delta) {
+            this.unlistenCanvas();
+
             console.log("Delta: ", delta);
             console.log("Old state: ", previousState);
             previousState = jsondiffpatch.patch(previousState, delta);
             console.log("New state: ", previousState);
             canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
+
+            this.listenCanvas();
         },
         getCanvas: function() {
             return canvas;
@@ -309,11 +322,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return pageEdges;
         },
         deleteElement: deleteElement,
-        load: function(json) {
-            console.log("loading page...");
-            console.log(json);
-            // TODO replace this with json parsing:
-            //init("canvas", 400, 600, function() {});
+        load: function(canvasId, w, h, json, callback) {
+            init(canvasId, w, h, callback);
+            canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
         },
         init: init,
         addElement: addElement,

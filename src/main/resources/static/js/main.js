@@ -5,6 +5,7 @@ require.config({
 		jqueryui: "jquery-ui",
 		fabricjs: "http://fabricjs.com/lib/fabric",
 		jsondiffpatch: "https://cdn.rawgit.com/benjamine/jsondiffpatch/master/public/build/jsondiffpatch.min",
+		jsPDF: "https://cdn.rawgit.com/MrRio/jsPDF/master/dist/jspdf.min",
 		tools: "tools",
 		view: "view",
 		semanticui: "semantic"
@@ -38,12 +39,12 @@ require.config({
 //      console.log(canvasState);
 
       require(["Menu", "Editor"], function(menu, editor) {
-        editor.init("canvas");
+        // editor.init("canvas");
 //        console.log(menu);
         menu.init();
         console.log("editor:");
         console.log(editor);
-//        editor.test(); /* */
+        editor.test(); /* */
       });
 //    });
 
