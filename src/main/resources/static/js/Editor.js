@@ -103,7 +103,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
-				console.log(response);
+				console.log("create called with: ", params);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"GetPage": function(pageNum) {
@@ -164,7 +165,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		"AddPageTest": function(page) {
 			checkPage(page);
 			$.post("/pages/add", page, function(response) {
-				console.log("add page test called");
+				console.log("add page test called with: ", page);
 				console.log("response: ", JSON.parse(response));
 			});
 		},
@@ -278,21 +279,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for empty file. Expecting index out of bounds. Result: ");
-			actions.SavePageTest({
-				num: 1,
-				json: "",
-				thumbnail: ""
-			});
+			actions.SavePageTest(makePage(1, "", ""));
 		}, 1000);
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for empty file. Expecting success. Result: ");
-			actions.AddPageTest({
-				num: 1,
-				json: "FOOOO!",
-				thumbnail: ""
-			});
+			actions.AddPageTest(makePage(1, "FOOOO!", ""));
 		}, 2000);
 
 
@@ -305,21 +298,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for nonempty file. Expecting success!. Result:");
-			actions.SavePageTest({
-				num: 1,
-				json: "new String!",
-				thumbnail: "foo"
-			});
+			actions.SavePageTest(makePage(1, "new String!", "foo"));
 		}, 4000);
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for nonempty file. Expecting success!. Result:");
-			actions.AddPageTest({
-				num: 2,
-				json: "page 2",
-				thumbnail: "goo"
-			});
+			actions.AddPageTest(makePage(2, "page 2", "goo"));
 		}, 5000);
 
 		window.setTimeout(function() {
@@ -345,11 +330,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Adding hello world to new project");
-			actions.AddPageTest({
-				num: 1,
-				json: "hello world",
-				thumbnail: "akjfbad"
-			});
+			actions.AddPageTest(makePage(1, "hello world", "akjfbad"));
 		}, 9000);
 
 		window.setTimeout(function() {
@@ -369,11 +350,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Writing hey there to loaded project");
-			actions.SavePageTest({
-				num: 1,
-				json: "hey there",
-				thumbnail: "garg"
-			});
+			actions.SavePageTest(makePage(1, "hey there", "garg"));
 		}, 12000);
 
 		window.setTimeout(function() {
