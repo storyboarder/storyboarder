@@ -29,6 +29,7 @@ define(function(require) {
 			for (var i in toolset) {
 				toolset[i].init();
 			}
+			activate("Select");
 		},
 		activate: activate,
 		test: function() {

@@ -44,10 +44,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.action("AddPage");
 		},
 		"GetPage": function(item) {
-			var idx = item.attr("data-num");
+			var idx = parseInt(item.attr("data-num"));
 			console.log("menu getting page" + idx);
 			//TODO save current page
-			editor.action("Load", idx);
+			editor.action("GetPage", idx);
 		},
 		"RemovePage": function(item) {
 			var idx = item.attr("data-num");
@@ -74,6 +74,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
 					});
+					$("#page-thumbs").append(getPageThumb(1));
+					console.log($("#page-thumbs"));
 				}
 			});
 		},
@@ -81,9 +83,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			var num = item.attr("id");
 			console.log("load project");
 			var result = editor.action("LoadProj", {
-				choice: num
+				choice: num,
+				callback: updatePages
 			});
-			updatePages(result);
 			$("#editor").css("visibility", "visible");
 			$('.ui.modal.load-project').modal('hide');
 		},
@@ -133,6 +135,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var getPageThumb = function(i) {
+		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
 			'<a class="page-thumb view" id="GetPage" href="#" data-num=' + i + '>' + i + '</a>' +
 			'<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></li>';
@@ -155,6 +158,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var updatePages = function(num) {
 		$("#page-thumbs").empty();
 		for (var i = 0; i < num; i++) {
+			console.log(i);
 			$("#page-thumbs").append(getPageThumb(i));
 		}
 	};

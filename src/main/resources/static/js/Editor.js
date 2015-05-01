@@ -61,7 +61,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log(currentPage + "/" + numPages);
 				canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
-//				return response.numPages;
+				if (typeof params.callback != "undefined") {
+					params.callback(response.numPages);
+				}
 			});
 		},
 		"CreateProj": function(params) {
@@ -89,6 +91,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					name: params.name
 				}, function(response) {
 					that.AddPage();
+					console.log(params.editor);
 					params.editor.init();
 					activate("Select");
 				});
@@ -99,7 +102,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			/* init all tools in the toolset so they get the canvas state */
 //			toolset.init();
 
-			/* activate a tool to start with (esp. helpful for testing) */
 		},
 		"CreateProjTest": function(params) {
 			$.post("/projects/create", {
@@ -120,8 +122,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					console.log("get page called with page " + pageNum);
 					console.log("response: ", JSON.parse(response));
 					var responseObject = JSON.parse(response);
-					console.log("setting currentpage to " + currentPage);
 					currentPage = pageNum; // TODO check for errors(?)
+					console.log("setting currentpage to " + currentPage);
 					return responseObject;
 					// }
 				});
@@ -265,6 +267,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 	var action = function(name, params) {
 		if (name in actions) {
+			params = params || {};
 			params.editor = this;
 			actions[name](params);
 		} else {

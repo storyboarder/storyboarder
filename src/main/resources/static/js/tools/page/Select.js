@@ -43,37 +43,30 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		//console.log("select activated");
 		canvas.selection = true; // enable group selection
 
-		canvasState.mapElements(
-			function(found) { // map
-/*				if (found.elmType === "panel") {
-					found.set({
-						selectable: true,
-						lockScalingX: false,
-						lockScalingY: false
-					});
-				} else if(found.elmType === "rectext" || found.elmType === "textBorder") {
-					found.set({
-						selectable: true
-					});
-				} else if(found.elmType === "draw") {
-					console.log("HERE");
-					found.set({
-						selectable: true
-					})
-				}*/
-
-				if(found.elmType === "draw") {
-					console.log("HERE");
-					found.set({
-						selectable: true
-					})
-				} else {
-					found.set({
-						selectable: false
-					})
-				}
+		canvasState.mapElements(function(found) { // map
+			console.log(found.elmType);
+			if (found.elmType == "panel") {
+				found.set({
+					selectable: true,
+					lockScalingX: false,
+					lockScalingY: false
+				});
+			} else if(found.elmType === "rectext" || found.elmType === "textBorder") {
+				found.set({
+					selectable: true
+				});
+			} else if(found.elmType === "draw") {
+				console.log("HERE");
+				found.set({
+					selectable: true
+				})
+			} else {
+				console.log("unexpected type: " + found.elmType);
+				found.set({
+					selectable: false
+				});
 			}
-		);
+		});
 
 		canvas.on('object:moving', function(options) {
 			target = options.target;
@@ -122,12 +115,10 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				options.target.height *= options.target.scaleY;
 				options.target.scaleY = 1;
 
-				console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};
 				if (canvasState.isSnapActive()) {
-					console.log("scaling panel with snap");
 					if (corner.indexOf('l') >= 0) {
 						newEdges.left = snapPoint({
 							x: obj.left - panelMargin
@@ -203,11 +194,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:selected', function(options) {
-			if (options.elmType !== 'text') {
+			selected = options.target;
+			if (options.elmType !== 'text') { //TODO is this conditional necessary
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}
-			console.log("Selected");
 			//console.log(canvas);
 			console.log(options.target);
 		});
@@ -216,6 +207,19 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		canvas.on("text:changed", function(e) {
 			e.target.adjustBorder();
 		});
+
+		document.onkeydown = function(e) { // remove elements when delete is pressed
+			var key = e.keyCode;
+			if (key === 8 && typeof selected != "undefined") {
+				if (selected.elmType == 'rectext') {
+					selected.remove();
+				} else if (selected.elmType == 'textBorder') {
+					selected.textbox.remove();
+				} else if (selected.elmType == "draw") {
+					canvasState.deleteElement(selected);
+				}
+			}
+		};
 
 		return this;
 	};
@@ -245,7 +249,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		init: function() {
 			canvas = canvasState.getCanvas();
 			snapPoint = canvasState.snapPoint;
-			console.log("select tool inited with canvas: ", canvas);
+//			console.log("select tool inited with canvas: ", canvas);
 		},
 		activate: activate,
 		deactivate: deactivate
