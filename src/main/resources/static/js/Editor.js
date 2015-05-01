@@ -192,16 +192,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"Export": function(params) {
 			var pdf = new jsPDF();
-			var dummyCanvas = new fabric.Canvas();
+			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
+				.css({display: "none"})
+				.appendTo(document.body);
+			var dummyCanvas = new fabric.Canvas('dummyCanvas');
 
 			actions.GetAllPages(function (response) {
 				console.log(response);
 
 				for (var i= 0; i < response.length; i++) {
 					var page = response[i];
-					var img = dummyCanvas.loadFromJson(page, canvas.renderAll.bind(canvas));
+					dummyCanvas.loadFromJSON(page, canvas.renderAll.bind(canvas));
+					console.log()
+					var img = dummyCanvas.toDataURL('png');
 
-					pdf.addImage(img, 'JPEG', 0, 0);
+					pdf.addImage(img, 'PNG', 0, 0);
 				}
 
 				pdf.save("download.pdf");
