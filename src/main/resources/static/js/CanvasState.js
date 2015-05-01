@@ -187,13 +187,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         /* add the first panel */
         addPanel($.extend({}, pageEdges));
         /* adding a circle because why not */
-        var circle = new fabric.Circle({
-            radius: 20,
-            fill: 'green',
-            left: 100,
-            top: 100
-        });
-        canvas.add(circle);
+//        var circle = new fabric.Circle({
+//            radius: 20,
+//            fill: 'green',
+//            left: 100,
+//            top: 100
+//        });
+//        canvas.add(circle);
 
         previousState = CanvasState.getState();
         CanvasState.listenCanvas();

@@ -74,7 +74,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
 					});
-					$("#page-thumbs").append(getPageThumb(1));
+					$("#page-thumbs").append(getPageThumb(0));
 					console.log($("#page-thumbs"));
 				}
 			});

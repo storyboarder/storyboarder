@@ -84,13 +84,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			canvasState.setPageMargin(pageMargin);
 			canvasState.setPanelMargin(panelMargin);
 			var that = this;
-			var editor = editor;
 			canvasState.init(canvas.attr("id"), width, height, function() {
 				params.callback();
 				$.post("/projects/create", {
 					name: params.name
 				}, function(response) {
-					that.AddPage();
+					console.log(response);
+					if (typeof response !== "string") {
+						that.AddPage();
+					}
 					console.log(params.editor);
 					params.editor.init();
 					activate("Select");
@@ -166,7 +168,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 //			console.log(currentPage, pageJSON);
 //			console.log(makePage(currentPage, pageJSON, ""));
 			$.post("/pages/add", makePage(currentPage, pageJSON, ""), function(response) {
-				console.log("add page called");
+				console.log("add page called with num: " + currentPage);
 				console.log("response: ", JSON.parse(response));
 			});
 		},
