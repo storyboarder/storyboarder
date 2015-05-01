@@ -20,7 +20,7 @@ public class StoryboarderProjectTest {
 
   @BeforeClass
   public static void createTestDatabase() throws ClassNotFoundException,
-    SQLException, IOException {
+  SQLException, IOException {
     Files.deleteIfExists(dbPath);
     testProj = new Project(dbPath);
   }
@@ -83,27 +83,27 @@ public class StoryboarderProjectTest {
 
     assertTrue(testProj.savePage(page10));
 
-    // assertTrue(testProj.movePage(10, 2));
-    //
-    // Page newPage2 = testProj.getPage(2);
-    // Page newPage3 = testProj.getPage(3);
-    //
-    // assertEquals(page10.getJson(), newPage2.getJson());
-    // assertEquals(page10.getThumbnail(), newPage2.getThumbnail());
-    //
-    // assertEquals(page2.getJson(), newPage3.getJson());
-    // assertEquals(page2.getThumbnail(), newPage3.getThumbnail());
-    //
-    // for (int i = 4; i <= testProj.getPageCount(); i++) {
-    // Page correctPage = new Page(i, "foo", "derp");
-    // Page curPage = testProj.getPage(i);
-    // assertEquals(correctPage, curPage);
-    // }
-    //
-    // assertTrue(testProj.movePage(2, 10));
-    //
-    // assertEquals(page2, testProj.getPage(2));
-    // assertEquals(page10, testProj.getPage(10));
+    assertTrue(testProj.movePage(10, 2));
+
+    Page newPage2 = testProj.getPage(2);
+    Page newPage3 = testProj.getPage(3);
+
+    assertEquals(page10.getJson(), newPage2.getJson());
+    assertEquals(page10.getThumbnail(), newPage2.getThumbnail());
+
+    assertEquals(page2.getJson(), newPage3.getJson());
+    assertEquals(page2.getThumbnail(), newPage3.getThumbnail());
+
+    for (int i = 4; i <= testProj.getPageCount(); i++) {
+      Page correctPage = new Page(i, "foo", "derp");
+      Page curPage = testProj.getPage(i);
+      assertEquals(correctPage, curPage);
+    }
+
+    assertTrue(testProj.movePage(2, 10));
+
+    assertEquals(page2, testProj.getPage(2));
+    assertEquals(page10, testProj.getPage(10));
 
   }
 
