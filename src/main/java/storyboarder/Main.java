@@ -54,8 +54,8 @@ public final class Main {
       sparkPort = options.valueOf(sparkSpec);
     }
     try {
-      StoryboarderProject testProj = new StoryboarderProject(DEFAULT_DIRECTORY);
-      StoryboarderGUI gui = new StoryboarderGUI(sparkPort, testProj);
+      Project testProj = new Project(DEFAULT_DIRECTORY);
+      GUI gui = new GUI(sparkPort, testProj);
       gui.start();
     } catch (ClassNotFoundException | SQLException e1) {
       // TODO Auto-generated catch block

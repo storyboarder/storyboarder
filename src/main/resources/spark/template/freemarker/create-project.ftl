@@ -8,9 +8,9 @@
 
   <div class="ui form" class="CreateProject">
     <div class="ui right labeled field">
-      <label>Filename</label>
+      <label>Project Name</label>
       <div class="ui input">
-        <input type="text" id="filename" value="Untitled">
+        <input type="text" id="project-name" value="Untitled">
       </div>
     </div>
 

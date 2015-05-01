@@ -1,10 +1,11 @@
-define(["../../CanvasState"], function (canvasState) {
+define(["../../CanvasState"], function(canvasState) {
 
-    //bug: clicking on draw right after
+	//bug: clicking on draw right after
 
-    var start = 0;
-    var times = 0;
+	var start = 0;
+	var times = 0;
 
+<<<<<<< HEAD
     var addGroup = function(group) {
      // console.log(3);
      //  console.log("PRINTING GROUP");
@@ -140,14 +141,13 @@ define(["../../CanvasState"], function (canvasState) {
       start = canvas._objects.length;
       //console.log("start " + start);
 
-      console.log("draw activated");
+		console.log("draw activated");
 
-      canvas.isDrawingMode = true;
-      //fabric.Object.prototype.transparentCorners = false;
+		canvas.isDrawingMode = true;
+		//fabric.Object.prototype.transparentCorners = false;
 
-      canvas.freeDrawingBrush.color = $('#drawing-color').val();
-      canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
-    
+		canvas.freeDrawingBrush.color = $('#drawing-color').val();
+		canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
 
 /*      canvas.on("mouse:up", function () {
         times++;
@@ -155,8 +155,11 @@ define(["../../CanvasState"], function (canvasState) {
         console.log(canvas);
       });*/
 
+		$('#drawing-line-width').click(function() {
+			console.log('width!');
+			canvas.freeDrawingBrush.width = parseInt(drawingLineWidth[0].value, 10);
+		});
       return this;
-
 
 		};
 
@@ -186,18 +189,16 @@ define(["../../CanvasState"], function (canvasState) {
       //canvas.__eventListeners["mouse:up"] = [];
       // times = 0;
       // console.log("end " + times);
+  };
 
-		};
-
-	
 	return {
 		name: "Draw",
-		init: function () {
+		init: function() {
 			console.log("init draw");
 			canvas = canvasState.getCanvas();
 		},
 		activate: activate,
 		deactivate: deactivate
 	};
-	
+
 });
