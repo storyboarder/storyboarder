@@ -122,10 +122,11 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					// }
 				});
 		},
-		"GetAllPages": function() {
+		"GetAllPages": function(callback) {
 			$.post("/pages/getAll", {}, function(responseJSON){
 				console.log("get all pages called");
-				console.log("response: ", JSON.parse(response));
+				console.log("response: ", JSON.parse(responseJSON));
+				callback(JSON.parse(responseJSON));
 			});
 		},
 		"SavePage": function() {
