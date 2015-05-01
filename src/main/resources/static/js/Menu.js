@@ -184,7 +184,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var init = function() {
 		console.log("Menu initing");
 
-		
+
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
@@ -273,6 +273,45 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			}
 		});
 		$("#page-thumbs").disableSelection();
+
+
+		$("#font-size").change(function (e) {
+			$("#fsize").text($("#font-size").val());
+			var active = canvas.getActiveObject();
+			if(active && active.elmType === "rectext") {
+				active.fontSize = $("#font-size").val();
+				canvas.renderAll();
+				active.adjustBorder();	
+			}
+		});
+
+		$("#font-color").change(function (e) {
+			var active = canvas.getActiveObject();
+			if(active && active.elmType === "rectext") {
+				active.fill = $("#font-color").val();
+				canvas.renderAll();
+			}
+		});
+
+
+		$("#font-family").change(function (e) {
+			var active = canvas.getActiveObject();
+			if(active && active.elmType === "rectext") {
+				active.fontFamily = $('#font-family :selected').val();
+				canvas.renderAll();
+				active.adjustBorder();
+			}
+		});
+
+		$('#drawing-color').change(function () {
+	        console.log('color!');
+	        canvas.freeDrawingBrush.color = $('#drawing-color').val();
+      	});
+
+	    $('#drawing-line-width').change(function () {
+		    console.log('width!');
+		    canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+	    });
 
 	    $( "#page-thumbs" ).disableSelection();
 

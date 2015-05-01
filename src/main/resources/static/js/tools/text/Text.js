@@ -271,34 +271,6 @@ define(["../../CanvasState"], function(canvasState) {
 			e.target.adjustBorder();
 		});
 
-		$("#font-size").change(function (e) {
-			$("#fsize").text($("#font-size").val());
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fontSize = $("#font-size").val();
-				canvas.renderAll();
-				active.adjustBorder();	
-			}
-		});
-
-		$("#font-color").change(function (e) {
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fill = $("#font-color").val();
-				canvas.renderAll();
-			}
-		});
-
-
-		$("#font-family").change(function (e) {
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fontFamily = $('#font-family :selected').val();
-				canvas.renderAll();
-				active.adjustBorder();
-			}
-		});
-
 		document.onkeydown = function(e) {
 			var key = e.keyCode;
 			if (key === 8 && selected.elmType == 'rectext') {

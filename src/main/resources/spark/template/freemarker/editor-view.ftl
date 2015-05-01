@@ -68,6 +68,12 @@
           <a href="#" class="tool" id="Split" data-content="Split"><i class="icon-drawing-tiles-plus"></i></a>
           <!--<a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>/-->
           <a href="#" class="tool" id="Join" data-content="Join"><i class="icon-drawing-tiles-minus"></i></a>
+
+          <a href="#" class="tool submenu" data-content="Fill" id="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
+          <div class="fill" style="display:none">
+              <label for="fill-color">Fill color:</label>
+              <input type="color" value="#005E7A" id="fill-color"><br>
+          </div>  
         </div>
       </div>
 
@@ -77,18 +83,15 @@
           <a href="#" class="view" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
-          <a href="#" class="tool submenu" data-content="Fill" id="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
-          <a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>
+
+          <!--<a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>/-->
           <div class="draw" style="display:none">
               <label for="drawing-line-width">Line width:</label>
-              <input type="range" value="10" min="0" max="150" id="drawing-line-width"><br>
+              <input type="range" value="10" min="1" max="150" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
               <input type="color" value="#005E7A" id="drawing-color"><br>
           </div>
-          <div class="fill" style="display:none">
-              <label for="fill-color">Fill color:</label>
-              <input type="color" value="#005E7A" id="fill-color"><br>
-          </div>    
+            
         </div>
       </div>
 
@@ -97,9 +100,9 @@
         <div class="tools">
 		      <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
          
-          <div id="None">No border</div>
+          <!--<div id="None">No border</div>
           <div id="Rectangle">Rectangle</div>
-          <div id="Ellipse">Ellipse</div>
+          <div id="Ellipse">Ellipse</div>/-->
 
 
           <div class="text" style="display:none">  
