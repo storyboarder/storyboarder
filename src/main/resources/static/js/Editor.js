@@ -54,6 +54,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"LoadProj": function(params) {
+			console.log("LOAD PROJ");
 			$.post("/projects/load", {choice: params.choice}, function(responseJSON) {
 				response = JSON.parse(responseJSON);
 				numPages = response.numPages;
