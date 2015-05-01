@@ -31,7 +31,7 @@ define(["../../CanvasState"], function(canvasState) {
 	        textbox : this
 	 	});
 
-      this.border.elmType = "textBorder";
+		this.border.elmType = "textBorder";
       canvas.add(this.border);
 	  },
 
@@ -57,20 +57,19 @@ define(["../../CanvasState"], function(canvasState) {
 	    });
 	  },
 	  adjustBorder: function() {
-	  	console.log("adjusting border");
-		var width = this.width;
-		var height = this.height;
-		var bwidth = this.border.width;
-		var bheight = this.border.height;
+			var width = this.width;
+			var height = this.height;
+			var bwidth = this.border.width;
+			var bheight = this.border.height;
 
-		if (width >= bwidth - padding) {
-			this.border.width = width + 2 * padding;
-		}
+			if (width >= bwidth - padding) {
+				this.border.width = width + 2 * padding;
+			}
 
-		if (height >= bheight - padding) {
-			this.border.height = height + 2 * padding;
-		}
-		canvas.renderAll();
+			if (height >= bheight - padding) {
+				this.border.height = height + 2 * padding;
+			}
+			canvas.renderAll();
 	  },
 
 	  adjustPosition: function(l, t) {
@@ -210,7 +209,6 @@ define(["../../CanvasState"], function(canvasState) {
 
 		canvas.on('mouse:down', function(coor) {
 			selected = coor.target;
-			console.log("LOOK HEREEEEEE", selected.toObject());
 
 			if(selected) {
 				if(coor.target.elmType === "textBorder") {
@@ -258,7 +256,6 @@ define(["../../CanvasState"], function(canvasState) {
 		  } else if (selected.elmType == "textBorder") {
 		    selected.textbox.adjustScale(selected.scaleX, selected.scaleY, selected.left + selected.padding, selected.top + selected.padding);
 		  }
-		  console.log(selected);
 		});
 
 		canvas.on("object:moving", function(e) {

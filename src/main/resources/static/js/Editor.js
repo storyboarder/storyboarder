@@ -90,9 +90,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					name: params.name
 				}, function(response) {
 					console.log(response);
-					if (typeof response !== "string") {
-						that.AddPage();
-					}
+					that.AddPage();
 					console.log(params.editor);
 					params.editor.init();
 					activate("Select");
@@ -122,10 +120,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					// 	throw response;
 					// } else {
 					console.log("get page called with page " + pageNum);
-					console.log("response: ", JSON.parse(response));
 					var responseObject = JSON.parse(response);
+//					console.log("responseObj", responseObject);
+//					console.log("responseObj json", responseObject.json);
+					console.log("responseObj json parsed", JSON.parse(responseObject.json));
 					currentPage = pageNum; // TODO check for errors(?)
 					console.log("setting currentpage to " + currentPage);
+					canvasState.load("canvas", JSON.parse(responseObject.json), function() {console.log("hi")});
 					return responseObject;
 					// }
 				});
