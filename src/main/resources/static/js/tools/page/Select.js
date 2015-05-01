@@ -43,68 +43,70 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		//console.log("select activated");
 		canvas.selection = true; // enable group selection
 
-		canvasState.mapElements(
-			function(found) { // map
-/*				if (found.elmType === "panel") {
-					found.set({
-						selectable: true,
-						lockScalingX: false,
-						lockScalingY: false
-					});
-				} else if(found.elmType === "rectext" || found.elmType === "textBorder") {
-					found.set({
-						selectable: true
-					});
-				} else if(found.elmType === "draw") {
-					console.log("HERE");
-					found.set({
-						selectable: true
-					})
-				}*/
-
-				if(found.elmType === "draw") {
-					console.log("HERE");
-					found.set({
-						selectable: true
-					})
-				} else {
-					found.set({
-						selectable: false
-					})
-				}
+		canvasState.mapElements(function(found) { // map
+			console.log(found.elmType);
+			if (found.elmType == "panel") {
+				found.set({
+					selectable: true,
+					lockScalingX: false,
+					lockScalingY: false
+				});
+			} else if(found.elmType === "rectext" || found.elmType === "textBorder") {
+				found.set({
+					selectable: true
+				});
+			} else if(found.elmType === "draw") {
+				console.log("HERE");
+				found.set({
+					selectable: true
+				})
+			} else {
+				console.log("unexpected type: " + found.elmType);
+				found.set({
+					selectable: false
+				});
 			}
-		);
+		});
 
 		canvas.on('object:moving', function(options) {
-			if (canvasState.isSnapActive() && options.target.elmType != "panel") {
-				target = options.target;
-				var borders = canvasState.snapBorders({
-					left: target.left,
-					right: target.left + target.width,
-					top: target.top,
-					bottom: target.top + target.height,
-				});
-				for (b in borders) {
-					if (typeof borders[b] != "undefined") {
-						if (b in target) {
-							target[b] = borders[b];
-						} else {
-							var dim = canvasState.getDimension(b);
-							var opposite = canvasState.getOppositeDirection(b);
-							target[opposite] = borders[b] - target[dim];
-						}
-					}
-				}
-			}
+			target = options.target;
+		  if (canvasState.isSnapActive() && options.target.elmType != "panel") {
+		    target = options.target;
+		    var borders = canvasState.snapBorders({
+          	left: target.left,
+          	right: target.left + target.width,
+          	top: target.top,
+          	bottom: target.top + target.height,
+        });
+
+        for (b in borders) {
+          if (typeof borders[b] != "undefined") {
+            if (b in target) {
+              target[b] = borders[b];
+            } else {
+              var dim = canvasState.getDimension(b);
+              var opposite = canvasState.getOppositeDirection(b);
+              target[opposite] = borders[b] - target[dim];
+            }
+          }
+        }
+      } else if (target.elmType === "rectext") {
+      	target.adjustPosition(target.left, target.top);
+				console.log("adjusting pos text");
+      } else if (target.elmType === "textBorder") {
+				console.log("adjusting pos border");
+      	target.textbox.adjustPosition(target.left + target.padding, target.top + target.padding);
+      }
 		});
 
 		canvas.on('object:scaling', function(options) {
 
-		if (options.elmType == "rectext") {
-		    options.adjustScale(options.scaleX, options.scaleY, options.left, options.top);
-		} else if (options.elmType == "textBorder") {
-		    options.textbox.adjustScale(options.scaleX, options.scaleY, options.left + options.padding, options.top + options.padding);
-		}
+			target = options.target;
+			if (target.elmType == "rectext") {
+				target.adjustScale(target.scaleX, target.scaleY, target.left, target.top);
+			} else if (target.elmType == "textBorder") {
+				target.textbox.adjustScale(target.scaleX, target.scaleY, target.left + target.padding, target.top + target.padding);
+			}
 
 			if (options.target.elmType == "panel") {
 				var panelMargin = canvasState.getPanelMargin();
@@ -113,12 +115,10 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				options.target.height *= options.target.scaleY;
 				options.target.scaleY = 1;
 
-				console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
 				var newEdges = {};
 				if (canvasState.isSnapActive()) {
-					console.log("scaling panel with snap");
 					if (corner.indexOf('l') >= 0) {
 						newEdges.left = snapPoint({
 							x: obj.left - panelMargin
@@ -194,14 +194,32 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:selected', function(options) {
-			if (options.elmType !== 'text') {
+			selected = options.target;
+			if (options.elmType !== 'text') { //TODO is this conditional necessary
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}
-			console.log("Selected");
 			//console.log(canvas);
 			console.log(options.target);
 		});
+
+
+		canvas.on("text:changed", function(e) {
+			e.target.adjustBorder();
+		});
+
+		document.onkeydown = function(e) { // remove elements when delete is pressed
+			var key = e.keyCode;
+			if (key === 8 && typeof selected != "undefined") {
+				if (selected.elmType == 'rectext') {
+					selected.remove();
+				} else if (selected.elmType == 'textBorder') {
+					selected.textbox.remove();
+				} else if (selected.elmType == "draw") {
+					canvasState.deleteElement(selected);
+				}
+			}
+		};
 
 		return this;
 	};
@@ -219,8 +237,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 		
 		if (typeof canvas.__eventListeners != "undefined") {
-			canvas.__eventListeners["object:scaling"] = [];
-		}
+		  canvas.__eventListeners["object:scaling"] = [];
+		  canvas.__eventListeners["object:moving"] = [];
+		  canvas.__eventListeners["object:selected"] = [];
+		  canvas.__eventListeners["text:changed"] = [];
+    }
 	};
 
 	return {
@@ -228,6 +249,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		init: function() {
 			canvas = canvasState.getCanvas();
 			snapPoint = canvasState.snapPoint;
+//			console.log("select tool inited with canvas: ", canvas);
 		},
 		activate: activate,
 		deactivate: deactivate

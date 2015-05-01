@@ -44,10 +44,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.action("AddPage");
 		},
 		"GetPage": function(item) {
-			var idx = item.attr("data-num");
+			var idx = parseInt(item.attr("data-num"));
 			console.log("menu getting page" + idx);
 			//TODO save current page
-			editor.action("Load", idx);
+			editor.action("GetPage", idx);
 		},
 		"RemovePage": function(item) {
 			var idx = item.attr("data-num");
@@ -56,42 +56,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			item.parent(".page-thumb").remove();
 		},
 		"CreateProject": function(form) {
-			console.log("create project");
-			$('.ui.modal.create-project').modal('hide');
-			$('#page').width(parseInt($("#page-width").val()));
-			$('#page').height(parseInt($("#page-height").val()));
-			console.log($('#canvas').width());
-			$("#editor").css("visibility", "visible");
-			editor.action("CreateProj", {
-				canvas: $("#canvas"),
-				width: parseInt($("#page-width").val()),
-				height: parseInt($("#page-height").val()),
-				pageMargin: parseInt($("#page-margin").val()),
-				panelMargin: parseInt($("#panel-margin").val()),
-				name: $("#filename").val(),
-				callback: function() {
-					$("input[type='text'].action").each(function(e) {
-						set_value($(this));
-					});
-				}
-			});
-		},
-		"LoadProject": function(item) {
-			var num = item.attr("id");
-			console.log("load project");
-			var result = editor.action("LoadProj", {
-				choice: num
-			});
-			updatePages(result);
-			$("#editor").css("visibility", "visible");
-			$('.ui.modal.load-project').modal('hide');
-		},
-		"NewProject": function(item) {
-			console.log("new project");
-			$('.ui.modal.create-project').modal('show');
-		},
-		"CreateProject": function(form) {
-			console.log("create project");
+			console.log("create project with name ", $("#project-name").val());
 			$('.ui.modal.create-project').modal('hide');
 			$('#page').width(parseInt($("#page-width").val()));
 			$('#page').height(parseInt($("#page-height").val()));
@@ -105,20 +70,22 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				panelMargin: parseInt($("#panel-margin").val()),
 				name: $("#project-name").val(),
 				callback: function() {
+					console.log("this is the callback passed to editor createproj");
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
 					});
+					$("#page-thumbs").append(getPageThumb(1));
+					console.log($("#page-thumbs"));
 				}
 			});
-			this.AddPage();
 		},
 		"LoadProject": function(item) {
 			var num = item.attr("id");
 			console.log("load project");
 			var result = editor.action("LoadProj", {
-				choice: num
+				choice: num,
+				callback: updatePages
 			});
-			updatePages(result);
 			$("#editor").css("visibility", "visible");
 			$('.ui.modal.load-project').modal('hide');
 		},
@@ -126,14 +93,49 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("new project");
 			$('.ui.modal.create-project').modal('show');
 		},
-		"ReorderPages": function() {
-			console.log("reordering pages");
-			var arr = $("#page-thumbs").sortable("toArray");
-			console.log(arr);
-		},
+//	  "CreateProject": function(form) {
+//      console.log("create project");
+//      $('.ui.modal.create-project').modal('hide');
+//      $('#page').width(parseInt($("#page-width").val()));
+//      $('#page').height(parseInt($("#page-height").val()));
+//      console.log($('#canvas').width());
+//      $("#editor").css("visibility", "visible");
+//      editor.action("CreateProj", {
+//        canvas: $("#canvas"),
+//        width: parseInt($("#page-width").val()),
+//        height: parseInt($("#page-height").val()),
+//        pageMargin: parseInt($("#page-margin").val()),
+//        panelMargin: parseInt($("#panel-margin").val()),
+//        name: $("#filename").val(),
+//        callback: function() {
+//          $("input[type='text'].action").each(function(e) {
+//            set_value($(this));
+//          });
+//        }
+//      });
+//      this.AddPage();
+//	  },
+//	  "LoadProject": function(item) {
+//	    var num = item.attr("id");
+//      console.log("load project");
+//      var result = editor.action("LoadProj", {choice: num});
+//      updatePages(result);
+//      $("#editor").css("visibility", "visible");
+//      $('.ui.modal.load-project').modal('hide');
+//	  },
+//	  "NewProject": function(item) {
+//      console.log("new project");
+//      $('.ui.modal.create-project').modal('show');
+//	  },
+	  "ReorderPages": function() {
+	    console.log("reordering pages");
+	    var arr = $( "#page-thumbs" ).sortable( "toArray" );
+	    console.log(arr);
+	  },
 	};
 
 	var getPageThumb = function(i) {
+		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
 			'<a class="page-thumb view" id="GetPage" href="#" data-num=' + i + '>' + i + '</a>' +
 			'<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></li>';
@@ -156,14 +158,16 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var updatePages = function(num) {
 		$("#page-thumbs").empty();
 		for (var i = 0; i < num; i++) {
+			console.log(i);
 			$("#page-thumbs").append(getPageThumb(i));
 		}
 	};
 
 	var set_value = function(item) {
 		//    console.log("set value called");
-		//    console.log(item);
+		    console.log(item);
 		var val = item.val();
+		console.log(item.attr('data-action'), item.attr('name'), item.attr('id'));
 		val = isNaN(val) ? val : parseInt(val);
 		editor.action(item.attr('data-action'), {
 			name: item.attr("name"),

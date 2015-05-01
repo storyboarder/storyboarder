@@ -216,6 +216,8 @@ define([], function() {
 
 	return {
 		init: function(c) {
+			console.log("snap init");
+			console.log(c);
 			canvasState = c;
 		},
 

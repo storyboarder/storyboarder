@@ -74,6 +74,9 @@ public final class Projects {
   static String addPageSql(Page page) {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
+    System.out.println(page.getNum());
+    System.out.println(page.getJson());
+    System.out.println(page.getThumbnail());
     builder.addParam(page.getNum()).addParam(page.getJson())
     .addParam(page.getThumbnail());
     return builder.build().getSql();
