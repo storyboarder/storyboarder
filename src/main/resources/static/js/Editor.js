@@ -107,13 +107,14 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		},
 		"GetPage": function(pageNum) {
 			$.post("/pages/get", {
-					page: pageNum
+					pageNum: pageNum
 				},
 				function(response) {
 					// if (typeof response == "string") {
 					// 	throw response;
 					// } else {
-					console.log("get page called with page", pageNum);
+					console.log("get page called with page " + pageNum);
+					console.log(response);
 					responseObject = JSON.parse(response);
 					console.log("got: ");
 					console.log(responseObject);
@@ -128,7 +129,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
 			var params = {
-				num: currentPage,
+				pageNum: currentPage,
 				json: JSON.stringify(pageJSON), // pages should be sent stringified
 				thumbnail: ""
 			};
@@ -139,6 +140,13 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			});
 		},
 		"SavePageTest": function(params) {
+			if (!"pageNum" in params) {
+				throw "Need a field pageNum";
+			} else if (!"json" in params) {
+				throw "Need a field params";
+			} else if (!"thumbnail" in params) {
+				throw "Need a field thumbnail";
+			}
 			$.post("/pages/save", params, function(response) {
 				console.log("save page test called with:");
 				console.log(params);
