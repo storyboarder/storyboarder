@@ -148,16 +148,12 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas.freeDrawingBrush.color = $('#drawing-color').val();
 		canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
 
-/*      canvas.on("mouse:up", function () {
-        times++;
-        console.log(times);
+      canvas.on("mouse:up", function () {
+  /*      times++;
+        console.log(times);*/
         console.log(canvas);
-      });*/
+      });
 
-		$('#drawing-line-width').click(function() {
-			console.log('width!');
-			canvas.freeDrawingBrush.width = parseInt(drawingLineWidth[0].value, 10);
-		});
       return this;
 
 		};
