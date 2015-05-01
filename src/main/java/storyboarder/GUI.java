@@ -28,15 +28,18 @@ import spark.template.freemarker.FreeMarkerEngine;
  *
  */
 final class GUI {
+  private static final Gson GSON = new Gson();
 
   private static final String PARAM = ":action";
 
-  private static final String NULL_PROJ_MSG = "ERROR: Need to initialize the project!";
+  private static final String NULL_PROJ_JSON =
+      GSON.toJson("ERROR: Need to initialize the project!");
 
-  private static final String OUT_OF_BOUNDS_MSG = "ERROR: Index out of bounds!";
-  private static final String INVALID_PARAM_MSG = "ERROR: Invalid parameter in post request string!";
+  private static final String OUT_OF_BOUNDS_JSON =
+      GSON.toJson("ERROR: Index out of bounds!");
 
-  private static final Gson GSON = new Gson();
+  private static final String INVALID_PARAM_JSON =
+      GSON.toJson("ERROR: Invalid parameter in post request string!");
 
   private final int port;
 
@@ -95,7 +98,7 @@ final class GUI {
         case "choices":
           return GSON.toJson(Projects.pathChoiceNames());
         default:
-          return GSON.toJson(INVALID_PARAM_MSG);
+          return INVALID_PARAM_JSON;
 
       }
     }
@@ -133,7 +136,7 @@ final class GUI {
         e.printStackTrace();
         return GSON.toJson("ERROR loading project.");
       } catch (IndexOutOfBoundsException e) {
-        return GSON.toJson(OUT_OF_BOUNDS_MSG);
+        return OUT_OF_BOUNDS_JSON;
       }
       return stringifyProject();
     }
@@ -148,7 +151,7 @@ final class GUI {
           + ", current proj: " + project);
 
       if (project == null) {
-        return GSON.toJson(NULL_PROJ_MSG);
+        return NULL_PROJ_JSON;
       }
 
       if (req.params(PARAM).equals("getAll")) {
@@ -173,7 +176,7 @@ final class GUI {
         case "add":
           return add(qm, pageNum);
         default:
-          return GSON.toJson(INVALID_PARAM_MSG);
+          return INVALID_PARAM_JSON;
       }
     }
 
@@ -187,14 +190,14 @@ final class GUI {
 
     private Object get(int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return GSON.toJson(OUT_OF_BOUNDS_MSG);
+        return OUT_OF_BOUNDS_JSON;
       }
       return GSON.toJson(project.getPage(pageNum));
     }
 
     private String save(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return GSON.toJson(OUT_OF_BOUNDS_MSG);
+        return OUT_OF_BOUNDS_JSON;
       }
       if (project.savePage(getPage(qm, pageNum))) {
         return GSON.toJson("Successfully saved page " + pageNum);
@@ -205,12 +208,17 @@ final class GUI {
 
     private String move(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return GSON.toJson(OUT_OF_BOUNDS_MSG);
+        return OUT_OF_BOUNDS_JSON;
       }
       if (qm.value("newSpot") == null) {
         return GSON.toJson("Need a newSpot field");
       }
       int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
+
+      if (!project.inBounds(newSpot)) {
+        return OUT_OF_BOUNDS_JSON;
+      }
+
       if (project.movePage(pageNum, newSpot)) {
         return GSON.toJson("Successfully moved page " + pageNum + " to "
             + newSpot);
@@ -221,7 +229,7 @@ final class GUI {
 
     private String add(QueryParamsMap qm, int pageNum) {
       if (pageNum != project.getPageCount() + 1) {
-        return GSON.toJson(OUT_OF_BOUNDS_MSG);
+        return OUT_OF_BOUNDS_JSON;
       }
       if (project.addPage(getPage(qm, pageNum))) {
         return GSON.toJson("Successfully added page");

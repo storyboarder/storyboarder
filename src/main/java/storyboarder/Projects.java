@@ -67,7 +67,7 @@ public final class Projects {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
+        .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -75,7 +75,7 @@ public final class Projects {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-        .addParam(page.getThumbnail());
+    .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -92,7 +92,7 @@ public final class Projects {
     return builder.build().getSql();
   }
 
-  static String changeNumsSql(int from, int to) {
+  static String changeNumSql(int from, int to) {
     String sql = "UPDATE ? SET num = ? WHERE num = ?";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(to).addParam(from);

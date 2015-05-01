@@ -3,7 +3,6 @@ package storyboarder;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -131,72 +130,46 @@ class Project {
     throwIfOutOfBounds(newSpot);
 
     if (pageNum > newSpot) {
-      // TODO
       return movePageDown(pageNum, newSpot);
     } else if (pageNum < newSpot) {
-      // TODO
       return movePageUp(pageNum, newSpot);
     } else {
       return true;
     }
   }
 
-  private void changeNum(PreparedStatement prep, int oldNum, int newNum)
-      throws SQLException {
-    prep.setInt(1, newNum);
-    prep.setInt(2, oldNum);
-  }
+  // private void changeNum(PreparedStatement prep, int oldNum, int newNum)
+  // throws SQLException {
+  // prep.setInt(1, newNum);
+  // prep.setInt(2, oldNum);
+  // }
 
   private boolean movePageDown(int pageNum, int newSpot) {
     assert pageNum > newSpot;
 
-    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
-      changeNum(prep, pageNum, getPageCount() + 1);
-      prep.addBatch();
-      int index = pageNum;
-      while (index >= newSpot) {
-        changeNum(prep, index, index + 1);
-        prep.addBatch();
-        index--;
-      }
-      changeNum(prep, getPageCount() + 1, newSpot);
-      prep.addBatch();
-      prep.executeBatch();
-      return true;
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
+    List<String> statements = new ArrayList<String>();
+
+    statements.add(Projects.changeNumSql(pageNum, -1));
+    for (int i = pageNum - 1; i >= newSpot; i--) {
+      statements.add(Projects.changeNumSql(i, i + 1));
     }
+    statements.add(Projects.changeNumSql(-1, newSpot));
+
+    return queryer.executeBatch(statements);
+
   }
 
   private boolean movePageUp(int pageNum, int newSpot) {
     assert pageNum < newSpot;
-    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
-      changeNum(prep, pageNum, -1);
-      prep.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
-    }
 
-    try (PreparedStatement prep = conn.prepareStatement(UPDATE_NUMS_SQL)) {
-      prep.setInt(NUM, pageNum);
-      prep.setInt(NUM + 1, newSpot + 1);
-      prep.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
+    List<String> statements = new ArrayList<String>();
+    statements.add(Projects.changeNumSql(pageNum, -1));
+    for (int i = pageNum + 1; i <= newSpot; i++) {
+      statements.add(Projects.changeNumSql(i, i - 1));
     }
+    statements.add(Projects.changeNumSql(-1, newSpot));
+    return queryer.executeBatch(statements);
 
-    try (PreparedStatement prep = conn.prepareStatement(CHANGE_NUM_SQL)) {
-      changeNum(prep, -1, newSpot);
-      prep.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
-    }
-
-    return true;
   }
 
   @Override

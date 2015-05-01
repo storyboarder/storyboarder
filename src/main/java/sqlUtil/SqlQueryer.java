@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Set;
+import java.util.Collection;
 
 public class SqlQueryer {
   private final Connection conn;
@@ -32,7 +32,7 @@ public class SqlQueryer {
     }
   }
 
-  public boolean executeBatch(Set<String> statements) {
+  public boolean executeBatch(Collection<String> statements) {
     try (Statement stat = conn.createStatement()) {
       for (String statement : statements) {
         stat.addBatch(statement);
