@@ -58,11 +58,16 @@ public final class Projects {
         .getSql();
   }
 
+  static String getAllPagesSql() {
+    String sql = "SELECT * FROM ?;";
+    return SqlString.of(sql, tableName()).getSql();
+  }
+
   static String savePageSql(Page page) {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-        .addParam(page.getThumbnail());
+    .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -70,7 +75,7 @@ public final class Projects {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
+        .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 

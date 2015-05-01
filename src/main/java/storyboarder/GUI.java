@@ -3,6 +3,7 @@ package storyboarder;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -150,6 +151,10 @@ final class GUI {
         return GSON.toJson(NULL_PROJ_MSG);
       }
 
+      if (req.params(PARAM).equals("getAll")) {
+        return getAll();
+      }
+
       QueryParamsMap qm = req.queryMap();
 
       if (qm.value("pageNum") == null) {
@@ -170,6 +175,14 @@ final class GUI {
         default:
           return GSON.toJson(INVALID_PARAM_MSG);
       }
+    }
+
+    private Object getAll() {
+      List<Page> pages = project.getAllPages();
+      if (pages.isEmpty()) {
+        return GSON.toJson("Failure getting pages, or project is empty.");
+      }
+      return GSON.toJson(pages);
     }
 
     private Object get(int pageNum) {

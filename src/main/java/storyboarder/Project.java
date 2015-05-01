@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import sqlUtil.SqlQueryer;
 
@@ -65,10 +67,7 @@ class Project {
     try {
       ResultSet page = queryer.query(Projects.getPageSql(pageNum));
       if (page.next()) {
-        int num = page.getInt(1);
-        String json = page.getString(2);
-        String thumbnail = page.getString(3);
-        return new Page(num, json, thumbnail);
+        return getPageFromRs(page);
       } else {
         System.err.println("ERROR getting page.");
         return null;
@@ -77,6 +76,26 @@ class Project {
       e1.printStackTrace();
       return null;
     }
+  }
+
+  List<Page> getAllPages() {
+    List<Page> pages = new ArrayList<Page>();
+    try {
+      ResultSet pageSet = queryer.query(Projects.getAllPagesSql());
+      while (pageSet.next()) {
+        pages.add(getPageFromRs(pageSet));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return pages;
+  }
+
+  private Page getPageFromRs(ResultSet rs) throws SQLException {
+    int num = rs.getInt(1);
+    String json = rs.getString(2);
+    String thumbnail = rs.getString(3);
+    return new Page(num, json, thumbnail);
   }
 
   boolean savePage(Page page) {
@@ -123,7 +142,7 @@ class Project {
   }
 
   private void changeNum(PreparedStatement prep, int oldNum, int newNum)
-    throws SQLException {
+      throws SQLException {
     prep.setInt(1, newNum);
     prep.setInt(2, oldNum);
   }

@@ -114,43 +114,38 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 					// 	throw response;
 					// } else {
 					console.log("get page called with page " + pageNum);
-					console.log(response);
-					responseObject = JSON.parse(response);
-					console.log("got: ");
-					console.log(responseObject);
+					console.log("response: ", JSON.parse(response));
+					var responseObject = JSON.parse(response);
 					console.log("setting currentpage to " + currentPage);
 					currentPage = pageNum; // TODO check for errors(?)
 					return responseObject;
 					// }
 				});
 		},
+		"GetAllPages": function() {
+			$.post("/pages/getAll", {}, function(responseJSON){
+				console.log("get all pages called");
+				console.log("response: ", JSON.parse(response));
+			});
+		},
 		"SavePage": function() {
 			console.log("save called");
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			var params = {
-				pageNum: currentPage,
-				json: JSON.stringify(pageJSON), // pages should be sent stringified
-				thumbnail: ""
-			};
-			console.log(params);
-			
-			$.post("/pages/save", params, function(response) {
-				console.log(JSON.parse(response));
+			var page = makePage(currentPage, pageJSON, "");
+
+			console.log(page);
+
+			$.post("/pages/save", page, function(response) {
+				console.log("response: ", JSON.parse(response));
 			});
 		},
-		"SavePageTest": function(params) {
-			if (!"pageNum" in params) {
-				throw "Need a field pageNum";
-			} else if (!"json" in params) {
-				throw "Need a field params";
-			} else if (!"thumbnail" in params) {
-				throw "Need a field thumbnail";
-			}
-			$.post("/pages/save", params, function(response) {
+		"SavePageTest": function(page) {
+			checkPage(page);
+			$.post("/pages/save", page, function(response) {
 				console.log("save page test called with:");
-				console.log(params);
-				console.log(response);
+				console.log(page);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"AddPage": function() {
@@ -158,19 +153,16 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			numPages++;
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			$.post("/pages/add", {
-				num: currentPage,
-				json: pageJSON,
-				thumbnail: ""
-			}, function(response) {
+			$.post("/pages/add", makePage(currentPage, pageJSON, ""), function(response) {
 				console.log("add page called");
-				console.log(response);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
-		"AddPageTest": function(params) {
-			$.post("/pages/add", params, function(response) {
+		"AddPageTest": function(page) {
+			checkPage(page);
+			$.post("/pages/add", page, function(response) {
 				console.log("add page test called");
-				console.log(response);
+				console.log("response: ", JSON.parse(response));
 			});
 		},
 		"Export": function(params) {
@@ -195,6 +187,25 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			}
 		},
 	};
+
+	var checkPage = function(page) {
+		if (!("pageNum" in page)) {
+			throw "Need a field pageNum";
+		} else if (!("json" in page)) {
+			throw "Need a field params";
+		} else if (!("thumbnail" in page)) {
+			throw "Need a field thumbnail";
+		}
+	}
+
+	var makePage = function(pageNum, json, thumbnail) {
+		return {
+			pageNum: pageNum,
+			json: json,
+			thumbnail: thumbnail
+		}
+	};
+
 	var init = function(spec, callback) {
 		console.log("editor init");
 		//		var canvas = spec.canvas;
