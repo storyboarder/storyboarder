@@ -30,7 +30,9 @@ define([], function() {
 						selectable: false
 					}
 				);
-				canvas.add(line);
+				canvasState.getHelperCanvas().add(line);
+
+				//canvas.add(line);
 				line.sendToBack();
 				this.grid.push(line);
 			}
@@ -41,7 +43,8 @@ define([], function() {
 						selectable: false
 					}
 				);
-				canvas.add(line);
+				canvasState.getHelperCanvas().add(line);
+				//canvas.add(line);
 				line.sendToBack();
 				this.grid.push(line);
 			}
@@ -49,7 +52,8 @@ define([], function() {
 
 		clear: function() {
 			for (g in this.grid) {
-				canvasState.getCanvas().remove(this.grid[g]);
+				//canvasState.getCanvas().remove(this.grid[g]);
+				canvasState.getHelperCanvas().remove(this.grid[g]);
 			}
 			this.grid = [];
 		},
