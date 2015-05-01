@@ -169,6 +169,17 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log("response: ", JSON.parse(response));
 			});
 		},
+		"MovePage": function(params) {
+			if (! ("from" in params)) {
+				throw "Need a field from";
+			} else if (! ("to" in params)) {
+				throw "Need a field to";
+			}
+			$.post("/pages/move", params, function(response){
+				console.log("Move page called with: ", params);
+				console.log("response: ", JSON.parse(response));
+			});
+		},
 		"Export": function(params) {
 			var pdf = new jsPDF();
 			var dummyCanvas = new fabric.Canvas();
