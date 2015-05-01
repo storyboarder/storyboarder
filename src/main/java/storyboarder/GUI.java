@@ -3,6 +3,7 @@ package storyboarder;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -82,9 +83,10 @@ final class GUI {
 
     @Override
     public Object handle(Request req, Response res) {
-      System.out.println("Project action requested, current proj: " + project);
-      QueryParamsMap qm = req.queryMap();
+      System.out.println("\nProject action: " + req.params(PARAM)
+          + ", current proj: " + project);
 
+      QueryParamsMap qm = req.queryMap();
       switch (req.params(PARAM)) {
         case "create":
           return create(qm);
@@ -93,7 +95,7 @@ final class GUI {
         case "choices":
           return GSON.toJson(Projects.pathChoiceNames());
         default:
-          return INVALID_PARAM_MSG;
+          return GSON.toJson(INVALID_PARAM_MSG);
 
       }
     }
@@ -110,17 +112,17 @@ final class GUI {
           project = new Project(newFile);
         } catch (ClassNotFoundException | SQLException e) {
           e.printStackTrace();
-          return "ERROR creating project.";
+          return GSON.toJson("ERROR creating project.");
         }
         return stringifyProject();
       } else {
-        return "Project already exists!";
+        return GSON.toJson("Project already exists!");
       }
     }
 
     private Object load(QueryParamsMap qm) {
       if (qm.value("choice") == null) {
-        return "Need choice field.";
+        return GSON.toJson("Need choice field.");
       }
       int choice = GSON.fromJson(qm.value("choice"), Integer.class);
 
@@ -129,9 +131,9 @@ final class GUI {
         project = new Project(newFile);
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
-        return "ERROR loading project.";
+        return GSON.toJson("ERROR loading project.");
       } catch (IndexOutOfBoundsException e) {
-        return OUT_OF_BOUNDS_MSG;
+        return GSON.toJson(OUT_OF_BOUNDS_MSG);
       }
       return stringifyProject();
     }
@@ -142,16 +144,21 @@ final class GUI {
 
     @Override
     public Object handle(Request req, Response res) {
-      System.out.println("Page action requested, current proj: " + project);
+      System.out.println("\nPage action: " + req.params(PARAM)
+          + ", current proj: " + project);
 
       if (project == null) {
-        return NULL_PROJ_MSG;
+        return GSON.toJson(NULL_PROJ_MSG);
+      }
+
+      if (req.params(PARAM).equals("getAll")) {
+        return getAll();
       }
 
       QueryParamsMap qm = req.queryMap();
 
       if (qm.value("pageNum") == null) {
-        return "Need a pageNum field";
+        return GSON.toJson("Need a pageNum field");
       }
 
       int pageNum = GSON.fromJson(qm.value("pageNum"), Integer.class);
@@ -166,51 +173,60 @@ final class GUI {
         case "add":
           return add(qm, pageNum);
         default:
-          return INVALID_PARAM_MSG;
+          return GSON.toJson(INVALID_PARAM_MSG);
       }
+    }
+
+    private Object getAll() {
+      List<Page> pages = project.getAllPages();
+      if (pages.isEmpty()) {
+        return GSON.toJson("Failure getting pages, or project is empty.");
+      }
+      return GSON.toJson(pages);
     }
 
     private Object get(int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return OUT_OF_BOUNDS_MSG;
+        return GSON.toJson(OUT_OF_BOUNDS_MSG);
       }
       return GSON.toJson(project.getPage(pageNum));
     }
 
     private String save(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return OUT_OF_BOUNDS_MSG;
+        return GSON.toJson(OUT_OF_BOUNDS_MSG);
       }
       if (project.savePage(getPage(qm, pageNum))) {
-        return "Successfully saved page " + pageNum;
+        return GSON.toJson("Successfully saved page " + pageNum);
       } else {
-        return "Failure saving page " + pageNum;
+        return GSON.toJson("Failure saving page " + pageNum);
       }
     }
 
     private String move(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
-        return OUT_OF_BOUNDS_MSG;
+        return GSON.toJson(OUT_OF_BOUNDS_MSG);
       }
       if (qm.value("newSpot") == null) {
-        return "Need a newSpot field";
+        return GSON.toJson("Need a newSpot field");
       }
       int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
       if (project.movePage(pageNum, newSpot)) {
-        return "Successfully moved page " + pageNum + " to " + newSpot;
+        return GSON.toJson("Successfully moved page " + pageNum + " to "
+            + newSpot);
       } else {
-        return "Failure moving page " + pageNum + " to " + newSpot;
+        return GSON.toJson("Failure moving page " + pageNum + " to " + newSpot);
       }
     }
 
     private String add(QueryParamsMap qm, int pageNum) {
       if (pageNum != project.getPageCount() + 1) {
-        return OUT_OF_BOUNDS_MSG;
+        return GSON.toJson(OUT_OF_BOUNDS_MSG);
       }
       if (project.addPage(getPage(qm, pageNum))) {
-        return "Successfully added page";
+        return GSON.toJson("Successfully added page");
       } else {
-        return "Failure adding page";
+        return GSON.toJson("Failure adding page");
       }
     }
 
