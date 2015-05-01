@@ -28,10 +28,9 @@ define(["../../CanvasState"], function(canvasState) {
 	        stroke: "black",
 	        strokeWeight: 2,
 	        hasRotatingPoint: false,
-	        text : this
+	        textbox : this
 	 	});
 
-      this.border.textbox = this; // give textborder a reference back to text
       this.border.elmType = "textBorder";
       canvas.add(this.border);
 	  },
@@ -86,7 +85,8 @@ define(["../../CanvasState"], function(canvasState) {
 
 	  toObject: function() {
 	    return fabric.util.object.extend(this.callSuper('toObject'), {
-	      //label: this.get('label')
+	      border : this.border,
+	      elmType : "rectext"
 	    });
 	  },
 
@@ -216,10 +216,11 @@ define(["../../CanvasState"], function(canvasState) {
 				y: coor.e.offsetY
 			};
 			selected = coor.target;
+			console.log("LOOK HEREEEEEE", selected.toObject());
 
 			if(selected) {
 				if(coor.target.elmType === "textBorder") {
-					var newText = coor.target.text;
+					var newText = coor.target.textbox;
 				    canvas.setActiveObject(newText);
 				    newText.selectAll();
 				    newText.enterEditing();
