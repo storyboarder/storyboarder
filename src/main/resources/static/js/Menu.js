@@ -56,7 +56,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			item.parent(".page-thumb").remove();
 		},
 		"CreateProject": function(form) {
-			console.log("create project");
+			console.log("create project with name ", $("#project-name").val());
 			$('.ui.modal.create-project').modal('hide');
 			$('#page').width(parseInt($("#page-width").val()));
 			$('#page').height(parseInt($("#page-height").val()));
@@ -68,7 +68,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				height: parseInt($("#page-height").val()),
 				pageMargin: parseInt($("#page-margin").val()),
 				panelMargin: parseInt($("#panel-margin").val()),
-				name: $("#filename").val(),
+				name: $("#project-name").val(),
 				callback: function() {
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
