@@ -44,7 +44,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.elmType === "panel") {
+/*				if (found.elmType === "panel") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,
@@ -54,9 +54,21 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 					found.set({
 						selectable: true
 					});
-				} else if(found.elmType === "path") {
+				} else if(found.elmType === "draw") {
+					console.log("HERE");
 					found.set({
 						selectable: true
+					})
+				}*/
+
+				if(found.elmType === "draw") {
+					console.log("HERE");
+					found.set({
+						selectable: true
+					})
+				} else {
+					found.set({
+						selectable: false
 					})
 				}
 			}
@@ -177,6 +189,9 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				var obj = options.target;
 				// obj.onKeyPress(e);
 			}
+			console.log("Selected");
+			//console.log(canvas);
+			console.log(options.target);
 		});
 
 		return this;
@@ -195,7 +210,9 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 		if (typeof canvas.__eventListeners != "undefined") {
 		  canvas.__eventListeners["object:scaling"] = [];
-    }
+    	}
+
+    	canvas.__eventListeners["mouse:down"] = [];
 	};
 
 	return {
