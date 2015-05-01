@@ -176,6 +176,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             width: w,
             height: h
         });
+        console.log(canvas);
 //        elements = [];
         pageEdges = {
             left: pageMargin,
@@ -197,10 +198,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         previousState = CanvasState.getState();
         CanvasState.listenCanvas();
 
-        var that = this;
         require(["SnapUtil"], function(snapUtil) {
             snap = snapUtil;
-            snap.init(that);
+            snap.init(CanvasState);
             if (typeof callback != "undefined") {
                 callback();
             }
@@ -209,15 +209,15 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
     var CanvasState = {
         storeState: function() {
-            console.log("storing a new state...");
-            var state = this.getState();
-
-            var delta = jsondiffpatch.diff(state, previousState);
-            history[ ++historyIdx ] = delta;
-            previousState = state;
-            canvas.trigger('stateUpdated', jsondiffpatch.reverse(delta));
-
-            return delta;
+//            console.log("storing a new state...");
+//            var state = this.getState();
+//
+//            var delta = jsondiffpatch.diff(state, previousState);
+//            history[ ++historyIdx ] = delta;
+//            previousState = state;
+//            canvas.trigger('stateUpdated', jsondiffpatch.reverse(delta));
+//
+//            return delta;
         },
         canRevert: function() {
             return historyIdx >= 0;
@@ -271,10 +271,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             canvas.off('object:removed');*/
         },
         getState: function() {
-            return $.extend(this.getCanvas().toJSON(["elmType", "edges"]), {
-                width: width,
-                height: height
-            });
+						return JSON.stringify($.extend(this.getCanvas().toJSON([
+							"elmType", "edges", "lockMovementX", "lockMovementY"]), {
+								width: width,
+								height: height,
+								pageMargin: pageMargin,
+								panelMargin: panelMargin
+						}));
         },
         applyDeltaToState: function(delta) {
             this.unlistenCanvas();
@@ -322,9 +325,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return pageEdges;
         },
         deleteElement: deleteElement,
-        load: function(canvasId, w, h, json, callback) {
-            init(canvasId, w, h, callback);
-            canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
+        load: function(canvasId, json, callback) {
+        		console.log(json);
+        		var that = this;
+            init(canvasId, json.width, json.height, function() {
+            	that.setPageMargin(json.pageMargin);
+            	that.setPanelMargin(json.panelMargin);
+            	canvas.loadFromJSON(json, function() {
+            		canvas.renderAll.bind(canvas);
+            		canvas.renderAll();
+            		if (typeof callback != "undefined") {
+            			callback();
+            		}
+            	});
+            });
         },
         init: init,
         addElement: addElement,
@@ -332,6 +346,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             pageMargin = p;
         },
         setPanelMargin: function(p) {
+//        	throw "setting panel margin";
             panelMargin = p;
         },
         setGridSpacing: function(p) {

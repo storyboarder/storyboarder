@@ -174,6 +174,7 @@ final class GUI {
         case "move":
           return move(qm, pageNum);
         case "add":
+          System.out.println("qm value json is: " + qm.value("json"));
           return add(qm, pageNum);
         default:
           return INVALID_PARAM_JSON;

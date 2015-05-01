@@ -70,6 +70,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				panelMargin: parseInt($("#panel-margin").val()),
 				name: $("#project-name").val(),
 				callback: function() {
+					console.log("this is the callback passed to editor createproj");
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
 					});

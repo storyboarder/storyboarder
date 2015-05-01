@@ -45,7 +45,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-			  console.log(found.elmType);
 				if (found.elmType === "panel") {
 					found.set({
 						selectable: true,
@@ -230,6 +229,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		init: function() {
 			canvas = canvasState.getCanvas();
 			snapPoint = canvasState.snapPoint;
+			console.log("select tool inited with canvas: ", canvas);
 		},
 		activate: activate,
 		deactivate: deactivate

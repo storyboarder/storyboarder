@@ -74,6 +74,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	};
 
 	var initPreviewLine = function(y) {
+		console.log(canvas);
 		var coords = [0, y, canvas.getWidth(), y];
 
 		previewDivideLine = new fabric.Line(coords, {
@@ -171,6 +172,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		init: function() {
 			canvas = canvasState.getCanvas();
 			helperCanvas = canvasState.getHelperCanvas();
+			console.log(canvas);
 		},
 		activate: activate,
 		deactivate: deactivate,

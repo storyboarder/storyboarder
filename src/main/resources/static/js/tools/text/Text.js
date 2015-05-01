@@ -28,7 +28,6 @@ define(["../../CanvasState"], function(canvasState) {
 	        stroke: "black",
 	        strokeWeight: 2,
 	        hasRotatingPoint: false,
-	        text : this
 	 		});
       this.border.textbox = this; // give textborder a reference back to text
       this.border.elmType = "textBorder";
@@ -212,7 +211,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 			if(selected) {
 				if(coor.target.elmType === "textBorder") {
-					var newText = coor.target.text;
+					var newText = coor.target.textbox;
 				    canvas.setActiveObject(newText);
 				    newText.selectAll();
 				    newText.enterEditing();
