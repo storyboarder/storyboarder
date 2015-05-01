@@ -155,27 +155,39 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         width = w;
         height = h;
         $canvas = $("#" + canvasId);
-        canvas = new fabric.Canvas(canvasId, {
-            selection: false
-        });
+        if (typeof canvas !== "undefined") {
+        	canvas.dispose();
+        	console.log(canvas);
+        	canvas.selection = false;
+        } else {
+					canvas = new fabric.Canvas(canvasId, {
+							selection: false
+					});
+        }
         // Create helper canvas
-        $('<canvas id="helperCanvas"></canvas>').css({
-            position: "absolute",
-            top: $canvas.offset().top,
-            left: $canvas.offset().left
-        }).insertAfter($canvas);
+        console.log($("#helperCanvas").length);
+        if ($("#helperCanvas").length == 0) {
+        	console.log("ADDING HELPER CANVAS");
+					$('<canvas id="helperCanvas"></canvas>').css({
+							position: "absolute",
+							top: $canvas.offset().top,
+							left: $canvas.offset().left
+					}).insertAfter($canvas);
 
-        helperCanvas = new fabric.Canvas("helperCanvas", {
-            selection: false
-        });
+					helperCanvas = new fabric.Canvas("helperCanvas", {
+							selection: false
+					});
+        } else {
+        	helperCanvas.dispose();
+        }
         canvas.setDimensions({
             width: w,
             height: h
         });
-        helperCanvas.setDimensions({
-            width: w,
-            height: h
-        });
+				helperCanvas.setDimensions({
+						width: w,
+						height: h
+				});
         console.log(canvas);
 //        elements = [];
         pageEdges = {
