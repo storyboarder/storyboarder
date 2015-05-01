@@ -19,6 +19,8 @@ public class SqlQueryer {
 
   public ResultSet query(String query) throws SQLException {
     PreparedStatement prep = conn.prepareStatement(query);
+    ResultSet rs = prep.executeQuery();
+
     return prep.executeQuery();
   }
 

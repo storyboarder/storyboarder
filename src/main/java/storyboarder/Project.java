@@ -1,11 +1,8 @@
 package storyboarder;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,20 +26,20 @@ class Project {
   private static final String OUT_OF_BOUNDS_MSG =
       "pageNum must be at least 1 and less than or equal to the number of pages.";
 
-  private final Connection conn;
+  // private final Connection conn;
   private final Path path;
 
   private final SqlQueryer queryer;
 
   Project(Path path) throws SQLException, ClassNotFoundException {
     this.path = path;
-    Class.forName("org.sqlite.JDBC");
-    conn = DriverManager.getConnection("jdbc:sqlite:" + path);
+    // Class.forName("org.sqlite.JDBC");
+    // conn = DriverManager.getConnection("jdbc:sqlite:" + path);
     queryer = new SqlQueryer(path);
-
-    Statement stat = conn.createStatement();
-    stat.executeUpdate(TABLE_SQL);
-    stat.close();
+    queryer.execute(Projects.createTableSql());
+    // Statement stat = conn.createStatement();
+    // stat.executeUpdate(TABLE_SQL);
+    // stat.close();
   }
 
   int getPageCount() {
