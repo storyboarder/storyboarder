@@ -44,12 +44,8 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-<<<<<<< HEAD
 			  console.log(found.elmType);
-				if (found.elmType == "panel" || found.elmType == "draw" || found.elmType == "rectext") {
-=======
 				if (found.elmType === "panel") {
->>>>>>> 8408d664ed0011cb7a6447ca8d7e611c43d12fe6
 					found.set({
 						selectable: true,
 						lockScalingX: false,
@@ -68,6 +64,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 
 		canvas.on('object:moving', function(options) {
+			target = options.target;
 		  if (canvasState.isSnapActive() && options.target.elmType != "panel") {
 		    target = options.target;
 		    var borders = canvasState.snapBorders({
@@ -88,16 +85,23 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
             }
           }
         }
+      } else if (target.elmType === "rectext") {
+      	target.adjustPosition(target.left, target.top);
+				console.log("adjusting pos text");
+      } else if (target.elmType === "textBorder") {
+				console.log("adjusting pos border");
+      	target.textbox.adjustPosition(target.left + target.padding, target.top + target.padding);
       }
 		});
 
 		canvas.on('object:scaling', function(options) {
 
-		if (options.elmType == "rectext") {
-		    options.adjustScale(options.scaleX, options.scaleY, options.left, options.top);
-		} else if (options.elmType == "textBorder") {
-		    options.textbox.adjustScale(options.scaleX, options.scaleY, options.left + options.padding, options.top + options.padding);
-		}
+			target = options.target;
+			if (target.elmType == "rectext") {
+				target.adjustScale(target.scaleX, target.scaleY, target.left, target.top);
+			} else if (target.elmType == "textBorder") {
+				target.textbox.adjustScale(target.scaleX, target.scaleY, target.left + target.padding, target.top + target.padding);
+			}
 
 			if (options.target.elmType == "panel") {
 		        var panelMargin = canvasState.getPanelMargin();
@@ -184,6 +188,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			}
 		});
 
+
+		canvas.on("text:changed", function(e) {
+			e.target.adjustBorder();
+		});
+
 		return this;
 	};
 
@@ -200,6 +209,9 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		);
 		if (typeof canvas.__eventListeners != "undefined") {
 		  canvas.__eventListeners["object:scaling"] = [];
+		  canvas.__eventListeners["object:moving"] = [];
+		  canvas.__eventListeners["object:selected"] = [];
+		  canvas.__eventListeners["text:changed"] = [];
     }
 	};
 

@@ -30,7 +30,6 @@ define(function(require) {
 				toolset[i].init();
 			}
 		},
-		settings: settings,
 		activate: activate,
 		test: function() {
 			//TODO could this cause issues when doing asynchronous operations?

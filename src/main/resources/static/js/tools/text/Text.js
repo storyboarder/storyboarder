@@ -1,10 +1,10 @@
-//TODO make textbox fill width and height of border box
 //TODO check bug where sometimes text isn't editable (possibly b/c of above/below layers)
 
 define(["../../CanvasState"], function(canvasState) {
 
   var fontFamily;
   var fontSize;
+  var padding = 3;
 
 	var Rectext = fabric.util.createClass(fabric.IText, {
 
@@ -14,7 +14,7 @@ define(["../../CanvasState"], function(canvasState) {
 	    options || (options = { });
 	    options.hasRotatingPoint = false;
 	    options.backgroundColor = "rgba(0, 0, 0, 0)";
-	    options.padding = 3;
+	    options.padding = padding;
 
 	    this.callSuper('initialize', text, options);
 	    this.transparentCorners = true;
@@ -29,8 +29,7 @@ define(["../../CanvasState"], function(canvasState) {
 	        strokeWeight: 2,
 	        hasRotatingPoint: false,
 	        text : this
-	 	});
-
+	 		});
       this.border.textbox = this; // give textborder a reference back to text
       this.border.elmType = "textBorder";
       canvas.add(this.border);
@@ -38,16 +37,16 @@ define(["../../CanvasState"], function(canvasState) {
 
 	  remove: function() {
 	    canvas.remove(this.border);
-      	canvasState.deleteElement(this);
+			canvasState.deleteElement(this);
 	  },
 
 	  adjustScale: function(x, y, l, t) {
-	    this.width *= x;
-	    this.height *= y;
+			this.width *= x;
+			this.height *= y;
+	   	this.scaleX = 1; // this keeps the font size the same (probably what we want?)
+	   	this.scaleY = 1;
 	    this.left = l;
 	    this.top = t;
-	    this.scaleX = 1; // this keeps the font size the same (probably what we want?)
-	    this.scaleY = 1;
 	    this.border.set({
 	      width: this.width + 2 * this.padding,
 	      height: this.height + 2 * this.padding,
@@ -58,23 +57,22 @@ define(["../../CanvasState"], function(canvasState) {
 	    });
 	  },
 	  adjustBorder: function() {
-	  	console.log("HERE");
+	  	console.log("adjusting border");
 		var width = this.width;
 		var height = this.height;
 		var bwidth = this.border.width;
 		var bheight = this.border.height;
 
-		if(width >= bwidth - 10) {
-			console.log("entering width");
-			this.border.width = width + 20;
-		} 
+		if (width >= bwidth - padding) {
+			this.border.width = width + 2 * padding;
+		}
 
-		if(height >= bheight - 10) {
-			console.log("entering height");
-			this.border.height = height + 20;
+		if (height >= bheight - padding) {
+			this.border.height = height + 2 * padding;
 		}
 		canvas.renderAll();
 	  },
+
 	  adjustPosition: function(l, t) {
 	    this.border.set({
 	      left: l - this.padding,
@@ -205,16 +203,11 @@ define(["../../CanvasState"], function(canvasState) {
 			}
 		);
 
-		var initialPos;
 		var finalPos;
 		var selected;
 		var time;
 
 		canvas.on('mouse:down', function(coor) {
-			initialPos = {
-				x: coor.e.offsetX,
-				y: coor.e.offsetY
-			};
 			selected = coor.target;
 
 			if(selected) {
@@ -236,29 +229,16 @@ define(["../../CanvasState"], function(canvasState) {
 			};
 
 			if(typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
-				if (Math.abs(initialPos.x - finalPos.x) > 50 && Math.abs(initialPos.y - finalPos.y) > 20) {
-					var test = new Rectext('Text', {
-						fontFamily: $('#font-family :selected').val(),
-						fontSize: $('#font-size')[0].value,
-						fill: $("#font-color").val(),
-						left: initialPos.x,
-						top: initialPos.y,
-						width: finalPos.x - initialPos.x,
-						height: finalPos.y - initialPos.y
-					});
-					canvasState.addElement(test, 'rectext');
-					test.adjustBorder();
-
-				} else if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
+				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
 				    typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
 		            var test = new Rectext('Text', {
 		              fontFamily: $('#font-family :selected').val(),
 		              fontSize: $('#font-size')[0].value,
 		              fill: $("#font-color").val(),
-		              left: initialPos.x,
-		              top: initialPos.y,
-		              width: 40,
-		              height: 20 
+		              left: finalPos.x,
+		              top: finalPos.y,
+		              width: 5,
+		              height: 5
 		            });
 
 		            canvasState.addElement(test, 'rectext');
@@ -276,6 +256,7 @@ define(["../../CanvasState"], function(canvasState) {
 		  } else if (selected.elmType == "textBorder") {
 		    selected.textbox.adjustScale(selected.scaleX, selected.scaleY, selected.left + selected.padding, selected.top + selected.padding);
 		  }
+		  console.log(selected);
 		});
 
 		canvas.on("object:moving", function(e) {
@@ -290,8 +271,6 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas.on("text:changed", function(e) {
 			e.target.adjustBorder();
 		});
-
-
 
 		$("#font-size").change(function (e) {
 			$("#fsize").text($("#font-size").val());
