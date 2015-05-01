@@ -25,7 +25,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			//TODO call editor
 		},
 		"Export": function() {
-			console.log("export called");
+			editor.action("Export");
 			//TODO call editor (and a modal?)
 		},
 		"Load": function() {

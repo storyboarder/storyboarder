@@ -5,6 +5,7 @@ require.config({
 		jqueryui: "jquery-ui",
 		fabricjs: "http://fabricjs.com/lib/fabric",
 		jsondiffpatch: "https://cdn.rawgit.com/benjamine/jsondiffpatch/master/public/build/jsondiffpatch.min",
+		jsPDF: "https://cdn.rawgit.com/MrRio/jsPDF/master/dist/jspdf.min",
 		tools: "tools",
 		view: "view",
 		semanticui: "semantic"

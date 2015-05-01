@@ -326,11 +326,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return pageEdges;
         },
         deleteElement: deleteElement,
-        load: function(json) {
-            console.log("loading page...");
-            console.log(json);
-            // TODO replace this with json parsing:
-            //init("canvas", 400, 600, function() {});
+        load: function(canvasId, w, h, json, callback) {
+            init(canvasId, w, h, callback);
+            canvas.loadFromJSON(json, canvas.renderAll.bind(canvas));
         },
         init: init,
         addElement: addElement,

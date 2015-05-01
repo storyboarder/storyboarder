@@ -1,4 +1,4 @@
-define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
+define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasState, toolset) {
 	var projectName;
 	var currentPage; // index of current page
 	var numPages;
@@ -58,9 +58,10 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 			$.post("/projects/load", params, function(responseJSON) {
 				response = JSON.parse(responseJSON);
+				console.log("Project json: ", response);
 				numPages = response.numPages;
 				currentPage = 0;
-				canvasState.load(response.page); // parse JSON received
+				canvasState.load(canvas.attr("id"), response.page); // parse JSON received
 				return response.numPages;
 			});
 		},
@@ -133,7 +134,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				thumbnail: ""
 			};
 			console.log(params);
-			
+
 			$.post("/pages/save", params, function(response) {
 				console.log(JSON.parse(response));
 			});
@@ -166,7 +167,21 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			});
 		},
 		"Export": function(params) {
-			console.log("export called");
+			var pdf = new jsPDF();
+			var dummyCanvas = new fabric.Canvas();
+
+			actions.GetAllPages(function (response) {
+				console.log(response);
+
+				for (var i= 0; i < response.length; i++) {
+					var page = response[i];
+					var img = dummyCanvas.loadFromJson(page, canvas.renderAll.bind(canvas));
+
+					pdf.addImage(img, 'JPEG', 0, 0);
+				}
+
+				pdf.save("download.pdf");
+			});
 		},
 		"AddImage": function(params) {
 			canvasState.addImage(params);
