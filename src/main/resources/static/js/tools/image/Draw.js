@@ -6,7 +6,6 @@ define(["../../CanvasState"], function(canvasState) {
 	var times = 0;
 
 	var activate = function() {
-
 		start = canvas._objects.length;
 		console.log("start " + start);
 

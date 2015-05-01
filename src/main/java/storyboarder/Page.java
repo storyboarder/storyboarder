@@ -9,7 +9,7 @@ package storyboarder;
  * @author narobins
  * @author yz38 *
  */
-class StoryboarderPage {
+class Page {
   private final int num;
   private final String json;
   private final String thumbnail;
@@ -26,7 +26,7 @@ class StoryboarderPage {
    *          The result of canvas.toDataURL, which can be turned into a
    *          thumbnail.
    */
-  StoryboarderPage(int num, String json, String thumbnail) {
+  Page(int num, String json, String thumbnail) {
     this.num = num;
     this.json = json;
     this.thumbnail = thumbnail;
@@ -78,10 +78,10 @@ class StoryboarderPage {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof StoryboarderPage)) {
+    if (!(obj instanceof Page)) {
       return false;
     }
-    StoryboarderPage o = (StoryboarderPage) obj;
+    Page o = (Page) obj;
     return num == o.getNum() && json.equals(o.getJson())
         && thumbnail.equals(o.getThumbnail());
   }

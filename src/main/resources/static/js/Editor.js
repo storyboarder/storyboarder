@@ -48,7 +48,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 		},
 		"GetChoices": function(displayChoices) {
 			console.log("getting project choices");
-			$.post("/choices", {}, function(responseJSON) {
+			$.post("/projects/choices", {}, function(responseJSON) {
 				displayChoices(JSON.parse(responseJSON));
 			});
 		},
@@ -56,7 +56,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			console.log("loading project with:");
 			console.log(params);
 
-			$.post("/loadProj", params, function(responseJSON) {
+			$.post("/projects/load", params, function(responseJSON) {
 				response = JSON.parse(responseJSON);
 				numPages = response.numPages;
 				currentPage = 0;
@@ -90,7 +90,7 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 
 			/* activate a tool to start with (esp. helpful for testing) */
 			activate("Select");
-			$.post("/createProj", {
+			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
 				console.log(response);
@@ -99,21 +99,21 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 			init();
 		},
 		"CreateProjTest": function(params) {
-			$.post("/createProj", {
+			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
 				console.log(response);
 			});
 		},
 		"GetPage": function(pageNum) {
-			console.log("get page called with page", pageNum);
-			$.post("/getPage", {
+			$.post("/pages/get", {
 					page: pageNum
 				},
 				function(response) {
 					// if (typeof response == "string") {
 					// 	throw response;
 					// } else {
+					console.log("get page called with page", pageNum);
 					responseObject = JSON.parse(response);
 					console.log("got: ");
 					console.log(responseObject);
@@ -133,34 +133,35 @@ define(["./CanvasState", "./tools/Toolset"], function(canvasState, toolset) {
 				thumbnail: ""
 			};
 			console.log(params);
-			$.post("/savePage", params, function(response) {
+			
+			$.post("/pages/save", params, function(response) {
 				console.log(JSON.parse(response));
 			});
 		},
 		"SavePageTest": function(params) {
-			console.log("save page test called with:");
-			console.log(params);
-			$.post("/savePage", params, function(response) {
+			$.post("/pages/save", params, function(response) {
+				console.log("save page test called with:");
+				console.log(params);
 				console.log(response);
 			});
 		},
 		"AddPage": function() {
-			console.log("add page called");
 			currentPage++;
 			numPages++;
 			pageJSON = canvasState.getState();
 			console.log(currentPage, pageJSON);
-			$.post("/addPage", {
+			$.post("/pages/add", {
 				num: currentPage,
 				json: pageJSON,
 				thumbnail: ""
 			}, function(response) {
+				console.log("add page called");
 				console.log(response);
 			});
 		},
 		"AddPageTest": function(params) {
-			console.log("add page test called");
-			$.post("/addPage", params, function(response) {
+			$.post("/pages/add", params, function(response) {
+				console.log("add page test called");
 				console.log(response);
 			});
 		},

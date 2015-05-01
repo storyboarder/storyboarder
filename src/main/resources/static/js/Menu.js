@@ -184,6 +184,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var init = function() {
 		console.log("Menu initing");
 
+		
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
@@ -260,6 +261,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			reader.readAsDataURL(e.target.files[0]);
 		});
 
+		$('.ui.radio.checkbox').checkbox();
 
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
@@ -272,6 +274,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 		$("#page-thumbs").disableSelection();
 
+	    $( "#page-thumbs" ).disableSelection();
 
 		init_project();
 	};

@@ -45,12 +45,20 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		canvasState.mapElements(
 			function(found) { // map
-				if (found.elmType == "panel") {
+				if (found.elmType === "panel") {
 					found.set({
 						selectable: true,
 						lockScalingX: false,
 						lockScalingY: false
 					});
+				} else if(found.elmType === "rectext" || found.elmType === "textBorder") {
+					found.set({
+						selectable: true
+					});
+				} else if(found.elmType === "path") {
+					found.set({
+						selectable: true
+					})
 				}
 			}
 		);
@@ -79,12 +87,20 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		});
 
 		canvas.on('object:scaling', function(options) {
+
+		if (options.elmType == "rectext") {
+		    options.adjustScale(options.scaleX, options.scaleY, options.left, options.top);
+		} else if (options.elmType == "textBorder") {
+		    options.textbox.adjustScale(options.scaleX, options.scaleY, options.left + options.padding, options.top + options.padding);
+		}
+
 			if (options.target.elmType == "panel") {
 				var panelMargin = canvasState.getPanelMargin();
 				options.target.width *= options.target.scaleX;
 				options.target.scaleX = 1;
 				options.target.height *= options.target.scaleY;
 				options.target.scaleY = 1;
+
 				console.log("panel");
 				var corner = options.target.__corner;
 				var obj = options.target;
@@ -171,6 +187,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				// obj.onKeyPress(e);
 			}
 		});
+
 		return this;
 	};
 
