@@ -78,14 +78,15 @@ final class GUI {
   /**
    * Serializes the current project.
    *
-   * @return The number of pages in a project, and the first page of the
-   *         project. The first page element will be 'empty project' if the
-   *         number of pages is zero.
+   * @return The number of pages in a project, the name of the project, and the
+   *         first page of the project. The first page element will be 'empty
+   *         project' if the number of pages is zero.
    */
   private Object stringifyProject() {
     int numPages = project.getPageCount();
     Map<String, Object> data = new HashMap<String, Object>();
     data.put("numPages", numPages);
+    data.put("name", project.name());
     data.put("page", "empty project");
     if (numPages > 0) {
       data.put("page", project.getPage(1));

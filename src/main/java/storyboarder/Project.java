@@ -10,8 +10,6 @@ import sqlutil.SqlQueryer;
 
 class Project {
 
-  private static final String TABLE = "pages";
-
   private static final String OUT_OF_BOUNDS_MSG =
       "pageNum must be >= 1 and <= to the number of pages.";
 
@@ -23,6 +21,10 @@ class Project {
     this.path = path;
     queryer = new SqlQueryer(path);
     queryer.execute(Projects.createTableSql());
+  }
+
+  String name() {
+    return path.getFileName().toString().replace(Projects.fileType(), "");
   }
 
   int getPageCount() {
