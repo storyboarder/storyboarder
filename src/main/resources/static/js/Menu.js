@@ -65,13 +65,19 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			//TODO call editor
 			item.parent(".page-thumb").remove();
 		},
+		"SetPageDimensions": function(w, h) {
+			console.log("SET PAGE DIMENSIONS: ", w, h);
+			$('#page').width(w);
+			$('#page').height(h);
+		},
 		"CreateProject": function(form) {
 			console.log("create project with name ", $("#project-name").val());
 			this.UpdatePages(0, 0);
 			$('.ui.modal.create-project').modal('hide');
-			$('#page').width(parseInt($("#page-width").val()));
-			$('#page').height(parseInt($("#page-height").val()));
 			console.log($('#canvas').width());
+			width = parseInt($("#page-width").val());
+			height = parseInt($("#page-height").val());
+			this.SetPageDimensions(width, height);
 			$("#editor").css("visibility", "visible");
 			var that = this;
 			editor.action("CreateProj", {
@@ -132,9 +138,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			var that = this;
 			var result = editor.action("LoadProj", {
 				name: item[0].textContent,
-				callback: function(title, currentPage, numPages) {
-					that.SetHeading({title: title, currentPage: currentPage, numPages: numPages});
-					that.UpdatePages(currentPage, numPages);
+				callback: function(response) {
+					console.log(response);
+					that.SetHeading({title: response.title, currentPage: 1, numPages: response.numPages});
+					that.UpdatePages(1, response.numPages);
+					that.SetPageDimensions(response.page.json.width, response.page.json.height);
 				}
 			});
 			$("#editor").css("visibility", "visible");
