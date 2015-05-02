@@ -59,6 +59,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				numPages = response.numPages;
 				currentPage = response.page.num;
 				console.log(currentPage + "/" + numPages);
+				console.log(response.page);
 				canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
 				if (typeof params.callback != "undefined") {
@@ -194,18 +195,22 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		"Export": function(params) {
 			var pdf = new jsPDF();
 			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
-				.css({display: "none"})
+				// .css({display: "none"})
 				.appendTo(document.body);
 			var dummyCanvas = new fabric.Canvas('dummyCanvas');
+			dummyCanvas.setDimensions({
+				width: w,
+				height: h
+			});
 
 			actions.GetAllPages(function (response) {
 				console.log(response);
 
 				for (var i= 0; i < response.length; i++) {
 					var page = response[i];
-					dummyCanvas.loadFromJSON(page, canvas.renderAll.bind(canvas));
-					console.log()
+					dummyCanvas.loadFromJSON(page, dummyCanvas.renderAll.bind(dummyCanvas));
 					var img = dummyCanvas.toDataURL('png');
+					console.log(img);
 
 					pdf.addImage(img, 'PNG', 0, 0);
 				}
