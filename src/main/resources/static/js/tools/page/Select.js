@@ -153,6 +153,23 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 			if (options.target.elmType == "panel") {
 				var panelMargin = canvasState.getPanelMargin();
+				if (!target.active) {
+					target.scaleX = 1;
+					target.scaleY = 1;
+					target.left = target.edges.left + panelMargin;
+					target.top = target.edges.top + panelMargin;
+					return;
+				}
+				if (!(options.target.left + 1 * panelMargin < options.target.left + options.target.scaleX * options.target.width)) {
+					options.target.scaleX = 1;
+					canvas.deactivateAll().renderAll();
+					return;
+				}
+				if (!(options.target.top + 1 * panelMargin < options.target.top + options.target.scaleY * options.target.height)) {
+					options.target.scaleY = 1;
+					canvas.deactivateAll().renderAll();
+					return;
+				}
 				options.target.width *= options.target.scaleX;
 				options.target.scaleX = 1;
 				options.target.height *= options.target.scaleY;

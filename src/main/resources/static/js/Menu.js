@@ -62,7 +62,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"RemovePage": function(item) {
 			var idx = item.attr("data-num");
 			console.log("menu removing page" + idx);
-			//TODO call editor
+			var that = this;
+			editor.action("RemovePage", {pageNum: idx, callback: function() {
+				that.UpdatePages();
+			}});
 			item.parent(".page-thumb").remove();
 		},
 		"SetPageDimensions": function(w, h) {

@@ -179,6 +179,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log("response: ", JSON.parse(response));
 			});
 		},
+		"RemovePage": function(params) {
+			checkParams(params, ["pageNum"]);
+			console.log("EDITOR REMOVE PAGE");
+
+		},
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
 			numPages++;
