@@ -29,7 +29,7 @@ class Project {
 
   int getPageCount() {
     return queryer.queryOne(Projects.pageCountSql(),
-        ResultConverters.singleColumnConverter(Integer.class));
+        ResultConverters.singleColumnConverter(1, Integer.class));
   }
 
   Page getPage(int pageNum) {

@@ -1,10 +1,13 @@
 package storyboarder;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -95,6 +98,16 @@ final class GUI {
     return GSON.toJson(data);
   }
 
+  private Optional<String> checkParams(QueryParamsMap qm,
+      String... requiredParams) {
+    for (String param : requiredParams) {
+      if (qm.value(param) == null) {
+        return Optional.of("Need a field: '" + param + "'");
+      }
+    }
+    return Optional.empty();
+  }
+
   /**
    * Handles all actions that involve the entire Project.
    *
@@ -111,11 +124,23 @@ final class GUI {
           + ", current proj: " + project);
 
       QueryParamsMap qm = req.queryMap();
+
+      Optional<String> check = checkParams(qm, "name");
+      if (check.isPresent()) {
+        System.err.println(check.get());
+        return GSON.toJson(check.get());
+      }
+
+      String name = qm.value("name");
+      Map<String, Path> projects = Projects.getProjects();
+
       switch (req.params(PARAM)) {
         case "create":
-          return create(qm);
+          return create(name, projects);
         case "load":
-          return load(qm);
+          return load(name, projects);
+        case "delete":
+          return delete(name, projects);
         case "choices":
           return GSON.toJson(Projects.getProjects().keySet());
         default:
@@ -124,20 +149,23 @@ final class GUI {
       }
     }
 
-    private Object create(QueryParamsMap qm) {
+    private Object create(String name, Map<String, Path> projects) {
 
-      String givenName = qm.value("name").replace(Projects.fileType(), "");
-      Map<String, Path> projects = Projects.getProjects();
-
+      // remove the file type from the end if present
+      String givenName = name.replace(Projects.fileType(), "");
       String fileName = givenName;
 
+      // add number to end until a unique name is made
       int i = 2;
       while (projects.containsKey(fileName)) {
         fileName = givenName + i;
         i++;
       }
+
+      // re-add file type
       fileName += Projects.fileType();
 
+      // create path to new file
       Path newFile = Projects.projectFolder().resolve(fileName);
 
       // if (Projects.addPathChoice(newFile)) {
@@ -153,7 +181,7 @@ final class GUI {
       // }
     }
 
-    private Object load(QueryParamsMap qm) {
+    private Object load(String name, Map<String, Path> projects) {
       // if (qm.value("choice") == null) {
       // return GSON.toJson("Need choice field.");
       // }
@@ -168,12 +196,9 @@ final class GUI {
       // } catch (IndexOutOfBoundsException e) {
       // return OUT_OF_BOUNDS_JSON;
       // }
-      String name = qm.value("name");
-      if (name == null) {
-        return GSON.toJson("Need a name field");
-      }
+
       try {
-        Path newFile = Projects.getProjects().get(name);
+        Path newFile = projects.get(name);
         project = new Project(newFile);
         return stringifyProject();
       } catch (ClassNotFoundException | SQLException e) {
@@ -182,6 +207,18 @@ final class GUI {
       }
     }
 
+    private Object delete(String name, Map<String, Path> projects) {
+      if (!projects.containsKey(name)) {
+        return GSON.toJson(name + " does not exist.");
+      }
+      try {
+        Files.delete(projects.get(name));
+        return GSON.toJson("Success deleting " + name);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return GSON.toJson("Failure deleting " + name);
+      }
+    }
   }
 
   /**
