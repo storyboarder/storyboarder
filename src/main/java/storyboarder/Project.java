@@ -32,12 +32,11 @@ class Project {
 
   Page getPage(int pageNum) {
     throwIfOutOfBounds(pageNum);
-    return queryer.queryOne(Projects.getPageSql(pageNum),
-        Page.pageConverter());
+    return queryer.queryOne(Projects.getPageSql(pageNum), new Page.Converter());
   }
 
   List<Page> getAllPages() {
-    return queryer.query(Projects.getAllPagesSql(), Page.pageConverter());
+    return queryer.query(Projects.getAllPagesSql(), new Page.Converter());
   }
 
   boolean savePage(Page page) {

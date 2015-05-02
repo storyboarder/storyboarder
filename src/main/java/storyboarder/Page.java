@@ -19,9 +19,6 @@ class Page {
   private final String json;
   private final String thumbnail;
 
-  private static final ResultConverter<Page> PAGE_RESULT_CONVERTER =
-      new PageResultConverter();
-
   /**
    * Constructs a StoryboarderPage with the given page number, json string, and
    * thumbnail string.
@@ -94,11 +91,7 @@ class Page {
         && thumbnail.equals(o.getThumbnail());
   }
 
-  public static ResultConverter<Page> pageConverter() {
-    return PAGE_RESULT_CONVERTER;
-  }
-
-  private static class PageResultConverter implements ResultConverter<Page> {
+  static class Converter implements ResultConverter<Page> {
 
     private static final int NUM = 1;
     private static final int JSON = 2;
