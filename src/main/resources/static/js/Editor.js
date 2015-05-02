@@ -83,6 +83,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"CreateProj": function(params) {
+			checkParams(params, ["name"]);
 			console.log("CREATE PROJ");
 			var canvas = params.canvas;
 			var width = params.width;
@@ -102,9 +103,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			var that = this;
 			canvasState.init(canvas.attr("id"), width, height, function() {
 				params.callback();
-				$.post("/projects/create", {
-					name: params.name
-				}, function(response) {
+				$.post("/projects/create", params, function(response) {
 					console.log(response);
 					that.AddPage();
 					console.log(params.editor);
@@ -117,14 +116,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 			/* init all tools in the toolset so they get the canvas state */
 			//			toolset.init();
-
 		},
+
 		"CreateProjTest": function(params) {
 			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
-				console.log("create called with: ", params);
-				console.log("response: ", JSON.parse(response));
+				responseObject = JSON.parse(response);
+				console.log("Create project called with ", params, " Response: ", responseObject);
+			});
+		},
+		"DeleteProj": function(params) {
+			checkParams(params, ["name"]);
+			$.post("projects/delete", params, function(response) {
+				responseObject = JSON.parse(response);
+				console.log("Delete project called with ", params, " Response: ", responseObject);
 			});
 		},
 		"GetPage": function(pageNum) {
