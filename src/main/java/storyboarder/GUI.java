@@ -122,6 +122,20 @@ final class GUI {
     public Object handle(Request req, Response res) {
       System.out.println("\nProject action: " + req.params(PARAM)
           + ", current proj: " + project);
+      Map<String, Path> projects = Projects.getProjects();
+
+      if (req.params(PARAM).equals("choices")) {
+        return GSON.toJson(projects.keySet());
+      }
+
+      if (!(project == null)) {
+        try {
+          project.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+          return JsonMessages.makeError("unable to close project.");
+        }
+      }
 
       QueryParamsMap qm = req.queryMap();
 
@@ -132,7 +146,6 @@ final class GUI {
       }
 
       String name = qm.value("name");
-      Map<String, Path> projects = Projects.getProjects();
 
       switch (req.params(PARAM)) {
         case "create":
@@ -141,8 +154,6 @@ final class GUI {
           return load(name, projects);
         case "delete":
           return delete(name, projects);
-        case "choices":
-          return GSON.toJson(Projects.getProjects().keySet());
         default:
           return INVALID_PARAM_JSON;
 
