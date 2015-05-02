@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sqlutil.ResultConverter;
+import sqlutil.ResultConverters;
 import sqlutil.SqlQueryer;
 
 class Project {
@@ -13,13 +13,13 @@ class Project {
   private static final String TABLE = "pages";
 
   private static final String OUT_OF_BOUNDS_MSG =
-      "pageNum must be at least 1 and less than or equal to the number of pages.";
+      "pageNum must be >= 1 and <= to the number of pages.";
 
   private final Path path;
 
   private final SqlQueryer queryer;
 
-  Project(Path path) throws SQLException, ClassNotFoundException {
+  Project(Path path) throws ClassNotFoundException, SQLException {
     this.path = path;
     queryer = new SqlQueryer(path);
     queryer.execute(Projects.createTableSql());
@@ -27,60 +27,18 @@ class Project {
 
   int getPageCount() {
     return queryer.queryOne(Projects.pageCountSql(),
-        ResultConverter.singleColumnConverter(Integer.class));
-
-    // try {
-    // ResultSet count = queryer.query(Projects.pageCountSql());
-    // if (count.next()) {
-    // return count.getInt(1);
-    // } else {
-    // System.err.println("ERROR during size query.");
-    // return -1;
-    // }
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // return -1;
-    // }
+        ResultConverters.singleColumnConverter(Integer.class));
   }
 
   Page getPage(int pageNum) {
     throwIfOutOfBounds(pageNum);
     return queryer.queryOne(Projects.getPageSql(pageNum),
         Page.pageConverter());
-    // try {
-    // ResultSet page = queryer.query(Projects.getPageSql(pageNum));
-    // if (page.next()) {
-    // return getPageFromRs(page);
-    // } else {
-    // System.err.println("ERROR getting page.");
-    // return null;
-    // }
-    // } catch (SQLException e1) {
-    // e1.printStackTrace();
-    // return null;
-    // }
   }
 
   List<Page> getAllPages() {
     return queryer.query(Projects.getAllPagesSql(), Page.pageConverter());
-    // List<Page> pages = new ArrayList<Page>();
-    // try {
-    // ResultSet pageSet = queryer.query(Projects.getAllPagesSql());
-    // while (pageSet.next()) {
-    // pages.add(getPageFromRs(pageSet));
-    // }
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // return pages;
   }
-
-  // private Page getPageFromRs(ResultSet rs) throws SQLException {
-  // int num = rs.getInt(1);
-  // String json = rs.getString(2);
-  // String thumbnail = rs.getString(3);
-  // return new Page(num, json, thumbnail);
-  // }
 
   boolean savePage(Page page) {
     throwIfOutOfBounds(page.getNum());
@@ -122,12 +80,6 @@ class Project {
       return true;
     }
   }
-
-  // private void changeNum(PreparedStatement prep, int oldNum, int newNum)
-  // throws SQLException {
-  // prep.setInt(1, newNum);
-  // prep.setInt(2, oldNum);
-  // }
 
   @Override
   public String toString() {

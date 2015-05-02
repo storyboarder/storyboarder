@@ -98,6 +98,7 @@ public final class SqlString {
 
   /**
    * @see java.lang.Object#toString()
+   * @return a string representation of the object.
    */
   @Override
   public String toString() {
@@ -105,9 +106,12 @@ public final class SqlString {
   }
 
   /**
+   * Converts a Set of SqlStrings to a Set of Strings.
    *
    * @param sqlStrings
-   * @return
+   *          the Set of SqlStrings.
+   * @return A Set of Strings containing the SQL strings stored in the SqlString
+   *         objects in the Set of SqlStrings.
    */
   public static Set<String> convert(Set<SqlString> sqlStrings) {
     Set<String> strings = new HashSet<String>();
@@ -117,22 +121,48 @@ public final class SqlString {
     return strings;
   }
 
+  /**
+   * @return a builder object for this SqlString.
+   */
   public Builder builder() {
     return new Builder();
   }
 
-  public class Builder {
+  /**
+   * A class that assigns parameters to '?' characters in an SQL string.
+   *
+   * @author narobins
+   * @author yz38
+   * @author ktsakas
+   * @author fbystric
+   */
+  public final class Builder {
     private String preparedSql;
 
     private Builder() {
       preparedSql = sql;
     }
 
+    /**
+     * Assigns the given parameter to the first '?' character in the SQL string.
+     *
+     * @param param
+     *          The parameter to be assigned.
+     * @return this, the builder with an updated SQL string.
+     */
     public Builder addParam(Object param) {
       preparedSql = preparedSql.replaceFirst("\\?", param.toString());
       return this;
     }
 
+    /**
+     * Assigns the given parameters to the first '?' characters in the SQL
+     * string.
+     *
+     * @param params
+     *          The list of parameters to be assigned.
+     * @return this, the builder with an updated SQL string.
+     */
     public Builder addParams(List<Object> params) {
       for (Object param : params) {
         addParam(param);
@@ -140,6 +170,11 @@ public final class SqlString {
       return this;
     }
 
+    /**
+     * Builds (finalizes) the sql string.
+     *
+     * @return an SqlString object with the parameters assigned so far.
+     */
     public SqlString build() {
       return new SqlString(preparedSql);
     }

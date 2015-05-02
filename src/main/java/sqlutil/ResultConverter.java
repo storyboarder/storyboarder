@@ -24,23 +24,8 @@ public interface ResultConverter<T> {
    * @return The object of type T stored in the ResultSet at the row pointed to
    *         by the current cursor.
    * @throws SQLException
+   *           If an SQL error occurs while accessing the ResultSet.
    */
   T convert(ResultSet rs) throws SQLException;
 
-  /**
-   * Constructs a ResultConverter object for ResultSets of just one column.
-   *
-   * @param type
-   *          The type of object stored in the resultset.
-   * @return A ResultConverter that converts rows of resultsets to objects of
-   *         type 'type'.
-   */
-  public static <E> ResultConverter<E> singleColumnConverter(Class<E> type) {
-    return new ResultConverter<E>() {
-      @Override
-      public E convert(ResultSet rs) throws SQLException {
-        return type.cast(rs.getObject(1));
-      }
-    };
-  }
 }

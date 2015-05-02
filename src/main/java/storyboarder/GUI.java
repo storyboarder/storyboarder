@@ -96,7 +96,7 @@ final class GUI {
         case "load":
           return load(qm);
         case "choices":
-          return GSON.toJson(Projects.pathChoiceNames());
+          return GSON.toJson(Projects.getProjects().keySet());
         default:
           return INVALID_PARAM_JSON;
 
@@ -104,41 +104,61 @@ final class GUI {
     }
 
     private Object create(QueryParamsMap qm) {
-      String fileName = qm.value("name");
-      if (!fileName.endsWith(Projects.fileType())) {
-        fileName += Projects.fileType();
+
+      String givenName = qm.value("name").replace(Projects.fileType(), "");
+      Map<String, Path> projects = Projects.getProjects();
+
+      String fileName = givenName;
+
+      int i = 2;
+      while (projects.containsKey(fileName)) {
+        fileName = givenName + i;
+        i++;
       }
+      fileName += Projects.fileType();
+
       Path newFile = Projects.projectFolder().resolve(fileName);
 
-      if (Projects.addPathChoice(newFile)) {
-        try {
-          project = new Project(newFile);
-        } catch (ClassNotFoundException | SQLException e) {
-          e.printStackTrace();
-          return GSON.toJson("ERROR creating project.");
-        }
-        return stringifyProject();
-      } else {
-        return GSON.toJson("Project already exists!");
-      }
-    }
-
-    private Object load(QueryParamsMap qm) {
-      if (qm.value("choice") == null) {
-        return GSON.toJson("Need choice field.");
-      }
-      int choice = GSON.fromJson(qm.value("choice"), Integer.class);
-
+      // if (Projects.addPathChoice(newFile)) {
       try {
-        Path newFile = Projects.getPathChoice(choice);
         project = new Project(newFile);
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
-        return GSON.toJson("ERROR loading project.");
-      } catch (IndexOutOfBoundsException e) {
-        return OUT_OF_BOUNDS_JSON;
+        return GSON.toJson("ERROR creating project.");
       }
       return stringifyProject();
+      // } else {
+      // return GSON.toJson("Project already exists!");
+      // }
+    }
+
+    private Object load(QueryParamsMap qm) {
+      // if (qm.value("choice") == null) {
+      // return GSON.toJson("Need choice field.");
+      // }
+      // int choice = GSON.fromJson(qm.value("choice"), Integer.class);
+      //
+      // try {
+      // Path newFile = Projects.getPathChoice(choice);
+      // project = new Project(newFile);
+      // } catch (ClassNotFoundException | SQLException e) {
+      // e.printStackTrace();
+      // return GSON.toJson("ERROR loading project.");
+      // } catch (IndexOutOfBoundsException e) {
+      // return OUT_OF_BOUNDS_JSON;
+      // }
+      String name = qm.value("name");
+      if (name == null) {
+        return GSON.toJson("Need a name field");
+      }
+      try {
+        Path newFile = Projects.getProjects().get(name);
+        project = new Project(newFile);
+        return stringifyProject();
+      } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        return GSON.toJson("ERROR loading project.");
+      }
     }
 
   }

@@ -54,6 +54,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"LoadProj": function(params) {
+			checkParams(params, ["name"]);
 			$.post("/projects/load", {choice: params.choice}, function(responseJSON) {
 				console.log("LOAD PROJ, params: ", params, "response: ", responseJSON);
 				response = JSON.parse(responseJSON);
@@ -183,11 +184,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"MovePage": function(params) {
-			if (! ("from" in params)) {
-				throw "Need a field from";
-			} else if (! ("to" in params)) {
-				throw "Need a field to";
-			}
+			checkParams(params, ["from", "to"]);
+			// if (! ("from" in params)) {
+			// 	throw "Need a field from";
+			// } else if (! ("to" in params)) {
+			// 	throw "Need a field to";
+			// }
 			$.post("/pages/move", params, function(response){
 				console.log("Move page called with: ", params);
 				console.log("response: ", JSON.parse(response));
@@ -230,14 +232,23 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 	};
 
-	var checkPage = function(page) {
-		if (!("pageNum" in page)) {
-			throw "Need a field pageNum";
-		} else if (!("json" in page)) {
-			throw "Need a field params";
-		} else if (!("thumbnail" in page)) {
-			throw "Need a field thumbnail";
+	var checkParams = function(object, requiredParams) {
+		for (var i = 0; i < requiredParams.length; i++) {
+			if (!(requiredParams[i] in object)) {
+				throw "Need a field " + requiredParams[i];
+			}
 		}
+	}
+
+	var checkPage = function(page) {
+		checkParams(page, ["pageNum", "json", "thumbnail"]);
+		// if (!("pageNum" in page)) {
+		// 	throw "Need a field pageNum";
+		// } else if (!("json" in page)) {
+		// 	throw "Need a field params";
+		// } else if (!("thumbnail" in page)) {
+		// 	throw "Need a field thumbnail";
+		// }
 	}
 
 	var makePage = function(pageNum, json, thumbnail) {

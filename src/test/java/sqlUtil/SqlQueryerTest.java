@@ -19,6 +19,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableSet;
 
 import sqlutil.ResultConverter;
+import sqlutil.ResultConverters;
 import sqlutil.SqlQueryer;
 
 public class SqlQueryerTest {
@@ -55,9 +56,8 @@ public class SqlQueryerTest {
   public void hasTablesTest() {
     String sql = "SELECT tbl_name FROM sqlite_master WHERE type = 'table'";
     List<String> tables = queryer.query(sql,
-        ResultConverter.singleColumnConverter(String.class));
+        ResultConverters.singleColumnConverter(String.class));
     assertEquals(2, tables.size());
-    System.out.println(tables);
     assertEquals(TABLE_1, tables.get(0));
     assertEquals(TABLE_2, tables.get(1));
   }

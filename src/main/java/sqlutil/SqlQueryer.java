@@ -50,6 +50,8 @@ public class SqlQueryer {
    * @param converter
    *          The ResultConverter that converts each row of the ResultSet to the
    *          desired object.
+   * @param <T>
+   *          The type of the object being stored in the list to be returned.
    * @return A list of results of the type returned by 'converter,' or null if
    *         an error occurs while querying the database.
    */
@@ -76,6 +78,8 @@ public class SqlQueryer {
    * @param converter
    *          The ResultConverter that converts the row of the ResultSet to the
    *          desired object.
+   * @param <T>
+   *          the type of object to be returned.
    * @return The object created by 'converter' from the single ResultSet row.
    */
   public <T> T queryOne(String query, ResultConverter<T> converter) {
