@@ -38,18 +38,21 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		if (!(obj.edges.top < y && y < obj.edges.bottom)) {
 			throw "Illegal argument: " + y;
 		}
+		
 		var old = obj.edges.bottom;
 		obj.edges.bottom = y;
 		obj.set({
 			height: obj.edges.bottom - obj.edges.top - 2 * canvasState.getPanelMargin()
 		});
 		canvasState.setControls(obj);
+		
 		var newPanel = canvasState.addPanel({
 			left: obj.edges.left,
 			top: y,
 			right: obj.edges.right,
-			bottom: old
-		});
+			bottom: old,
+		}, obj.fill);
+		console.log("new", newPanel);
 		obj.setCoords();
 	};
 
@@ -58,6 +61,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		if (!(obj.edges.left < x && x < obj.edges.right)) {
 			throw "Illegal argument: " + x;
 		}
+		
 		var old = obj.edges.right;
 		obj.edges.right = x;
 		obj.set({
@@ -68,8 +72,10 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			left: obj.edges.right,
 			top: obj.edges.top,
 			right: old,
-			bottom: obj.edges.bottom
-		});
+			bottom: obj.edges.bottom,
+		}, obj.fill);
+
+		console.log("new", newPanel);
 		obj.setCoords();
 	};
 

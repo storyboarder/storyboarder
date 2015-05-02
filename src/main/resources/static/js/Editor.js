@@ -3,6 +3,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var currentPage; // index of current page
 	var numPages;
 	var socket;
+	var width;
+	var height;
 	var editorObj = this;
 
 	/* Actions are one-time functions, unlike tools. */
@@ -54,13 +56,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"LoadProj": function(params) {
+
 			checkParams(params, ["name"]);
 			$.post("/projects/load", {
 				name: params.name
 			}, function(responseJSON) {
 				console.log("LOAD PROJ, params: ", params, "response: ", responseJSON);
 				response = JSON.parse(responseJSON);
-//				console.log(response);
+				console.log(response.page);
+				canvasState.load_project("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
 				numPages = response.numPages;
 				console.log(response.page);
@@ -69,7 +73,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 //					console.log("empty project:", response.page);
 //					throw "empty project";
 //				} else {
-					currentPage = response.page.num;
+					currentPage = response.page.pageNum;
 					console.log(currentPage + "/" + numPages);
 					canvasState.load_project("canvas", JSON.parse(response.page.json), params.editor.update); // parse JSON received
 
@@ -80,10 +84,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"CreateProj": function(params) {
+			checkParams(params, ["name"]);
 			console.log("CREATE PROJ");
 			var canvas = params.canvas;
-			var width = params.width;
-			var height = params.height;
+			width = params.width;
+			height = params.height;
 			var pageMargin = params.pageMargin;
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
@@ -115,8 +120,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			$.post("/projects/create", {
 				name: params.name
 			}, function(response) {
-				console.log("create called with: ", params);
-				console.log("response: ", JSON.parse(response));
+				responseObject = JSON.parse(response);
+				console.log("Create project called with ", params, " Response: ", responseObject);
 			});
 		},
 		"GetPage": function(params) {
@@ -128,13 +133,20 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					console.log("get page called with page " + params.pageNum);
 					var responseObject = JSON.parse(response);
 					checkPage(responseObject);
-					currentPage = responseObject.num; // TODO check for errors(?)
+					currentPage = responseObject.pageNum; // TODO check for errors(?)
 					canvasState.load_page("canvas", JSON.parse(responseObject.json), function() {
 						params.editor.update();
 					});
 					return responseObject;
 					// }
 				});
+		},
+		"DeleteProj": function(params) {
+			checkParams(params, ["name"]);
+			$.post("projects/delete", params, function(response) {
+				responseObject = JSON.parse(response);
+				console.log("Delete project called with ", params, " Response: ", responseObject);
+			});
 		},
 		"GetAllPages": function(callback) {
 			$.post("/pages/getAll", {}, function(responseJSON) {
@@ -201,17 +213,29 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"Export": function(params) {
-			var pdf = new jsPDF();
-			var dummyCanvas = new fabric.Canvas();
+			console.log(width, height);
+			var pdf = new jsPDF('portrait', 'pt', [height * 72/96, width * 72/96]);
+			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
+				.css({display: "none"})
+				.appendTo(document.body);
+			var dummyCanvas = new fabric.Canvas('dummyCanvas');
+			dummyCanvas.setDimensions({
+				width: width,
+				height: height
+			});
 
 			actions.GetAllPages(function(response) {
 				console.log(response);
 
 				for (var i = 0; i < response.length; i++) {
 					var page = response[i];
-					var img = dummyCanvas.loadFromJson(page, canvas.renderAll.bind(canvas));
+					console.log("Current: ", JSON.parse(canvasState.getState()));
+					console.log("Page: ", JSON.parse(page.json));
+					dummyCanvas.loadFromJSON(JSON.parse(page.json), dummyCanvas.renderAll.bind(dummyCanvas));
+					var img = dummyCanvas.toDataURL('png');
+					console.log(img);
 
-					pdf.addImage(img, 'JPEG', 0, 0);
+					pdf.addImage(img, 'PNG', 0, 0);
 				}
 
 				pdf.save("download.pdf");
@@ -238,9 +262,16 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	};
 
 	var checkParams = function(object, requiredParams) {
-		if (typeof object === "string") {
+		if (typeof object == "string") {
 			throw object;
+			console.trace();
+			return;
 		}
+		if (typeof object == "number") {
+			console.trace();
+			return;
+		}
+		console.log(typeof object);
 		for (var i = 0; i < requiredParams.length; i++) {
 			if (!(requiredParams[i] in object)) {
 				throw "ERROR: need a field: " + requiredParams[i];
@@ -249,7 +280,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	}
 
 	var checkPage = function(page) {
-		checkParams(page, ["num", "json", "thumbnail"]); //TODO change num to pageNum
+		checkParams(page, ["pageNum", "json", "thumbnail"]);
 	}
 
 	var makePage = function(pageNum, json, thumbnail) {
@@ -282,6 +313,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		};
 
 		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
+		canvasState.getCanvas().on('change', function() {
+			actions["SavePage"]();
+		});
 	};
 
 	var activate = function(toolname) {
@@ -301,50 +335,66 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var test = function() {
 		console.log(" ");
 		console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
-		actions.GetPage(0);
+		actions.GetPage({pageNum: 0});
+
+		var wait = 100;
+		var between = 100;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for empty file. Expecting index out of bounds. Result: ");
 			actions.SavePageTest(makePage(1, "", ""));
-		}, 1000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for empty file. Expecting success. Result: ");
 			actions.AddPageTest(makePage(1, "FOOOO!", ""));
-		}, 2000);
+		}, wait);
 
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing get page after addition of FOOOO!. Expecing something with FOOOO!. Result:");
 			actions.GetPage(1);
-		}, 3000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for nonempty file. Expecting success!. Result:");
 			actions.SavePageTest(makePage(1, "new String!", "foo"));
-		}, 4000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for nonempty file. Expecting success!. Result:");
 			actions.AddPageTest(makePage(2, "page 2", "goo"));
-		}, 5000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing GetPage after previous changes. Expecting {content: New string!}. Result:");
 			actions.GetPage(1);
-		}, 6000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Expecting {content: page 2}. Result:");
 			actions.GetPage(2);
-		}, 7000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -352,19 +402,25 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			actions.CreateProjTest({
 				name: "newProject"
 			});
-		}, 8000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Adding hello world to new project");
 			actions.AddPageTest(makePage(1, "hello world", "akjfbad"));
-		}, 9000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Getting hello world from new project");
 			actions.GetPage(1);
-		}, 10000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -372,19 +428,23 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			actions.LoadProj({
 				choice: 2
 			});
-		}, 11000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Writing hey there to loaded project");
 			actions.SavePageTest(makePage(1, "hey there", "garg"));
-		}, 12000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
-		}, 13000);
+		}, wait);
 
 		//toolset.test();
 		// console.log("editor tested");

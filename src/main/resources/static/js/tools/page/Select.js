@@ -40,14 +40,56 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	/* activate returns this (the tool) */
 	var activate = function() {
-		//console.log("select activated");
+
+		console.log("select activated");
+		console.log("SELECT", canvas);
+		console.log(canvas._objects);
+		//canvas._objects[1].selectable = true;
+		console.log("SELECT", canvas);
 		canvas.selection = true; // enable group selection
+
+		var selectable = {
+			"panel" : {
+				selectable : true,
+				lockScalingX: false,
+				lockScalingY: false
+			},
+			"rectext" : {
+				selectable: true
+			}, 
+			"textBorder" : {
+				selectable: true
+			},
+			"draw" : {
+				// there's no draw, gotta check if path or stroke something exists
+				selectable: true
+			},
+			"image" : {
+				selectable: true
+			}	
+		}
 
 		canvasState.mapElements(function(found) { // map
 			console.log(found.elmType);
-			if (found.elmType == "panel") {
+
+			if(selectable.hasOwnProperty(found.elmType)) {
+				var options = selectable[found.elmType];
+				console.log(options);
+				for(property in options) {
+					found.set(property, options[property]);
+				}
+			} else {
+				console.log("unexpected type: " + found.elmType);
+				found.set({
+					selectable: false
+				});
+			}
+
+			/*if (found.elmType == "panel") {
+				console.log("I'm HEREEEEEE");
 				found.set({
 					selectable: true,
+
 					lockScalingX: false,
 					lockScalingY: false
 				});
@@ -65,7 +107,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				found.set({
 					selectable: false
 				});
-			}
+			}*/
 		});
 
 		canvas.on('object:moving', function(options) {
@@ -210,12 +252,12 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		document.onkeydown = function(e) { // remove elements when delete is pressed
 			var key = e.keyCode;
-			if (key === 8 && typeof selected != "undefined") {
-				if (selected.elmType == 'rectext') {
+			if (key === 8 && typeof selected !== "undefined") {
+				if (selected.elmType === 'rectext') {
 					selected.remove();
-				} else if (selected.elmType == 'textBorder') {
+				} else if (selected.elmType === 'textBorder') {
 					selected.textbox.remove();
-				} else if (selected.elmType == "draw") {
+				} else if (selected.elmType === "image") {
 					canvasState.deleteElement(selected);
 				}
 			}

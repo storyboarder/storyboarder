@@ -8,7 +8,7 @@ import java.util.List;
 import sqlutil.ResultConverters;
 import sqlutil.SqlQueryer;
 
-class Project {
+class Project implements AutoCloseable {
 
   private static final String OUT_OF_BOUNDS_MSG =
       "pageNum must be >= 1 and <= to the number of pages.";
@@ -29,7 +29,7 @@ class Project {
 
   int getPageCount() {
     return queryer.queryOne(Projects.pageCountSql(),
-        ResultConverters.singleColumnConverter(Integer.class));
+        ResultConverters.singleColumnConverter(1, Integer.class));
   }
 
   Page getPage(int pageNum) {
@@ -85,6 +85,11 @@ class Project {
   @Override
   public String toString() {
     return path + ", number of pages: " + getPageCount();
+  }
+
+  @Override
+  public void close() throws Exception {
+    queryer.close();
   }
 
   public boolean inBounds(int index) {

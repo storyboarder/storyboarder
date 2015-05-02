@@ -106,7 +106,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"UpdatePages": function(curr, num) {
 			$("#page-thumbs").empty();
 			for (var i = 0; i < num; i++) {
-				console.log(i);
 				$("#page-thumbs").append(makePageThumb(i));
 			}
 			this.SetHeading({currentPage: curr, numPages: num});
@@ -258,7 +257,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(".submenu").click(function() {
-			console.log($(this).attr('id').toLowerCase());
 			$("." + $(this).attr("id").toLowerCase()).slideToggle();
 		});
 
@@ -299,7 +297,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if(active && active.elmType === "rectext") {
 				active.fontSize = $("#font-size").val();
 				canvas.renderAll();
-				active.adjustBorder();	
+				active.adjustScale(active.left, active.top);
 			}
 		});
 
@@ -317,7 +315,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if(active && active.elmType === "rectext") {
 				active.fontFamily = $('#font-family :selected').val();
 				canvas.renderAll();
-				active.adjustBorder();
+				active.adjustScale(active.left, active.top);
 			}
 		});
 

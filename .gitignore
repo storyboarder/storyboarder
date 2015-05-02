@@ -1,3 +1,2 @@
-/target
-storyboarder.iml
-.idea
+projects/
+target/
