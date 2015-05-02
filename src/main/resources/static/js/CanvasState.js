@@ -83,14 +83,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         panel.setControlsVisibility(options);
     };
     /* edges should be an object with left, top, right, and bottom keys */
-    var addPanel = function(edges) {
+    var addPanel = function(edges, fill) {
         var panel = new fabric.Rect({
             left: edges.left + panelMargin,
             top: edges.top + panelMargin,
             width: edges.right - edges.left - 2 * panelMargin,
             height: edges.bottom - edges.top - 2 * panelMargin,
-            fill: "rgba(0, 0, 0, 0)", // transparent
             stroke: "black",
+            fill: fill || "rgba(0, 0, 0, 0)", // transparent
             strokeWeight: 1,
             lockMovementX: true,
             lockMovementY: true,
@@ -186,14 +186,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         };
         /* add the first panel */
         addPanel($.extend({}, pageEdges));
-        /* adding a circle because why not */
-        var circle = new fabric.Circle({
-            radius: 20,
-            fill: 'green',
-            left: 100,
-            top: 100
-        });
-        canvas.add(circle);
 
         previousState = CanvasState.getState();
         CanvasState.listenCanvas();
@@ -326,8 +318,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         },
         deleteElement: deleteElement,
         load: function(canvasId, json, callback) {
-        		console.log(json);
-        		var that = this;
+            console.log("BEGINNING LOAD");
+            console.log(json.objects[1]);
+
+    		var that = this;
             init(canvasId, json.width, json.height, function() {
             	that.setPageMargin(json.pageMargin);
             	that.setPanelMargin(json.panelMargin);
@@ -340,6 +334,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             		}
             	});
             });
+
+            console.log("ENDING LOAD");
         },
         init: init,
         addElement: addElement,

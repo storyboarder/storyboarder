@@ -13,10 +13,12 @@ define(function(require) {
 
 	var activate = function(toolname) {
 		if (toolname in toolset) {
+			console.log(currentTool);
 
 			if (typeof currentTool != "undefined") { //TODO How is currentTool evaluated to a boolean?
 				currentTool.deactivate();
 			}
+			
 			console.log("activating from toolset:", toolname);
 			currentTool = toolset[toolname].activate();
 		} else {

@@ -12,18 +12,29 @@ define(["../../CanvasState"], function(canvasState) {
 
 	initialize: function(text, options) {
 	    options || (options = { });
-	    options.hasRotatingPoint = false;
-	    options.backgroundColor = "rgba(0, 0, 0, 0)";
-	    options.padding = padding;
 
 	    this.callSuper('initialize', text, options);
-	    this.transparentCorners = true;
-	    this.lockRotation = true;
+	    this.set({
+	    	transparentCorners : true,
+	    	lockRotation : true,
+	    	hasRotatingPoint : false,
+	    	backgroundColor : "rgba(0, 0, 0, 0)"
+	    });
+
+	    this.setControlsVisibility({
+	    	mt: false,
+	    	mb: false,
+	    	mr: false,
+	    	ml: false
+	    })
+
+/*	    this.transparentCorners = true;
+	    this.lockRotation = true;*/
 	    this.border = new fabric.Rect({
 	        left: options.left - options.padding,
 	        top: options.top - options.padding,
-	        width: options.width,
-	        height: options.height,
+	        width: options.width + (options.padding * options.scaleX * 2),
+	        height: options.height + (options.padding * options.scaleY * 2),
 	        fill: "rgba(0, 0, 0, 0)", // transparent
 	        stroke: "black",
 	        strokeWeight: 2,
@@ -40,39 +51,25 @@ define(["../../CanvasState"], function(canvasState) {
 			canvasState.deleteElement(this);
 	  },
 
-	  adjustScale: function(x, y, l, t) {
-			this.width *= x;
-			this.height *= y;
-	   	this.scaleX = 1; // this keeps the font size the same (probably what we want?)
-	   	this.scaleY = 1;
+	  adjustScale: function(l, t) {
+/*	  	var scaleX = this.scaleX;
+	  	var scaleY = this.scaleY;*/
+/*		this.width *= this.scaleX;
+		this.height *= this.scaleY;*/
+/*	   	this.scaleX = 1; // this keeps the font size the same (probably what we want?)
+	   	this.scaleY = 1;*/
 	    this.left = l;
 	    this.top = t;
 	    this.border.set({
-	      width: this.width + 2 * this.padding,
-	      height: this.height + 2 * this.padding,
+	      width: (this.width * this.scaleX) + (2 * this.padding),
+	      height: (this.height * this.scaleY) + (2 * this.padding),
 	      left: l - this.padding,
 	      top: t - this.padding,
 	      scaleX: 1,
 	      scaleY: 1
 	    });
+	    canvas.renderAll();
 	  },
-	  adjustBorder: function() {
-	  	console.log("adjusting border");
-		var width = this.width;
-		var height = this.height;
-		var bwidth = this.border.width;
-		var bheight = this.border.height;
-
-		if (width >= bwidth - padding) {
-			this.border.width = width + 2 * padding;
-		}
-
-		if (height >= bheight - padding) {
-			this.border.height = height + 2 * padding;
-		}
-		canvas.renderAll();
-	  },
-
 	  adjustPosition: function(l, t) {
 	    this.border.set({
 	      left: l - this.padding,
@@ -210,7 +207,6 @@ define(["../../CanvasState"], function(canvasState) {
 
 		canvas.on('mouse:down', function(coor) {
 			selected = coor.target;
-			console.log("LOOK HEREEEEEE", selected.toObject());
 
 			if(selected) {
 				if(coor.target.elmType === "textBorder") {
@@ -235,16 +231,19 @@ define(["../../CanvasState"], function(canvasState) {
 				    typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
 		            var test = new Rectext('Text', {
 		              fontFamily: $('#font-family :selected').val(),
-		              fontSize: $('#font-size')[0].value,
+		              fontSize: 12,
 		              fill: $("#font-color").val(),
 		              left: finalPos.x,
 		              top: finalPos.y,
+		              padding: 3,
 		              width: 5,
-		              height: 5
+		              height: 5,
+		              scaleX: 1,
+		              scaleY: 1
 		            });
 
 		            canvasState.addElement(test, 'rectext');
-		            test.adjustBorder();
+		            test.adjustScale(test.left, test.top);
 	          	}
 
           		time = coor.e.timeStamp;
@@ -253,12 +252,20 @@ define(["../../CanvasState"], function(canvasState) {
 
 		canvas.on("object:scaling", function(e) {
 		  var selected = e.target;
-		  if (selected.elmType == "rectext") {
+		  if(selected.elmType === "rectext") {
+		  	selected.adjustScale(selected.left, selected.top);
+		  }
+
+/*		  if (selected.elmType == "rectext") {
 		    selected.adjustScale(selected.scaleX, selected.scaleY, selected.left, selected.top);
 		  } else if (selected.elmType == "textBorder") {
 		    selected.textbox.adjustScale(selected.scaleX, selected.scaleY, selected.left + selected.padding, selected.top + selected.padding);
 		  }
-		  console.log(selected);
+		  console.log(selected);*/
+		});
+
+		canvas.on("text:changed", function(e) {
+			selected.adjustScale(selected.left, selected.top);
 		});
 
 		canvas.on("object:moving", function(e) {
@@ -266,22 +273,11 @@ define(["../../CanvasState"], function(canvasState) {
 		  if (selected.elmType == "rectext") {
 		    selected.adjustPosition(selected.left, selected.top);
 		  } else if (selected.elmType == "textBorder") {
-		    selected.textbox.adjustPosition(selected.left + selected.padding, selected.top + selected.padding);
+		    selected.textbox.adjustPosition(selected.top + selected.padding);
 		  }
 		});
 
-		canvas.on("text:changed", function(e) {
-			e.target.adjustBorder();
-		});
 
-		document.onkeydown = function(e) {
-			var key = e.keyCode;
-			if (key === 8 && selected.elmType == 'rectext') {
-				selected.remove();
-			} else if (key === 8 && selected.elmType == 'textBorder') {
-				selected.textbox.remove();
-			}
-		};
 
 		return this;
 	};

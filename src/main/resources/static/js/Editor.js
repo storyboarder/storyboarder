@@ -55,15 +55,20 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"LoadProj": function(params) {
 			$.post("/projects/load", {choice: params.choice}, function(responseJSON) {
-				response = JSON.parse(responseJSON);
-				numPages = response.numPages;
-				currentPage = response.page.num;
-				console.log(currentPage + "/" + numPages);
-				canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
+					console.log(responseJSON);
+					response = JSON.parse(responseJSON);
+					numPages = response.numPages;
+					currentPage = response.page.num;
+					console.log(currentPage + "/" + numPages);
 
-				if (typeof params.callback != "undefined") {
-					params.callback(response.numPages);
-				}
+					console.log("LOADING");
+					if(response.page.json){
+						canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
+					}
+					
+					if (typeof params.callback != "undefined") {
+						params.callback(response.numPages);
+					}
 			});
 		},
 		"CreateProj": function(params) {
