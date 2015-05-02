@@ -108,7 +108,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					console.log(response);
 					projectName = response.name;
 					that.AddPage();
-					params.editor.update();
 					activate("Select");
 					if (typeof params.callback != "undefined") {
 						params.callback(response);
@@ -284,18 +283,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		}
 	};
 
-	/* Updates the Editor, initializing all the tools with the updated CanvasState.
-		Should be called after the page has been changed. */
-	var update = function(spec, callback) {
-		console.log("UPDATE EDITOR");
-		toolset.init();
-	};
-
 	/* Initializes the Editor.
 		Should be called once at the beginning of the client session. */
-	var init = function(spec, callback) {
+	var init = function(canvasId, callback) {
 		console.log("INIT EDITOR");
-		canvasState.init();
+		canvasState.init("canvas");
+		toolset.init();
 
 		socket = new WebSocket("ws://localhost:8888");
 		socket.onmessage = function(e) {
@@ -464,7 +457,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 	return {
 		init: init,
-		update: update,
 		activate: activate,
 		action: action,
 		test: test
