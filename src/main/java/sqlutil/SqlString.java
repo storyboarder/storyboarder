@@ -1,4 +1,4 @@
-package sqlUtil;
+package sqlutil;
 
 import java.util.HashSet;
 import java.util.List;

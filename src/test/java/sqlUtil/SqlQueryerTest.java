@@ -18,6 +18,9 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 
+import sqlutil.ResultConverter;
+import sqlutil.SqlQueryer;
+
 public class SqlQueryerTest {
   private static final String NAME = "test.sqlite3";
   private static final Path DB_PATH = Paths.get(NAME);
@@ -54,6 +57,7 @@ public class SqlQueryerTest {
     List<String> tables = queryer.query(sql,
         ResultConverter.singleColumnConverter(String.class));
     assertEquals(2, tables.size());
+    System.out.println(tables);
     assertEquals(TABLE_1, tables.get(0));
     assertEquals(TABLE_2, tables.get(1));
   }

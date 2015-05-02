@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import sqlUtil.SqlString;
+import sqlutil.SqlString;
 
 public final class Projects {
   private static final Path PROJECT_FOLDER = Paths.get("projects");

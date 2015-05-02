@@ -1,4 +1,4 @@
-package sqlUtil;
+package sqlutil;
 
 import java.nio.file.Path;
 import java.sql.Connection;

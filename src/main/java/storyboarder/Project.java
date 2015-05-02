@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sqlUtil.ResultConverter;
-import sqlUtil.SqlQueryer;
+import sqlutil.ResultConverter;
+import sqlutil.SqlQueryer;
 
 class Project {
 

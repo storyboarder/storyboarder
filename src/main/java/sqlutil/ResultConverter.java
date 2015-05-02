@@ -1,4 +1,4 @@
-package sqlUtil;
+package sqlutil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ public interface ResultConverter<T> {
     return new ResultConverter<E>() {
       @Override
       public E convert(ResultSet rs) throws SQLException {
-        return rs.getObject(1, type);
+        return type.cast(rs.getObject(1));
       }
     };
   }

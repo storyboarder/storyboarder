@@ -4,5 +4,5 @@
  * @author ktsakas
  * @author fbystric
  */
-package sqlUtil;
+package sqlutil;
 

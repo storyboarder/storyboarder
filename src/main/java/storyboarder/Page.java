@@ -3,7 +3,7 @@ package storyboarder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import sqlUtil.ResultConverter;
+import sqlutil.ResultConverter;
 
 /**
  * Represents a page in a storyboarder project. Stores page number, the page's
