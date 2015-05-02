@@ -13,7 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StoryboarderProjectTest {
+public class ProjectTest {
   private static final Path dbPath = Paths.get("test.sqlite3");
 
   private static Project testProj;

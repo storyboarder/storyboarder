@@ -1,5 +1,10 @@
 package storyboarder;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import sqlutil.ResultConverter;
+
 /**
  * Represents a page in a storyboarder project. Stores page number, the page's
  * json string, and the page's thumbnail.
@@ -84,6 +89,20 @@ class Page {
     Page o = (Page) obj;
     return num == o.getNum() && json.equals(o.getJson())
         && thumbnail.equals(o.getThumbnail());
+  }
+
+  static class Converter implements ResultConverter<Page> {
+
+    private static final int NUM = 1;
+    private static final int JSON = 2;
+    private static final int THUMBNAIL = 3;
+
+    @Override
+    public Page convert(ResultSet rs) throws SQLException {
+      return new Page(rs.getInt(NUM), rs.getString(JSON),
+          rs.getString(THUMBNAIL));
+    }
+
   }
 
 }

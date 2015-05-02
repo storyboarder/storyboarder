@@ -1,100 +1,44 @@
 package storyboarder;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import sqlUtil.SqlQueryer;
+import sqlutil.ResultConverters;
+import sqlutil.SqlQueryer;
 
 class Project {
 
-  private static final String TABLE = "pages";
-
-  private static final String TABLE_SQL = "CREATE TABLE IF NOT EXISTS "
-      + TABLE + " (num INTEGER primary key, json TEXT, thumbnail TEXT)";
-
-  private static final String UPDATE_NUMS_SQL = "UPDATE " + TABLE
-      + " SET num = num - 1 WHERE num > ? AND num < ?";
-
-  private static final String CHANGE_NUM_SQL = "UPDATE " + TABLE
-      + " SET num = ? WHERE num = ?";
-
-  private static final int NUM = 1;
-
   private static final String OUT_OF_BOUNDS_MSG =
-      "pageNum must be at least 1 and less than or equal to the number of pages.";
+      "pageNum must be >= 1 and <= to the number of pages.";
 
-  private final Connection conn;
   private final Path path;
 
   private final SqlQueryer queryer;
 
-  Project(Path path) throws SQLException, ClassNotFoundException {
+  Project(Path path) throws ClassNotFoundException, SQLException {
     this.path = path;
-    Class.forName("org.sqlite.JDBC");
-    conn = DriverManager.getConnection("jdbc:sqlite:" + path);
     queryer = new SqlQueryer(path);
+    queryer.execute(Projects.createTableSql());
+  }
 
-    Statement stat = conn.createStatement();
-    stat.executeUpdate(TABLE_SQL);
-    stat.close();
+  String name() {
+    return path.getFileName().toString().replace(Projects.fileType(), "");
   }
 
   int getPageCount() {
-    try {
-      ResultSet count = queryer.query(Projects.pageCountSql());
-      if (count.next()) {
-        return count.getInt(1);
-      } else {
-        System.err.println("ERROR during size query.");
-        return -1;
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return -1;
-    }
+    return queryer.queryOne(Projects.pageCountSql(),
+        ResultConverters.singleColumnConverter(Integer.class));
   }
 
   Page getPage(int pageNum) {
     throwIfOutOfBounds(pageNum);
-
-    try {
-      ResultSet page = queryer.query(Projects.getPageSql(pageNum));
-      if (page.next()) {
-        return getPageFromRs(page);
-      } else {
-        System.err.println("ERROR getting page.");
-        return null;
-      }
-    } catch (SQLException e1) {
-      e1.printStackTrace();
-      return null;
-    }
+    return queryer.queryOne(Projects.getPageSql(pageNum), new Page.Converter());
   }
 
   List<Page> getAllPages() {
-    List<Page> pages = new ArrayList<Page>();
-    try {
-      ResultSet pageSet = queryer.query(Projects.getAllPagesSql());
-      while (pageSet.next()) {
-        pages.add(getPageFromRs(pageSet));
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    return pages;
-  }
-
-  private Page getPageFromRs(ResultSet rs) throws SQLException {
-    int num = rs.getInt(1);
-    String json = rs.getString(2);
-    String thumbnail = rs.getString(3);
-    return new Page(num, json, thumbnail);
+    return queryer.query(Projects.getAllPagesSql(), new Page.Converter());
   }
 
   boolean savePage(Page page) {
@@ -138,11 +82,20 @@ class Project {
     }
   }
 
-  // private void changeNum(PreparedStatement prep, int oldNum, int newNum)
-  // throws SQLException {
-  // prep.setInt(1, newNum);
-  // prep.setInt(2, oldNum);
-  // }
+  @Override
+  public String toString() {
+    return path + ", number of pages: " + getPageCount();
+  }
+
+  public boolean inBounds(int index) {
+    return index >= 1 && index <= getPageCount();
+  }
+
+  private void throwIfOutOfBounds(int index) {
+    if (!inBounds(index)) {
+      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
+    }
+  }
 
   private boolean movePageDown(int pageNum, int newSpot) {
     assert pageNum > newSpot;
@@ -170,22 +123,6 @@ class Project {
     statements.add(Projects.changeNumSql(-1, newSpot));
     return queryer.executeBatch(statements);
 
-  }
-
-  @Override
-  public String toString() {
-    return path + ", number of pages: " + getPageCount();
-  }
-
-  private void throwIfOutOfBounds(int index) {
-    if (!inBounds(index)) {
-      throw new IndexOutOfBoundsException(OUT_OF_BOUNDS_MSG);
-    }
-  }
-
-  public boolean inBounds(int index) {
-
-    return index >= 1 && index <= getPageCount();
   }
 
 }
