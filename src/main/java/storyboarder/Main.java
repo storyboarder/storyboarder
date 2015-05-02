@@ -1,7 +1,5 @@
 package storyboarder;
 
-import java.net.UnknownHostException;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -31,18 +29,6 @@ public final class Main {
   }
 
   /**
-   * Prints the given error message (with 'ERROR' in front), and exits with
-   * error code 1.
-   *
-   * @param message
-   *          The error message to be printed before exiting.
-   */
-  private static void exit(String message) {
-    System.err.println("ERROR: " + message);
-    System.exit(1);
-  }
-
-  /**
    * Entry point into the program. Starts a GUI server, and a Multiplayer
    * server.
    *
@@ -68,15 +54,12 @@ public final class Main {
 
     GUI.start(sparkPort);
 
-    try {
-      int socketPort = DEFAULT_SOCKET_PORT;
-      if (options.has(socketSpec)) {
-        socketPort = options.valueOf(socketSpec);
-      }
-      Multiplayer server = new Multiplayer(socketPort);
-      server.start();
-    } catch (UnknownHostException e) {
-      exit("could not start the multiplayer server: " + e.getMessage());
+    int socketPort = DEFAULT_SOCKET_PORT;
+    if (options.has(socketSpec)) {
+      socketPort = options.valueOf(socketSpec);
     }
+    Multiplayer server = new Multiplayer(socketPort);
+    server.start();
+
   }
 }
