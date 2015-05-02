@@ -16,8 +16,7 @@ import org.java_websocket.server.WebSocketServer;
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".
  */
 class Multiplayer extends WebSocketServer {
-  
-  
+
   Multiplayer(int port) throws UnknownHostException {
     super(new InetSocketAddress(port));
     System.out.println("Listening for multiplayer requests on port " + port
@@ -30,7 +29,7 @@ class Multiplayer extends WebSocketServer {
 
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
-//    this.sendToAll("new connection: " + handshake.getResourceDescriptor());
+    // this.sendToAll("new connection: " + handshake.getResourceDescriptor());
     System.out.println(conn.getRemoteSocketAddress().getAddress()
         .getHostAddress()
         + " entered the room!");
@@ -38,7 +37,7 @@ class Multiplayer extends WebSocketServer {
 
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-//    this.sendToAll(conn + " has left the room!");
+    // this.sendToAll(conn + " has left the room!");
     System.out.println(conn + " has left the room!");
   }
 
@@ -54,7 +53,7 @@ class Multiplayer extends WebSocketServer {
    */
 
   public static void main(String[] args) throws InterruptedException,
-  IOException {
+    IOException {
     WebSocketImpl.DEBUG = true;
     int port = 8887; // 843 flash policy port
     try {
@@ -68,7 +67,7 @@ class Multiplayer extends WebSocketServer {
     BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
     while (true) {
       String in = sysin.readLine();
-//      s.sendToOthers(in);
+      // s.sendToOthers(in);
       if (in.equals("exit")) {
         s.stop();
         break;
@@ -101,10 +100,10 @@ class Multiplayer extends WebSocketServer {
     Collection<WebSocket> con = connections();
     synchronized (con) {
       for (WebSocket c : con) {
-        if ( !origin.equals(c) ) {
-        	c.send(text);
+        if (!origin.equals(c)) {
+          c.send(text);
         } else {
-        	System.out.println("Do not send to self!");
+          System.out.println("Do not send to self!");
         }
       }
     }

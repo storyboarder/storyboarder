@@ -1,4 +1,4 @@
-package sqlUtil;
+package sqlutil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,10 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
-
-import sqlutil.ResultConverter;
-import sqlutil.ResultConverters;
-import sqlutil.SqlQueryer;
 
 public class SqlQueryerTest {
   private static final String NAME = "test.sqlite3";

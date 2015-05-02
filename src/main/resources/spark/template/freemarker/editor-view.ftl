@@ -11,15 +11,15 @@
       </div>
     </div>
 
-    <div id="editor">
-    <p id="heading"><span id="title">Storyboarder</span> <span id="currentPage">0</span>/<span id="numPages">0</span></p>
+    <div id="editor" style="overflow:scroll;">
+    <p id="heading"><span id="title">Storyboarder</span> - <span id="currentPage">0</span>/<span id="numPages">0</span></p>
         <div class="previous-page">
           <a href="#" data-content="Previous page"><i class="fa fa-x fa-caret-left"></i></a>
         </div>
         <div id="page">
-                <div class="canvas-bg">
-                  <canvas id="canvas"></canvas>
-                </div>
+            <div class="canvas-bg">
+              <canvas id="canvas"></canvas>
+            </div>
         </div>
         <div class="next-page">
           <a href="#" data-content="Next page"><i class="fa fa-x fa-caret-right"></i></a>
@@ -40,19 +40,19 @@
           <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
           <a href="#" class="action" id="Redo" data-action="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
-            <div class="ui checkbox">
-                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
-                  <label>Snap to grid</label>
-            </div>
+
+            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
+            <label>Snap to grid</label><br>
+            
             <div class="gridsnap" style="display:none">
               <div class="ui mini input">
                     <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
               </div>
             </div>
-            <div class="ui checkbox">
-                  <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap">
-                  <label>Snap to panel grid</label>
-            </div>
+
+            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap">
+            <label>Snap to panel grid</label>
+
             <div class="panelgridsnap" style="display:none">
               <div class="ui mini input">
                     <label>Rows</label><input type="text" class="action" data-action="SetSnap" id="panelRows" name="panelGridSnap" value="3">

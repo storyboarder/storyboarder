@@ -1,3 +1,4 @@
+//TODO canvasId should probably be a module-level variable
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Main canvas
 	var canvas;
@@ -178,78 +179,73 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		return between(min, x, max);
 	};
 
-	// Constructor for canvas state
-	var init = function(canvasId, width, height, callback) {
-		console.log("initing page...");
+	/* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
+	var init = function(callback) {
+		console.log("INIT");
+		$canvas = $("#" + canvasId);
+		canvas = new fabric.Canvas(canvasId, {
+			selection: false
+		});
+		console.log("ADDING HELPER CANVAS");
+		$('<canvas id="helperCanvas"></canvas>').css({
+			position: "absolute",
+			top: $canvas.offset().top,
+			left: $canvas.offset().left
+		}).insertAfter($canvas);
 
-		// Set width and height in class
-		width = width;
-		height = height;
-
-		// JQuery canvas elements
-		var $canvas = $("#" + canvasId);
-		if (typeof canvas !== "undefined") {
-			canvas.dispose();
-			console.log(canvas);
-			canvas.selection = false;
-		} else {
-			canvas = new fabric.Canvas(canvasId, {
-				selection: false
-			});
-			console.log("Created canvas");
-		}
-
-		// Create helper canvas
-		console.log($("#helperCanvas").length);
-		if ($("#helperCanvas").length == 0) {
-			$('<canvas id="helperCanvas"></canvas>').css({
-				position: "absolute",
-				top: $canvas.offset().top,
-				left: $canvas.offset().left
-			}).insertAfter($canvas);
-
-			helperCanvas = new fabric.Canvas("helperCanvas", {
-				selection: false
-			});
-		} else {
-			helperCanvas.dispose();
-		}
-
-		canvas.setDimensions({
-			width: width,
-			height: height
+		helperCanvas = new fabric.Canvas("helperCanvas", {
+			selection: false
 		});
 
-		helperCanvas.setDimensions({
-			width: width,
-			height: height
-		});
+		if (typeof callback != "undefined") callback();
+	};
 
-		// Calculate the edges of the first panel
-		// that is the edges of the page without the margins
+	/* Should be called when a new page is loaded (project variables stay the same) */
+	var init_page = function(callback) {
+		console.log("INIT PAGE");
+		if (typeof canvas === "undefined") {
+			init();
+		}
+		canvas.clear();
+		helperCanvas.clear();
 		pageEdges = {
 			left: pageMargin,
 			top: pageMargin,
-			right: width - pageMargin,
-			bottom: height - pageMargin
+			right: canvas.getWidth() - pageMargin,
+			bottom: canvas.getHeight() - pageMargin
 		};
-
-		// Add the first and main panel
 		addPanel($.extend({}, pageEdges));
-
-		// Store the initial state of the canvas
 		previousState = CanvasState.getState();
-		// Listen for changes in the canvas
-		// to update the history
 		CanvasState.listenCanvas();
 
 		require(["SnapUtil"], function(snapUtil) {
 			snap = snapUtil;
 			snap.init(CanvasState);
+
 			if (typeof callback != "undefined") {
 				callback();
 			}
 		});
+	};
+	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
+	var init_project = function(w, h, panelM, pageM, callback) {
+		console.log("INIT PROJECT");
+		if (typeof canvas === "undefined") {
+			init();
+		}
+		width = w;
+		height = h;
+		pageMargin = pageM
+		panelMargin = panelM
+		canvas.setDimensions({
+			width: w,
+			height: h
+		});
+		helperCanvas.setDimensions({
+			width: w,
+			height: h
+		});
+		init_page(callback);
 	};
 
 	var CanvasState = {
@@ -370,28 +366,46 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			return pageEdges;
 		},
 		deleteElement: deleteElement,
-		load: function(canvasId, json, callback) {
-			console.log(json);
+		load_page: function(canvasId, json, callback) {
 			var that = this;
-			init(canvasId, json.width, json.height, function() {
-				that.setPageMargin(json.pageMargin);
-				that.setPanelMargin(json.panelMargin);
-				console.log("loading canvas from json...", json);
+			init_page(function() {
+				console.log("loading from json: ", json);
 				canvas.loadFromJSON(json, function() {
+					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {
-						console.log(callback);
 						callback();
 					}
 				});
 			});
 		},
+		load_project: function(canvasId, json, callback) {
+			var that = this;
+			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
+				console.log("loading canvas from json...", json);
+				canvas.loadFromJSON(json, function() {
+					console.log(canvas);
+					console.log("done loading");
+					canvas.renderAll.bind(canvas);
+					console.log(canvas);
+					canvas.renderAll();
+					if (typeof callback != "undefined") {
+						callback();
+					}
+				});
+			});
+
+			console.log("ENDING LOAD");
+		},
 		init: init,
+		init_page: init_page,
+		init_project: init_project,
 		addElement: addElement,
 		setPageMargin: function(p) {
 			pageMargin = p;
 		},
 		setPanelMargin: function(p) {
+			//        	throw "setting panel margin";
 			panelMargin = p;
 		},
 		setGridSpacing: function(p) {

@@ -1,8 +1,6 @@
-/*TODO make a.new-page fill div.page-thumb */
 
-
-/*@link-color:        #428bca; // sea blue
-@link-color-hover:  darken(@link-color, 10%);*/
+@link-color:        #009fda;
+@link-color-hover:  darken(@link-color, 10%);
 @canvas-width:      400px;
 @canvas-height:     600px;
 @bg-color:          #ddd;
@@ -83,6 +81,10 @@ html, body {
       background-color: white;
       outline:1px solid @bg-color-darker;
 
+      a {
+      	color:@link-color;
+      }
+
       a.page-thumb {
 		    padding:0;
 		    margin:0;
@@ -111,6 +113,10 @@ html, body {
     }
     .page-thumb:hover a.remove-page {
       visibility:visible;
+    }
+
+    .page-thumb.current {
+    	outline:2px solid @link-color;
     }
 
     li.ui-state-placeholder {

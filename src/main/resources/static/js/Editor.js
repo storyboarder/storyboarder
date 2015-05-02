@@ -56,32 +56,31 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"LoadProj": function(params) {
+
 			checkParams(params, ["name"]);
 			$.post("/projects/load", {
-				choice: params.choice
+				name: params.name
 			}, function(responseJSON) {
 				console.log("LOAD PROJ, params: ", params, "response: ", responseJSON);
 				response = JSON.parse(responseJSON);
-				
-				numPages = response.numPages;
-				currentPage = response.page.num;
-				console.log(currentPage + "/" + numPages);
-				console.log(response.page);
-				canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
+				checkPage(response.page);
+				response.page.json = JSON.parse(response.page.json);
+//				console.log(response.page);
 				numPages = response.numPages;
-				if (typeof response.page === "string" || !("json" in response.page)) {
-					console.log("empty project:", response.page);
-					canvasState.init("canvas", 200, 200); //TODO not this
-				} else {
-					currentPage = response.page.num;
+				console.log(response.page);
+				currentPage = 1; //TODO check if valid index?
+//				if (typeof response.page === "string" || !("json" in response.page)) {
+//					console.log("empty project:", response.page);
+//					throw "empty project";
+//				} else {
 					console.log(currentPage + "/" + numPages);
-					canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
+					canvasState.load_project("canvas", response.page.json, params.editor.update); // parse JSON received
 
 					if (typeof params.callback != "undefined") {
-						params.callback(currentPage, numPages);
+						params.callback(response);
 					}
-				}
+//				}
 			});
 		},
 		"CreateProj": function(params) {
@@ -100,24 +99,22 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 			projectName = params.name;
 
-			canvasState.setPageMargin(pageMargin);
-			canvasState.setPanelMargin(panelMargin);
 			var that = this;
-			canvasState.init(canvas.attr("id"), width, height, function() {
-				params.callback();
-				$.post("/projects/create", params, function(response) {
+			canvasState.init_project(width, height, panelMargin, pageMargin, function() {
+				$.post("/projects/create", {
+					name: params.name
+				}, function(responseJSON) {
+					response = JSON.parse(responseJSON);
 					console.log(response);
+					projectName = response.name;
 					that.AddPage();
-					console.log(params.editor);
-					params.editor.init();
+					params.editor.update();
 					activate("Select");
+					if (typeof params.callback != "undefined") {
+						params.callback(response);
+					}
 				});
 			});
-
-			console.log("finished initing editor");
-
-			/* init all tools in the toolset so they get the canvas state */
-			//			toolset.init();
 		},
 		"CreateProjTest": function(params) {
 			$.post("/projects/create", {
@@ -127,32 +124,29 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log("Create project called with ", params, " Response: ", responseObject);
 			});
 		},
+		"GetPage": function(params) {
+			checkParams(params, ["pageNum"])
+			$.post("/pages/get", {
+					pageNum: params.pageNum
+				},
+				function(response) {
+					console.log("get page called with page " + params.pageNum);
+					var responseObject = JSON.parse(response);
+					checkPage(responseObject);
+					currentPage = responseObject.pageNum; // TODO check for errors(?)
+					canvasState.load_page("canvas", JSON.parse(responseObject.json), function() {
+						params.editor.update();
+					});
+					return responseObject;
+					// }
+				});
+		},
 		"DeleteProj": function(params) {
 			checkParams(params, ["name"]);
 			$.post("projects/delete", params, function(response) {
 				responseObject = JSON.parse(response);
 				console.log("Delete project called with ", params, " Response: ", responseObject);
 			});
-		},
-		"GetPage": function(params) {
-			checkParams(params, ["pageNum"]);
-			$.post("/pages/get", params, function(response) {
-					// if (typeof response == "string") {
-					// 	throw response;
-					// } else {
-					var responseObject = JSON.parse(response);
-					console.log("Get page called with ", params, " Response: ", responseObject);
-					//					console.log("responseObj", responseObject);
-					//					console.log("responseObj json", responseObject.json);
-					console.log("responseObj json parsed", JSON.parse(responseObject.json));
-					currentPage = pageNum; // TODO check for errors(?)
-					console.log("setting currentpage to " + currentPage);
-					canvasState.load("canvas", JSON.parse(responseObject.json), function() {
-						console.log("hi")
-					});
-					return responseObject;
-					// }
-				});
 		},
 		"GetAllPages": function(callback) {
 			$.post("/pages/getAll", {}, function(responseJSON) {
@@ -163,8 +157,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"SavePage": function() {
 			console.log("save called");
+			if (currentPage <= 0 || currentPage > numPages) {
+				throw "invalid currentPage: " + currentPage + "/" + numPages;
+			}
 			pageJSON = canvasState.getState();
-			console.log(currentPage, pageJSON);
+//			console.log(currentPage, pageJSON);
 
 			var page = makePage(currentPage, pageJSON, "");
 
@@ -184,19 +181,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
-//			currentPage++;
 			numPages++;
 			console.log(currentPage, "/", numPages);
-			pageJSON = canvasState.getState();
-//			console.log(pageJSON);
-//			console.log(currentPage, pageJSON);
-			console.log(makePage(numPages, pageJSON, ""));
-			$.post("/pages/add", makePage(numPages, pageJSON, ""), function(response) {
-				console.log("add page called with num: " + numPages);
-				console.log("response: ", JSON.parse(response));
-				if (typeof params != "undefined" && typeof params.callback != undefined) {
-					callback(numPages);
-				}
+			//TODO save previous page
+			canvasState.init_page(function() {
+				pageJSON = canvasState.getState();
+				$.post("/pages/add", makePage(numPages, pageJSON, ""), function(response) {
+					console.log("add page called with num: " + numPages + " in project " + projectName);
+					console.log("response: ", JSON.parse(response));
+
+					currentPage = numPages;
+					console.log(currentPage + "/" + numPages);
+					if (typeof params != "undefined" && typeof params.callback != undefined) {
+						params.callback(numPages);
+					}
+				});
 			});
 		},
 		"AddPageTest": function(page) {
@@ -263,21 +262,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	};
 
 	var checkParams = function(object, requiredParams) {
-
-		try {
 		for (var i = 0; i < requiredParams.length; i++) {
 			if (!(requiredParams[i] in object)) {
 				throw "ERROR: need a field: " + requiredParams[i];
 			}
 		}
-	} catch(e) {
-
-			var stack = e.stack.replace(/^[^\(]+?[\n$]/gm, '')
-				.replace(/^\s+at\s+/gm, '')
-				.replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
-				.split('\n');
-			console.log(stack);
-	}
 	};
 
 	var checkPage = function(page) {
@@ -292,11 +281,18 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		}
 	};
 
-	var init = function(spec, callback) {
-		//		console.trace();
-		console.log("editor init");
-		//		/* init all tools in the toolset so they get the canvas state */
+	/* Updates the Editor, initializing all the tools with the updated CanvasState.
+		Should be called after the page has been changed. */
+	var update = function(spec, callback) {
+		console.log("UPDATE EDITOR");
 		toolset.init();
+	};
+
+	/* Initializes the Editor.
+		Should be called once at the beginning of the client session. */
+	var init = function(spec, callback) {
+		console.log("INIT EDITOR");
+		canvasState.init();
 
 		socket = new WebSocket("ws://localhost:8888");
 		socket.onmessage = function(e) {
@@ -452,6 +448,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 	return {
 		init: init,
+		update: update,
 		activate: activate,
 		action: action,
 		test: test

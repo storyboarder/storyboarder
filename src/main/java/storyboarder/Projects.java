@@ -11,6 +11,13 @@ import java.util.Map;
 
 import sqlutil.SqlString;
 
+/**
+ * @author fbystric
+ * @author ktsakas
+ * @author narobins
+ * @author yz38
+ *
+ */
 public final class Projects {
   private static final Path PROJECT_FOLDER = Paths.get("projects");
   private static final String TABLE_NAME = "pages";
@@ -19,32 +26,17 @@ public final class Projects {
   // private static Set<Path> pathChoices = getPathChoices();
 
   private Projects() {
+    String message = "This class cannot have instances.";
+    throw new UnsupportedOperationException(message);
   }
 
-  public static Path projectFolder() {
+  static Path projectFolder() {
     return PROJECT_FOLDER;
   }
 
-  public static String fileType() {
+  static String fileType() {
     return FILE_TYPE;
   }
-
-  // public static boolean addPathChoice(Path newChoice) {
-  // return pathChoices.add(newChoice);
-  // }
-  //
-  // public static Path getPathChoice(int choice) {
-  // return new ArrayList<Path>(pathChoices).get(choice);
-  // }
-  //
-  // public static Set<String> pathChoiceNames() {
-  // Set<String> names = new TreeSet<String>();
-  // for (Path choice : pathChoices) {
-  // String choiceName = choice.getFileName().toString();
-  // names.add(choiceName.replace(Projects.fileType(), ""));
-  // }
-  // return names;
-  // }
 
   static String tableName() {
     return TABLE_NAME;
@@ -70,7 +62,7 @@ public final class Projects {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-        .addParam(page.getThumbnail());
+    .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -78,7 +70,7 @@ public final class Projects {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
+        .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 

@@ -137,29 +137,31 @@ define(["../../CanvasState"], function(canvasState) {
     }
 
 		var activate = function() {
-      start = canvas._objects.length;
+      console.log(2);
+      //start = canvas._objects.length;
       //console.log("start " + start);
 
-		console.log("draw activated");
+  		console.log("draw activated");
 
-		canvas.isDrawingMode = true;
-		//fabric.Object.prototype.transparentCorners = false;
+  		canvas.isDrawingMode = true;
+  		//fabric.Object.prototype.transparentCorners = false;
 
-		canvas.freeDrawingBrush.color = $('#drawing-color').val();
-		canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+  		canvas.freeDrawingBrush.color = $('#drawing-color').val();
+  		canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
 
       canvas.on("mouse:up", function () {
-  /*      times++;
-        console.log(times);*/
+        //times++;
+        //console.log(times);
         console.log(canvas);
       });
 
       return this;
-
 		};
 
 		var deactivate = function() {
 			console.log("draw deactivate");
+      canvas.isDrawingMode = false;
+
 /*      console.log("times " + times);
       console.log(canvas);
 
@@ -174,17 +176,17 @@ define(["../../CanvasState"], function(canvasState) {
       addGroup(group);
 
       console.log(7);*/
-      canvas.isDrawingMode = false;
 
       // DOESN'T LIKE ADDELEMENT FOR SOME REASON
       //canvas.add(toAdd);
       //canvas.renderAll();
       //fabric.Object.prototype.transparentCorners = true;
 
-      //canvas.__eventListeners["mouse:up"] = [];
+      canvas.__eventListeners["mouse:up"] = [];
       // times = 0;
       // console.log("end " + times);
-  };
+
+    };
 
 	return {
 		name: "Draw",

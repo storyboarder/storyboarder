@@ -1,4 +1,4 @@
-package sqlUtil;
+package sqlutil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -10,8 +10,6 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
-import sqlutil.SqlString;
 
 public class SqlStringTest {
   @Test
