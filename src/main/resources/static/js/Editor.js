@@ -263,19 +263,28 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	};
 
 	var checkParams = function(object, requiredParams) {
+
+		try {
 		for (var i = 0; i < requiredParams.length; i++) {
 			if (!(requiredParams[i] in object)) {
 				throw "ERROR: need a field: " + requiredParams[i];
 			}
 		}
+	} catch(e) {
+
+			var stack = e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+				.replace(/^\s+at\s+/gm, '')
+				.replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+				.split('\n');
+			console.log(stack);
 	}
+	};
 
 	var checkPage = function(page) {
 		checkParams(page, ["pageNum", "json", "thumbnail"]);
-	}
+	};
 
 	var makePage = function(pageNum, json, thumbnail) {
-		//		console.log("making page with json: " + json);
 		return {
 			pageNum: pageNum,
 			json: json,
@@ -320,9 +329,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var test = function() {
 		console.log(" ");
 		console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
-		actions.GetPage({pageNum: 0});
+		actions.GetPage({ pageNum: 0 });
 
-		var wait = 100;
+		/*var wait = 100;
 		var between = 100;
 
 		window.setTimeout(function() {
@@ -368,7 +377,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing GetPage after previous changes. Expecting {content: New string!}. Result:");
-			actions.GetPage(1);
+			actions.GetPage({ pageNum: 1 });
 		}, wait);
 
 		wait += between;
@@ -376,7 +385,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Expecting {content: page 2}. Result:");
-			actions.GetPage(2);
+			actions.GetPage({ pageNum: 2 });
 		}, wait);
 
 		wait += between;
@@ -429,7 +438,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log(" ");
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
-		}, wait);
+		}, wait);*/
 
 		//toolset.test();
 		// console.log("editor tested");

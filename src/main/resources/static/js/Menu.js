@@ -22,11 +22,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"Save": function() {
 			console.log("save called");
 			editor.action("SavePage", {});
-			//TODO call editor
 		},
 		"Export": function() {
 			editor.action("Export");
-			//TODO call editor (and a modal?)
 		},
 		"Load": function() {
 			console.log("load called");
@@ -208,7 +206,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	var init = function() {
 		console.log("Menu initing");
-
 
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {

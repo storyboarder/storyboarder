@@ -74,7 +74,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	};
 
 	var initPreviewLine = function(y) {
-		console.log(canvas);
 		var coords = [0, y, canvas.getWidth(), y];
 
 		previewDivideLine = new fabric.Line(coords, {
@@ -112,8 +111,10 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 				x: options.e.offsetX,
 				y: options.e.offsetY
 			});
+
 			var x = pt.x;
 			var y = pt.y;
+
 			if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
 				previewDivideY(options.target, y);
 				vertical = false;
@@ -158,21 +159,20 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		return this;
 	};
 
-
 	var deactivate = function() {
 		console.log("split deactivated");
 		helperCanvas.remove(previewDivideLine);
-		canvas.__eventListeners["mouse:move"] = [];
-		canvas.__eventListeners["object:selected"] = [];
+		canvas.off("mouse:move");
+		canvas.off("object:selected");
 	};
 
-	/* the following code should probably be the same for all tools */
+	// Public api for Split tools
+	// (its the same for all tools)
 	return {
 		name: "Split",
 		init: function() {
 			canvas = canvasState.getCanvas();
 			helperCanvas = canvasState.getHelperCanvas();
-			console.log(canvas);
 		},
 		activate: activate,
 		deactivate: deactivate,
