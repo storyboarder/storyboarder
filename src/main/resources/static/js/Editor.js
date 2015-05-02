@@ -132,6 +132,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					var responseObject = JSON.parse(response);
 					console.log("get page called with page ", params, " Response: ", responseObject);
 
+					if ("error" in responseObject) {
+						throw "error: " + responseObject.error;
+					}
 					checkPage(responseObject);
 					currentPage = responseObject.pageNum; // TODO check for errors(?)
 					canvasState.load_page("canvas", JSON.parse(responseObject.json), function() {
@@ -323,7 +326,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		var between = 100;
 
 		console.log("creating an empty project.");
-		actions.CreateProjTest({name: "testProj"});
+		actions.CreateProjTest({name: "test_proj_dont_use"});
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -399,7 +402,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log(" ");
 			console.log("Testing creating a new project");
 			actions.CreateProjTest({
-				name: "newProject"
+				name: "test_proj_2_dont_use"
 			});
 		}, wait);
 
@@ -416,14 +419,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Getting hello world from new project");
-			actions.GetPage(1);
+			actions.GetPage({pageNum: 1});
 		}, wait);
 
 		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
-			console.log("Loading project 2");
+			console.log("Loading new project");
 			actions.LoadProj({
 				choice: 2
 			});
