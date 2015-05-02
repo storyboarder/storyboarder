@@ -42,10 +42,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	var activate = function() {
 
 		console.log("select activated");
-		console.log("SELECT", canvas);
-		console.log(canvas._objects);
+//		console.log("SELECT", canvas);
+		console.log(canvasState);
+//		console.log(canvas._objects);
 		//canvas._objects[1].selectable = true;
-		console.log("SELECT", canvas);
+//		console.log("SELECT", canvas);
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -70,11 +71,11 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		}
 
 		canvasState.mapElements(function(found) { // map
-			console.log(found.elmType);
+//			console.log(found.elmType);
 
 			if(selectable.hasOwnProperty(found.elmType)) {
 				var options = selectable[found.elmType];
-				console.log(options);
+//				console.log(options);
 				for(property in options) {
 					found.set(property, options[property]);
 				}
@@ -290,6 +291,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		name: "Select",
 		init: function() {
 			canvas = canvasState.getCanvas();
+			console.log(canvas);
 			snapPoint = canvasState.snapPoint;
 //			console.log("select tool inited with canvas: ", canvas);
 		},

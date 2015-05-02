@@ -339,6 +339,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         load_page: function(canvasId, json, callback) {
         		var that = this;
             init_page(function() {
+            	console.log("loading from json: ", json);
             	canvas.loadFromJSON(json, function() {
             		canvas.renderAll.bind(canvas);
             		canvas.renderAll();
@@ -349,21 +350,21 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             });
         },
         load_project: function(canvasId, json, callback) {
-        		var that = this;
-            init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
-            	console.log("loading canvas from json...", json);
-            	canvas.loadFromJSON(json, function() {
-            		console.log(canvas);
-            		console.log("done loading");
-            		canvas.renderAll.bind(canvas);
-            		canvas.renderAll();
-            		if (typeof callback != "undefined") {
-            			callback();
-            		}
-            	});
-            });
+					var that = this;
+					init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
+						console.log("loading canvas from json...", json);
+						canvas.loadFromJSON(json, function() {
+							console.log(canvas);
+							console.log("done loading");
+							canvas.renderAll.bind(canvas);
+							canvas.renderAll();
+							if (typeof callback != "undefined") {
+								callback();
+							}
+						});
+					});
 
-            console.log("ENDING LOAD");
+					console.log("ENDING LOAD");
         },
         init: init,
         init_page: init_page,
