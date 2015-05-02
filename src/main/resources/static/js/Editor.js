@@ -66,21 +66,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 				checkPage(response.page);
 				response.page.json = JSON.parse(response.page.json);
-//				console.log(response.page);
+				//				console.log(response.page);
 				numPages = response.numPages;
 				console.log(response.page);
 				currentPage = 1; //TODO check if valid index?
-//				if (typeof response.page === "string" || !("json" in response.page)) {
-//					console.log("empty project:", response.page);
-//					throw "empty project";
-//				} else {
-					console.log(currentPage + "/" + numPages);
-					canvasState.load_project("canvas", response.page.json, params.editor.update); // parse JSON received
+				//				if (typeof response.page === "string" || !("json" in response.page)) {
+				//					console.log("empty project:", response.page);
+				//					throw "empty project";
+				//				} else {
+				console.log(currentPage + "/" + numPages);
+				canvasState.load_project("canvas", response.page.json, params.editor.update); // parse JSON received
 
-					if (typeof params.callback != "undefined") {
-						params.callback(response);
-					}
-//				}
+				if (typeof params.callback != "undefined") {
+					params.callback(response);
+				}
+				//				}
 			});
 		},
 		"CreateProj": function(params) {
@@ -130,8 +130,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					pageNum: params.pageNum
 				},
 				function(response) {
-					console.log("get page called with page " + params.pageNum);
 					var responseObject = JSON.parse(response);
+					console.log("get page called with page ", params, " Response: ", responseObject);
+
 					checkPage(responseObject);
 					currentPage = responseObject.pageNum; // TODO check for errors(?)
 					canvasState.load_page("canvas", JSON.parse(responseObject.json), function() {
@@ -161,7 +162,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				throw "invalid currentPage: " + currentPage + "/" + numPages;
 			}
 			pageJSON = canvasState.getState();
-//			console.log(currentPage, pageJSON);
+			//			console.log(currentPage, pageJSON);
 
 			var page = makePage(currentPage, pageJSON, "");
 
@@ -214,9 +215,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"Export": function(params) {
 			console.log(width, height);
-			var pdf = new jsPDF('portrait', 'pt', [height * 72/96, width * 72/96]);
+			var pdf = new jsPDF('portrait', 'pt', [height * 72 / 96, width * 72 / 96]);
 			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
-				.css({display: "none"})
+				.css({
+					display: "none"
+				})
 				.appendTo(document.body);
 			var dummyCanvas = new fabric.Canvas('dummyCanvas');
 			dummyCanvas.setDimensions({
@@ -323,12 +326,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	};
 
 	var test = function() {
-		console.log(" ");
-		console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
-		actions.GetPage({ pageNum: 0 });
-
-		/*var wait = 100;
+		var wait = 100;
 		var between = 100;
+
+		console.log("creating an empty project.");
+		actions.CreateProjTest({name: "testProj"});
+
+		window.setTimeout(function() {
+			console.log(" ");
+			console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
+			actions.GetPage({
+				pageNum: 0
+			});
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -349,7 +361,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing get page after addition of FOOOO!. Expecing something with FOOOO!. Result:");
-			actions.GetPage(1);
+			actions.GetPage({pageNum: 1});
 		}, wait);
 
 		wait += between;
@@ -373,7 +385,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing GetPage after previous changes. Expecting {content: New string!}. Result:");
-			actions.GetPage({ pageNum: 1 });
+			actions.GetPage({
+				pageNum: 1
+			});
 		}, wait);
 
 		wait += between;
@@ -381,7 +395,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Expecting {content: page 2}. Result:");
-			actions.GetPage({ pageNum: 2 });
+			actions.GetPage({
+				pageNum: 2
+			});
 		}, wait);
 
 		wait += between;
@@ -434,7 +450,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log(" ");
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
-		}, wait);*/
+		}, wait);
 
 		//toolset.test();
 		// console.log("editor tested");
