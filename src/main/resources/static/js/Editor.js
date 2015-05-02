@@ -3,6 +3,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var currentPage; // index of current page
 	var numPages;
 	var socket;
+	var width;
+	var height;
 	var editorObj = this;
 
 	/* Actions are one-time functions, unlike tools. */
@@ -87,8 +89,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			checkParams(params, ["name"]);
 			console.log("CREATE PROJ");
 			var canvas = params.canvas;
-			var width = params.width;
-			var height = params.height;
+			width = params.width;
+			height = params.height;
 			var pageMargin = params.pageMargin;
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
@@ -133,16 +135,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log("Delete project called with ", params, " Response: ", responseObject);
 			});
 		},
-		"GetPage": function(pageNum) {
-			$.post("/pages/get", {
-					pageNum: pageNum
-				},
-				function(response) {
+		"GetPage": function(params) {
+			checkParams(params, ["pageNum"]);
+			$.post("/pages/get", params, function(response) {
 					// if (typeof response == "string") {
 					// 	throw response;
 					// } else {
-					console.log("get page called with page " + pageNum);
 					var responseObject = JSON.parse(response);
+					console.log("Get page called with ", params, " Response: ", responseObject);
 					//					console.log("responseObj", responseObject);
 					//					console.log("responseObj json", responseObject.json);
 					console.log("responseObj json parsed", JSON.parse(responseObject.json));
@@ -215,14 +215,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"Export": function(params) {
-			var pdf = new jsPDF();
+			console.log(width, height);
+			var pdf = new jsPDF('portrait', 'pt', [height * 72/96, width * 72/96]);
 			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
-				// .css({display: "none"})
+				.css({display: "none"})
 				.appendTo(document.body);
 			var dummyCanvas = new fabric.Canvas('dummyCanvas');
 			dummyCanvas.setDimensions({
-				width: w,
-				height: h
+				width: width,
+				height: height
 			});
 
 			actions.GetAllPages(function(response) {
@@ -230,7 +231,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 				for (var i = 0; i < response.length; i++) {
 					var page = response[i];
-					dummyCanvas.loadFromJSON(page, dummyCanvas.renderAll.bind(dummyCanvas));
+					console.log("Current: ", JSON.parse(canvasState.getState()));
+					console.log("Page: ", JSON.parse(page.json));
+					dummyCanvas.loadFromJSON(JSON.parse(page.json), dummyCanvas.renderAll.bind(dummyCanvas));
 					var img = dummyCanvas.toDataURL('png');
 					console.log(img);
 
@@ -318,50 +321,66 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var test = function() {
 		console.log(" ");
 		console.log("testing get page on empty file. Expecting index out of bounds. Result: ");
-		actions.GetPage(0);
+		actions.GetPage({pageNum: 0});
+
+		var wait = 100;
+		var between = 100;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for empty file. Expecting index out of bounds. Result: ");
 			actions.SavePageTest(makePage(1, "", ""));
-		}, 1000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for empty file. Expecting success. Result: ");
 			actions.AddPageTest(makePage(1, "FOOOO!", ""));
-		}, 2000);
+		}, wait);
 
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing get page after addition of FOOOO!. Expecing something with FOOOO!. Result:");
 			actions.GetPage(1);
-		}, 3000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing save for nonempty file. Expecting success!. Result:");
 			actions.SavePageTest(makePage(1, "new String!", "foo"));
-		}, 4000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing add for nonempty file. Expecting success!. Result:");
 			actions.AddPageTest(makePage(2, "page 2", "goo"));
-		}, 5000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing GetPage after previous changes. Expecting {content: New string!}. Result:");
 			actions.GetPage(1);
-		}, 6000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Expecting {content: page 2}. Result:");
 			actions.GetPage(2);
-		}, 7000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -369,19 +388,25 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			actions.CreateProjTest({
 				name: "newProject"
 			});
-		}, 8000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Adding hello world to new project");
 			actions.AddPageTest(makePage(1, "hello world", "akjfbad"));
-		}, 9000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Getting hello world from new project");
 			actions.GetPage(1);
-		}, 10000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -389,19 +414,23 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			actions.LoadProj({
 				choice: 2
 			});
-		}, 11000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Writing hey there to loaded project");
 			actions.SavePageTest(makePage(1, "hey there", "garg"));
-		}, 12000);
+		}, wait);
+
+		wait += between;
 
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
-		}, 13000);
+		}, wait);
 
 		//toolset.test();
 		// console.log("editor tested");

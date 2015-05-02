@@ -20,7 +20,7 @@ import java.util.List;
  * @author ktsakas
  * @author fbystric
  */
-public class SqlQueryer {
+public class SqlQueryer implements AutoCloseable {
   private final Connection conn;
 
   /**
@@ -129,5 +129,10 @@ public class SqlQueryer {
       e.printStackTrace();
       return false;
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    conn.close();
   }
 }
