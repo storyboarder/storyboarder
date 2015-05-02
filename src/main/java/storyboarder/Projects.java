@@ -12,6 +12,11 @@ import java.util.Map;
 import sqlutil.SqlString;
 
 /**
+ * Utility class containing methods for creating SQL strings, and getting
+ * existing projects. Also stores basic information about Storyboarder,
+ * including the path to the project folder, the file type of the database, and
+ * the name of the table stored in each database.
+ *
  * @author fbystric
  * @author ktsakas
  * @author narobins
@@ -30,23 +35,40 @@ public final class Projects {
     throw new UnsupportedOperationException(message);
   }
 
+  /**
+   * @return the path to the folder containing all the projects.
+   */
   static Path projectFolder() {
     return PROJECT_FOLDER;
   }
 
+  /**
+   * @return the file type of the database.
+   */
   static String fileType() {
     return FILE_TYPE;
   }
 
+  /**
+   * @return the name of the table stored in each database.
+   */
   static String tableName() {
     return TABLE_NAME;
   }
 
+  /**
+   * @return an SQL string used to create the table used to store pages.
+   */
   static String createTableSql() {
     String sql = "CREATE TABLE IF NOT EXISTS ? (num INTEGER primary key, json TEXT, thumbnail TEXT);";
     return SqlString.of(sql, tableName()).getSql();
   }
 
+  /**
+   *
+   * @param pageNum
+   * @return
+   */
   static String getPageSql(int pageNum) {
     String sql = "SELECT * FROM ? WHERE num = ?;";
     return SqlString.of(sql, tableName()).builder().addParam(pageNum).build()
@@ -127,30 +149,4 @@ public final class Projects {
     return projects;
   }
 
-  // private static Set<Path> getPathChoices() {
-  // try {
-  // Files.createDirectories(Projects.projectFolder());
-  // } catch (IOException e) {
-  // System.err.println("ERROR creating necessary directories: "
-  // + e.getMessage());
-  // }
-  // Set<Path> pathChoices = new TreeSet<Path>();
-  //
-  // try (DirectoryStream<Path> choicesStream = Files
-  // .newDirectoryStream(Projects.projectFolder())) {
-  // Iterator<Path> choicesIterator = choicesStream.iterator();
-  //
-  // while (choicesIterator.hasNext()) {
-  // Path nextPath = choicesIterator.next();
-  // if (nextPath.toString().endsWith(Projects.fileType())) {
-  // pathChoices.add(nextPath);
-  // }
-  // }
-  // System.out.println(pathChoices);
-  // } catch (IOException e) {
-  // System.err.println("ERROR: error getting possible projects: "
-  // + e.getMessage());
-  // }
-  // return pathChoices;
-  // }
 }

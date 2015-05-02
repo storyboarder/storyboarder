@@ -331,6 +331,8 @@ final class GUI {
               }
               int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
               return move(pageNum, newSpot);
+            case "delete":
+              return delete(pageNum);
             default:
               // All other params need the whole page
               Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
@@ -383,6 +385,14 @@ final class GUI {
         return OUT_OF_BOUNDS_JSON;
       }
       return GSON.toJson(project.getPage(pageNum));
+    }
+
+    private Object delete(int pageNum) {
+      if (project.removePage(pageNum)) {
+        return JsonMessages.makeMessage("Sueccess deleting page " + pageNum);
+      } else {
+        return JsonMessages.makeError("Failure deleting page " + pageNum);
+      }
     }
 
     /**
