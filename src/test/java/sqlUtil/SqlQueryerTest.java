@@ -1,7 +1,6 @@
 package sqlUtil;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -10,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.AfterClass;
@@ -49,14 +49,30 @@ public class SqlQueryerTest {
   }
 
   @Test
-  public void hasTablesTest() throws SQLException {
+  public void hasTablesTest() {
     String sql = "SELECT tbl_name FROM sqlite_master WHERE type = 'table'";
-    ResultSet tables = queryer.query(sql);
-    assertTrue(tables.next());
-    assertEquals(TABLE_1, tables.getString(1));
+    List<String> tables = queryer.query(sql,
+        BasicResultConverters.STRING_CONVERTER);
+    assertEquals(2, tables.size());
+    assertEquals(TABLE_1, tables.get(0));
+    assertEquals(TABLE_2, tables.get(1));
+  }
 
-    assertTrue(tables.next());
-    assertEquals(TABLE_2, tables.getString(1));
+  private static class StringInt {
+    public String str;
+    public int num;
+
+    public StringInt(String str, int num) {
+      this.str = str;
+      this.num = num;
+    }
+
+    public static final ResultConverter<StringInt> CONVERTER = new ResultConverter<StringInt>() {
+      @Override
+      public StringInt convert(ResultSet rs) throws SQLException {
+        return new StringInt(rs.getString(1), rs.getInt(2));
+      }
+    };
   }
 
   @Test
@@ -71,33 +87,35 @@ public class SqlQueryerTest {
     assertTrue(queryer.executeBatch(additions));
 
     String getAll = "SELECT * FROM " + TABLE_1;
-    ResultSet rs = queryer.query(getAll);
-    for (int i = 1; i <= 5; i++) {
-      assertTrue(rs.next());
-      assertTrue(i == rs.getInt(2));
+
+    List<StringInt> results = queryer.query(getAll, StringInt.CONVERTER);
+    assertEquals(5, results.size());
+    for (int i = 0; i < results.size(); i++) {
+      assertEquals("fooo", results.get(i).str);
+      assertEquals(i + 1, results.get(i).num);
     }
 
-    String contains = "SELECT * FROM " + TABLE_1 + " WHERE ints = 3";
-    ResultSet result = queryer.query(contains);
-    assertTrue(result.next());
-    assertFalse(result.next());
+    String sql = "SELECT * FROM " + TABLE_1 + " WHERE ints = 3";
+    results = queryer.query(sql, StringInt.CONVERTER);
+    assertEquals(1, results.size());
+    assertEquals(3, results.get(0).num);
 
     String remove = "DELETE FROM " + TABLE_1 + " WHERE ints = 3";
     assertTrue(queryer.execute(remove));
 
-    contains = "SELECT * FROM " + TABLE_1 + " WHERE ints = 3";
-    result = queryer.query(contains);
-    assertFalse(result.next());
+    sql = "SELECT * FROM " + TABLE_1 + " WHERE ints = 3";
+    results = queryer.query(sql, StringInt.CONVERTER);
+    assertEquals(0, results.size());
 
-    contains = "SELECT * FROM " + TABLE_1 + " WHERE ints = 1";
-    result = queryer.query(contains);
-    assertTrue(result.next());
-    assertFalse(result.next());
+    sql = "SELECT * FROM " + TABLE_1 + " WHERE ints = 1";
+    results = queryer.query(sql, StringInt.CONVERTER);
+    assertEquals(1, results.size());
+    assertEquals(1, results.get(0).num);
 
-    contains = "SELECT * FROM " + TABLE_1 + " WHERE ints = 4";
-    result = queryer.query(contains);
-    assertTrue(result.next());
-    assertFalse(result.next());
+    sql = "SELECT * FROM " + TABLE_1 + " WHERE ints = 4";
+    results = queryer.query(sql, StringInt.CONVERTER);
+    assertEquals(1, results.size());
+    assertEquals(4, results.get(0).num);
 
   }
 }

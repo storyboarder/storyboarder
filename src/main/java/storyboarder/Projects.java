@@ -67,7 +67,7 @@ public final class Projects {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-        .addParam(page.getThumbnail());
+    .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -78,7 +78,7 @@ public final class Projects {
     System.out.println(page.getJson());
     System.out.println(page.getThumbnail());
     builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
+        .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
