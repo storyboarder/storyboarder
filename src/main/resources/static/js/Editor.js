@@ -63,22 +63,22 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			}, function(responseJSON) {
 				console.log("LOAD PROJ, params: ", params, "response: ", responseJSON);
 				response = JSON.parse(responseJSON);
-				console.log(response.page);
-				canvasState.load_project("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
+				checkPage(response.page);
+				response.page.json = JSON.parse(response.page.json);
+//				console.log(response.page);
 				numPages = response.numPages;
 				console.log(response.page);
-				checkPage(response.page);
+				currentPage = 1; //TODO check if valid index?
 //				if (typeof response.page === "string" || !("json" in response.page)) {
 //					console.log("empty project:", response.page);
 //					throw "empty project";
 //				} else {
-					currentPage = response.page.pageNum;
 					console.log(currentPage + "/" + numPages);
-					canvasState.load_project("canvas", JSON.parse(response.page.json), params.editor.update); // parse JSON received
+					canvasState.load_project("canvas", response.page.json, params.editor.update); // parse JSON received
 
 					if (typeof params.callback != "undefined") {
-						params.callback(params.name, currentPage, numPages);
+						params.callback(response);
 					}
 //				}
 			});
@@ -263,12 +263,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 	var checkParams = function(object, requiredParams) {
 		if (typeof object == "string") {
+			console.log(requiredParams);
 			throw object;
 			console.trace();
 			return;
 		}
 		if (typeof object == "number") {
+			console.log(requiredParams);
 			console.trace();
+			throw object;
 			return;
 		}
 		console.log(typeof object);
