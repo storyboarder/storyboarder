@@ -38,13 +38,14 @@ require.config({
 
 		//      console.log(canvasState);
 
+
 		require(["Menu", "Editor"], function(menu, editor) {
 			editor.init();
 			//        console.log(menu);
 			menu.init();
 			console.log("editor:");
 			console.log(editor);
-			//        editor.test();
+		  editor.test();
 		});
 
 	}

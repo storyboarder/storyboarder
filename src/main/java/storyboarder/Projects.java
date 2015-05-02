@@ -5,9 +5,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import sqlutil.SqlString;
 
@@ -93,7 +93,7 @@ public final class Projects {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
+        .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -106,7 +106,7 @@ public final class Projects {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
-        .addParam(page.getThumbnail());
+    .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
@@ -169,7 +169,7 @@ public final class Projects {
       System.err.println("ERROR creating necessary directories: "
           + e.getMessage());
     }
-    Map<String, Path> projects = new HashMap<String, Path>();
+    Map<String, Path> projects = new TreeMap<String, Path>();
     try (DirectoryStream<Path> choicesStream = Files
         .newDirectoryStream(Projects.projectFolder())) {
       Iterator<Path> choicesIterator = choicesStream.iterator();
