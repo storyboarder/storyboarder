@@ -65,6 +65,8 @@ class Project implements AutoCloseable {
    *          the number of the page being requested.
    * @return The page with the number 'pageNum', or null if there is no such
    *         page.
+   * @throws IndexOutOfBoundsException
+   *           as specified by {@link #throwIfOutOfBounds(int)} on pageNum
    */
   Page getPage(int pageNum) {
     throwIfOutOfBounds(pageNum);
@@ -85,6 +87,9 @@ class Project implements AutoCloseable {
    * @param page
    *          The new page to store in this project.
    * @return True if the page was successfully saved, false otherwise.
+   * @throws IndexOutOfBoundsException
+   *           as specified by {@link #throwIfOutOfBounds(int)} on page's
+   *           pageNum field.
    */
   boolean savePage(Page page) {
     throwIfOutOfBounds(page.getNum());
@@ -113,6 +118,9 @@ class Project implements AutoCloseable {
    * @param page
    *          The page to be added to this project.
    * @return True if the page was successfully added, false otherwise.
+   * @throws IndexOutOfBoundsException
+   *           if the page's number is not equal to the number of existing pages
+   *           plus 1.
    */
   boolean addPage(Page page) {
     if (page.getNum() != getPageCount() + 1) {
@@ -128,6 +136,8 @@ class Project implements AutoCloseable {
    * @param pageNum
    *          The number of the page to be removed.
    * @return true if the page was successfully removed, false otherwise.
+   * @throws IndexOutOfBoundsException
+   *           as specified by {@link #throwIfOutOfBounds(int)} on pageNum
    */
   boolean removePage(int pageNum) {
     throwIfOutOfBounds(pageNum);
@@ -147,6 +157,8 @@ class Project implements AutoCloseable {
    * @param newSpot
    *          The spot to which that page is to be moved.
    * @return true if the page was successfully moved, false otherwise.
+   * @throws IndexOutOfBoundsException
+   *           as specified by {@link #throwIfOutOfBounds(int)} on pageNum
    */
   boolean movePage(int pageNum, int newSpot) {
     throwIfOutOfBounds(pageNum);
