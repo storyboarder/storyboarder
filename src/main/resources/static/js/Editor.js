@@ -117,7 +117,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			/* init all tools in the toolset so they get the canvas state */
 			//			toolset.init();
 		},
-
 		"CreateProjTest": function(params) {
 			$.post("/projects/create", {
 				name: params.name
@@ -296,6 +295,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		};
 
 		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
+		canvasState.getCanvas().on('change', function() {
+			actions["SavePage"]();
+		});
 	};
 
 	var activate = function(toolname) {
