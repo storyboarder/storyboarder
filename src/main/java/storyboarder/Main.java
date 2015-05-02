@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -30,6 +29,7 @@ public final class Main {
       Paths.get("projects/test_0.sqlite3");
 
   private Main() {
+    throw new UnsupportedOperationException("This class cannot have instances.");
   }
 
   private static void exit(String message) {
@@ -53,14 +53,13 @@ public final class Main {
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
-    try {
-      Project testProj = new Project(DEFAULT_DIRECTORY);
-      GUI gui = new GUI(sparkPort, testProj);
-      gui.start();
-    } catch (ClassNotFoundException | SQLException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    // try {
+    // Project testProj = new Project(DEFAULT_DIRECTORY);
+    GUI.start(sparkPort);
+    // } catch (ClassNotFoundException | SQLException e1) {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // }
 
     try {
       int socketPort = DEFAULT_SOCKET_PORT;

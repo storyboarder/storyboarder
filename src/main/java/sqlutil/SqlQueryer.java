@@ -131,6 +131,10 @@ public class SqlQueryer implements AutoCloseable {
     }
   }
 
+  /**
+   * @see java.lang.AutoCloseable#close()
+   * @Throws Exception - if this resource cannot be closed
+   */
   @Override
   public void close() throws Exception {
     conn.close();
