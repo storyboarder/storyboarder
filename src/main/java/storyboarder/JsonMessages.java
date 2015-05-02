@@ -6,6 +6,10 @@ final class JsonMessages {
 
   private static final Gson GSON = new Gson();
 
+  private JsonMessages() {
+    throw new UnsupportedOperationException("This class cannot have instances.");
+  }
+
   static Object makeMessage(String message) {
     return GSON.toJson(new Message(message));
   }

@@ -13,11 +13,12 @@ import java.sql.SQLException;
  */
 public final class ResultConverters {
   private ResultConverters() {
+    throw new UnsupportedOperationException("This class cannot have instances.");
   }
 
   /**
    * Constructs a ResultConverter object for ResultSets of just one column.
-   * 
+   *
    * @param column
    *          The column of the ResultSet that stores the desired object.
    *          Columns are 1-indexed.

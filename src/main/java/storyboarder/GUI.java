@@ -22,7 +22,7 @@ import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
 
 /**
- * Handles all of the GUI stuff.
+ * Hosts a GUI spark server.
  *
  * @author fbystric
  * @author ktsakas
@@ -59,18 +59,20 @@ final class GUI {
   private static final Object OUT_OF_BOUNDS_JSON =
       JsonMessages.makeError("Index out of bounds!");
 
-  private Project project;
+  private static Project project;
 
-  GUI(int port, Project project) {
-    Spark.setPort(port);
-    this.project = project;
+  private GUI() {
+    throw new UnsupportedOperationException("This class cannot have instances.");
   }
 
-  GUI(int port) {
+  /**
+   * Starts the server at a given port.
+   *
+   * @param port
+   *          The port at which to host the server.
+   */
+  static void start(int port) {
     Spark.setPort(port);
-  }
-
-  void start() {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
@@ -85,7 +87,7 @@ final class GUI {
    *         first page of the project. The first page element will be 'empty
    *         project' if the number of pages is zero.
    */
-  private Object stringifyProject() {
+  private static Object stringifyProject() {
     int numPages = project.getPageCount();
     Map<String, Object> data = new HashMap<String, Object>();
     data.put("numPages", numPages);
@@ -98,7 +100,18 @@ final class GUI {
     return GSON.toJson(data);
   }
 
-  private Optional<String> checkParams(QueryParamsMap qm,
+  /**
+   * Checks that a QueryParamsMap contains the required arguments.
+   *
+   * @param qm
+   *          The map of given arguments.
+   * @param requiredParams
+   *          The parameters for which 'qm' must have a non-null value.
+   * @return An Optional containing the appropriate error message if 'qm' is
+   *         missing a parameter, or an empty Optional if 'qm' has all the
+   *         required parameters.
+   */
+  private static Optional<String> checkParams(QueryParamsMap qm,
       String... requiredParams) {
     for (String param : requiredParams) {
       if (qm.value(param) == null) {
@@ -116,8 +129,18 @@ final class GUI {
    * @author narobins
    * @author yz38
    */
-  private class ProjectActions implements Route {
+  private static class ProjectActions implements Route {
 
+    /**
+     * Reads a request and calls the appropriate method, or returns appropriate
+     * error messages where applicable.
+     *
+     * @param req
+     * @param res
+     * @return a JSON string containing the response to the request, or an
+     *         appropriate error message if the request is invalid or an error
+     *         occurs trying to fulfill the request.
+     */
     @Override
     public Object handle(Request req, Response res) {
       System.out.println("\nProject action: " + req.params(PARAM)
@@ -160,6 +183,18 @@ final class GUI {
       }
     }
 
+    /**
+     * Creates and loads a project with the given name, or a modified name if a
+     * project of the same name already exists.
+     *
+     * @param name
+     *          The name of the new project.
+     * @param projects
+     *          The existing projects, a map of names to Paths.
+     * @return the result of {@link GUI#stringifyProject()} using the new
+     *         project, or a JSON error message if there is an error creating
+     *         the project.
+     */
     private Object create(String name, Map<String, Path> projects) {
 
       // remove the file type from the end if present
@@ -179,37 +214,32 @@ final class GUI {
       // create path to new file
       Path newFile = Projects.projectFolder().resolve(fileName);
 
-      // if (Projects.addPathChoice(newFile)) {
       try {
         project = new Project(newFile);
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
-        // return GSON.toJson("ERROR creating project.");
         return JsonMessages.makeError("Could not create project: "
             + e.getMessage());
       }
       return stringifyProject();
-      // } else {
-      // return GSON.toJson("Project already exists!");
-      // }
+
     }
 
+    /**
+     * Loads the project of the given name, if it can be found.
+     *
+     * @param name
+     *          The name of the project to be loaded.
+     * @param projects
+     *          The existing projects, a map of names to Paths.
+     * @return the result of {@link GUI#stringifyProject()} using the new
+     *         project, or a JSON error message if there is an error loading the
+     *         project or if the project doesn't exist.
+     */
     private Object load(String name, Map<String, Path> projects) {
-      // if (qm.value("choice") == null) {
-      // return GSON.toJson("Need choice field.");
-      // }
-      // int choice = GSON.fromJson(qm.value("choice"), Integer.class);
-      //
-      // try {
-      // Path newFile = Projects.getPathChoice(choice);
-      // project = new Project(newFile);
-      // } catch (ClassNotFoundException | SQLException e) {
-      // e.printStackTrace();
-      // return GSON.toJson("ERROR loading project.");
-      // } catch (IndexOutOfBoundsException e) {
-      // return OUT_OF_BOUNDS_JSON;
-      // }
-
+      if (!projects.containsKey(name)) {
+        return JsonMessages.makeError(name + " does not exist.");
+      }
       try {
         Path newFile = projects.get(name);
         project = new Project(newFile);
@@ -221,6 +251,17 @@ final class GUI {
       }
     }
 
+    /**
+     * Deletes the project of the given name.
+     *
+     * @param name
+     *          The name of the project to be deleted.
+     * @param projects
+     *          The existing projects, a map of names to Paths.
+     * @return a JSON message if the project was successfully deleted, or a JSON
+     *         error message if the project doesn't exist, or there was a error
+     *         deleting the project.
+     */
     private Object delete(String name, Map<String, Path> projects) {
       if (!projects.containsKey(name)) {
         return JsonMessages.makeError(name + " does not exist.");
@@ -243,8 +284,18 @@ final class GUI {
    * @author narobins
    * @author yz38
    */
-  private class PageActions implements Route {
+  private static class PageActions implements Route {
 
+    /**
+     * Reads a request and calls the appropriate method, or returns appropriate
+     * error messages where applicable.
+     *
+     * @param req
+     * @param res
+     * @return a JSON string containing the response to the request, or an
+     *         appropriate error message if the request is invalid or an error
+     *         occurs trying to fulfill the request.
+     */
     @Override
     public Object handle(Request req, Response res) {
       System.out.println("\nPage action: " + req.params(PARAM)
@@ -272,7 +323,13 @@ final class GUI {
             case "get":
               return get(pageNum);
             case "move":
-              return move(qm, pageNum);
+              Optional<String> check = checkParams(qm, "newSpot");
+              if (check.isPresent()) {
+                System.err.println(check.get());
+                return JsonMessages.makeError(check.get());
+              }
+              int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
+              return move(pageNum, newSpot);
             default:
               // All other params need the whole page
               Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
@@ -296,6 +353,13 @@ final class GUI {
       }
     }
 
+    /**
+     * Gets all of the pages in the current project.
+     *
+     * @return A list of all the pages in the current project, or a JSON error
+     *         message if the project is empty or there was an error querying
+     *         the database for pages.
+     */
     private Object getAll() {
       List<Page> pages = project.getAllPages();
       if (pages.isEmpty()) {
@@ -305,6 +369,14 @@ final class GUI {
       return GSON.toJson(pages);
     }
 
+    /**
+     * Gets a single page in the current project.
+     *
+     * @param pageNum
+     *          The number of the page to get, 1-indexed.
+     * @return The page with the given number, or a JSON error message if
+     *         pageNum is out of bounds.
+     */
     private Object get(int pageNum) {
       if (!project.inBounds(pageNum)) {
         return OUT_OF_BOUNDS_JSON;
@@ -312,6 +384,14 @@ final class GUI {
       return GSON.toJson(project.getPage(pageNum));
     }
 
+    /**
+     * Saves a page to the current project.
+     *
+     * @param page
+     * @return a JSON message if the page was successfully saved, or a JSON
+     *         error message if the page's number is out of bounds, or an error
+     *         occurs while saving the project.
+     */
     private Object save(Page page) {
       if (!project.inBounds(page.getNum())) {
         return OUT_OF_BOUNDS_JSON;
@@ -324,19 +404,19 @@ final class GUI {
       }
     }
 
-    private Object move(QueryParamsMap qm, int pageNum) {
-      if (!project.inBounds(pageNum)) {
-        return OUT_OF_BOUNDS_JSON;
-      }
-      Optional<String> check = checkParams(qm, "newSpot");
-      if (check.isPresent()) {
-        System.err.println(check.get());
-        return JsonMessages.makeError(check.get());
-      }
-
-      int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
-
-      if (!project.inBounds(newSpot)) {
+    /**
+     * Moves a page from its position to a new position.
+     *
+     * @param pageNum
+     *          The number of the page to move, 1-indexed.
+     * @param newSpot
+     *          The position to which the page will be moved, 1-indexed.
+     * @return a JSON message if the page was successfully moved, or a JSON
+     *         error message if either pageNum or newSpot are out of bounds, or
+     *         there is an error moving the page.
+     */
+    private Object move(int pageNum, int newSpot) {
+      if (!(project.inBounds(pageNum) && !project.inBounds(newSpot))) {
         return OUT_OF_BOUNDS_JSON;
       }
 
@@ -349,26 +429,25 @@ final class GUI {
       }
     }
 
+    /**
+     * Adds a page to the current project.
+     *
+     * @param page
+     *          The page to be added.
+     * @return a JSON message if the page was successfully moved, or a JSON
+     *         error message if the page's number is not equal to the number of
+     *         pages plus 1, or there is an error adding the page.
+     */
     private Object add(Page page) {
       if (page.getNum() != project.getPageCount() + 1) {
         return OUT_OF_BOUNDS_JSON;
       }
-      // String json = qm.value("json");
-      // String thumbnail = qm.value("thumbnail");
-      // Page newPage = new Page(pageNum, json, thumbnail);
       if (project.addPage(page)) {
         return JsonMessages.makeMessage("Successfully added page");
       } else {
         return JsonMessages.makeError("Failure adding page");
       }
     }
-
-    // private Page getPage(QueryParamsMap qm, int pageNum) {
-    // String json = qm.value("json");
-    // String thumbnail = qm.value("thumbnail");
-    // return new Page(pageNum, json, thumbnail);
-    // }
-
   }
 
   /**
@@ -382,6 +461,10 @@ final class GUI {
    */
   private static class Setup implements TemplateViewRoute {
 
+    /**
+     * @return a ModelAndView object containing the location of the main ftl
+     *         file, and the title.
+     */
     @Override
     public ModelAndView handle(Request arg0, Response arg1) {
       Map<String, Object> variables = ImmutableMap.of("title", "Storyboarder");
