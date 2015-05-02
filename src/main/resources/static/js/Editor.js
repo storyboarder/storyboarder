@@ -211,10 +211,19 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		"MovePage": function(params) {
 			checkParams(params, ["from", "to"]);
 			$.post("/pages/move", params, function(response) {
+				var responseObject = JSON.parse(response);
 				console.log("Move page called with: ", params);
-				console.log("response: ", JSON.parse(response));
+				console.log("response: ", responseObject);
 			});
 		},
+		"DeletePage": function(params) {
+			checkParams(params, ["pageNum"]);
+			$.post("/pages/delete", params, function(response) {
+				var responseObject = JSON.parse(response);
+				console.log("Delete page called with: ", params);
+				console.log("response: ", responseObject);
+			});
+		}
 		"Export": function(params) {
 			console.log(width, height);
 			var pdf = new jsPDF('portrait', 'pt', [height * 72 / 96, width * 72 / 96]);
@@ -326,7 +335,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		var between = 100;
 
 		console.log("creating an empty project.");
-		actions.CreateProjTest({name: "test_proj_dont_use"});
+		actions.CreateProjTest({
+			name: "test_proj_dont_use"
+		});
 
 		window.setTimeout(function() {
 			console.log(" ");
@@ -357,7 +368,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("testing get page after addition of FOOOO!. Expecing something with FOOOO!. Result:");
-			actions.GetPage({pageNum: 1});
+			actions.GetPage({
+				pageNum: 1
+			});
 		}, wait);
 
 		wait += between;
@@ -419,7 +432,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		window.setTimeout(function() {
 			console.log(" ");
 			console.log("Getting hello world from new project");
-			actions.GetPage({pageNum: 1});
+			actions.GetPage({
+				pageNum: 1
+			});
 		}, wait);
 
 		wait += between;
@@ -428,7 +443,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log(" ");
 			console.log("Loading new project");
 			actions.LoadProj({
-				choice: 2
+				name: "test_proj_2_dont_use"
 			});
 		}, wait);
 
@@ -447,6 +462,18 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log("Reading hey there from loaded project");
 			actions.GetPage(1);
 		}, wait);
+
+		wait += between;
+		window.setTimeout(function() {
+			console.log(" ");
+			console.log("Deleting 'test_proj_dont_use' and 'test_proj_2_dont_use'");
+			actions.DeleteProj({
+				name: "test_proj_dont_use"
+			});
+			actions.DeleteProj({
+				name: "test_proj_2_dont_use"
+			});
+		});
 
 		//toolset.test();
 		// console.log("editor tested");
