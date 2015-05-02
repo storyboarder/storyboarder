@@ -29,7 +29,7 @@ public class SqlQueryerTest {
 
   @BeforeClass
   public static void createDb() throws ClassNotFoundException, SQLException,
-    IOException {
+  IOException {
     Files.deleteIfExists(DB_PATH);
     queryer = new SqlQueryer(DB_PATH);
     String table1 = "CREATE TABLE " + TABLE_1 + " (strings TEXT, ints INTEGER)";
@@ -52,7 +52,7 @@ public class SqlQueryerTest {
   public void hasTablesTest() {
     String sql = "SELECT tbl_name FROM sqlite_master WHERE type = 'table'";
     List<String> tables = queryer.query(sql,
-        BasicResultConverters.STRING_CONVERTER);
+        ResultConverter.singleColumnConverter(String.class));
     assertEquals(2, tables.size());
     assertEquals(TABLE_1, tables.get(0));
     assertEquals(TABLE_2, tables.get(1));

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sqlUtil.BasicResultConverters;
+import sqlUtil.ResultConverter;
 import sqlUtil.SqlQueryer;
 
 class Project {
@@ -27,7 +27,7 @@ class Project {
 
   int getPageCount() {
     return queryer.queryOne(Projects.pageCountSql(),
-        BasicResultConverters.INT_CONVERTER);
+        ResultConverter.singleColumnConverter(Integer.class));
 
     // try {
     // ResultSet count = queryer.query(Projects.pageCountSql());
