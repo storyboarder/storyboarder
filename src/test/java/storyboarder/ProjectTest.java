@@ -108,6 +108,27 @@ public class ProjectTest {
   }
 
   @Test
+  public void getAllPagesTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    createTestDatabase();
+    assertTrue(addPages());
+    List<Page> testPages = testProj.getAllPages();
+    for (int i = 0; i < pages.size(); i++) {
+      assertEquals(pages.get(i), testPages.get(i));
+    }
+  }
+
+  @Test
+  public void setPageTest() throws ClassNotFoundException, SQLException,
+    IOException {
+    createTestDatabase();
+    assertTrue(addPages());
+    Page newPage1 = new Page(1, "asdf", "aslihgakjfh");
+    Page newPage2 = new Page(2, "afkgh", "bar!");
+    Page newPage4 = new Page(4, "foo!", "bar!");
+  }
+
+  @Test
   public void everythingTest() throws ClassNotFoundException, SQLException,
   IOException {
     createTestDatabase();

@@ -58,11 +58,12 @@ public class SqlQueryer implements AutoCloseable {
   public <T> List<T> query(String query, ResultConverter<T> converter) {
     try (PreparedStatement prep = conn.prepareStatement(query)) {
       List<T> results = new ArrayList<T>();
-      ResultSet rs = prep.executeQuery();
-      while (rs.next()) {
-        results.add(converter.convert(rs));
+      try (ResultSet rs = prep.executeQuery()) {
+        while (rs.next()) {
+          results.add(converter.convert(rs));
+        }
+        return results;
       }
-      return results;
     } catch (SQLException e) {
       e.printStackTrace();
       return null;
@@ -86,9 +87,10 @@ public class SqlQueryer implements AutoCloseable {
    */
   public <T> T queryOne(String query, ResultConverter<T> converter) {
     try (PreparedStatement prep = conn.prepareStatement(query)) {
-      ResultSet rs = prep.executeQuery();
-      if (rs.next()) {
-        return converter.convert(rs);
+      try (ResultSet rs = prep.executeQuery()) {
+        if (rs.next()) {
+          return converter.convert(rs);
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();

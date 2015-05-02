@@ -428,10 +428,7 @@ final class GUI {
      *         there is an error moving the page.
      */
     private Object move(int pageNum, int newSpot) {
-      System.out.println("MOVE PAGE FROM " + pageNum + " TO " + newSpot);
-      System.out.println(project.getPageCount());
       if (!(project.inBounds(pageNum) && project.inBounds(newSpot))) {
-        System.out.println("hmmmmmmmmmmmmmm");
         return OUT_OF_BOUNDS_JSON;
       }
 

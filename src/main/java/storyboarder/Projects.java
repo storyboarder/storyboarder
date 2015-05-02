@@ -21,14 +21,11 @@ import sqlutil.SqlString;
  * @author ktsakas
  * @author narobins
  * @author yz38
- *
  */
 public final class Projects {
   private static final Path PROJECT_FOLDER = Paths.get("projects");
   private static final String TABLE_NAME = "pages";
   private static final String FILE_TYPE = ".sqlite3";
-
-  // private static Set<Path> pathChoices = getPathChoices();
 
   private Projects() {
     String message = "This class cannot have instances.";
