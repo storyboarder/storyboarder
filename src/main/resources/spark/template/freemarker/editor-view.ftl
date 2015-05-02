@@ -12,6 +12,8 @@
     </div>
 
     <div id="editor" style="overflow:scroll;">
+    <p id="heading"><span id="title">Storyboarder</span> <span id="currentPage">0</span>/<span id="numPages">0</span></p>
+
         <div class="previous-page">
           <a href="#" data-content="Previous page"><i class="fa fa-x fa-caret-left"></i></a>
         </div>
@@ -33,7 +35,7 @@
         <div class="title">Main</div>
         <div class="tools">
           <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
-          <a href="#" class="current tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
+          <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
           <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
           <a href="#" class="action" id="Undo" data-action="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
           <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->

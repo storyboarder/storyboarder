@@ -5,18 +5,21 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
 
-import sqlUtil.SqlString;
+import sqlutil.SqlString;
 
 public final class Projects {
   private static final Path PROJECT_FOLDER = Paths.get("projects");
+  private static final String TABLE_NAME = "pages";
   private static final String FILE_TYPE = ".sqlite3";
 
-  private static Set<Path> pathChoices = getPathChoices();
+  // private static Set<Path> pathChoices = getPathChoices();
+
+  private Projects() {
+  }
 
   public static Path projectFolder() {
     return PROJECT_FOLDER;
@@ -26,25 +29,25 @@ public final class Projects {
     return FILE_TYPE;
   }
 
-  public static boolean addPathChoice(Path newChoice) {
-    return pathChoices.add(newChoice);
-  }
-
-  public static Path getPathChoice(int choice) {
-    return new ArrayList<Path>(pathChoices).get(choice);
-  }
-
-  public static Set<String> pathChoiceNames() {
-    Set<String> names = new TreeSet<String>();
-    for (Path choice : pathChoices) {
-      String choiceName = choice.getFileName().toString();
-      names.add(choiceName.replace(Projects.fileType(), ""));
-    }
-    return names;
-  }
+  // public static boolean addPathChoice(Path newChoice) {
+  // return pathChoices.add(newChoice);
+  // }
+  //
+  // public static Path getPathChoice(int choice) {
+  // return new ArrayList<Path>(pathChoices).get(choice);
+  // }
+  //
+  // public static Set<String> pathChoiceNames() {
+  // Set<String> names = new TreeSet<String>();
+  // for (Path choice : pathChoices) {
+  // String choiceName = choice.getFileName().toString();
+  // names.add(choiceName.replace(Projects.fileType(), ""));
+  // }
+  // return names;
+  // }
 
   static String tableName() {
-    return "pages";
+    return TABLE_NAME;
   }
 
   static String createTableSql() {
@@ -74,9 +77,6 @@ public final class Projects {
   static String addPageSql(Page page) {
     String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
-    System.out.println(page.getNum());
-    System.out.println(page.getJson());
-    System.out.println(page.getThumbnail());
     builder.addParam(page.getNum()).addParam(page.getJson())
     .addParam(page.getThumbnail());
     return builder.build().getSql();
@@ -107,15 +107,14 @@ public final class Projects {
     return SqlString.of(sql, tableName()).getSql();
   }
 
-  private static Set<Path> getPathChoices() {
+  public static Map<String, Path> getProjects() {
     try {
       Files.createDirectories(Projects.projectFolder());
     } catch (IOException e) {
       System.err.println("ERROR creating necessary directories: "
           + e.getMessage());
     }
-    Set<Path> pathChoices = new TreeSet<Path>();
-
+    Map<String, Path> projects = new HashMap<String, Path>();
     try (DirectoryStream<Path> choicesStream = Files
         .newDirectoryStream(Projects.projectFolder())) {
       Iterator<Path> choicesIterator = choicesStream.iterator();
@@ -123,14 +122,43 @@ public final class Projects {
       while (choicesIterator.hasNext()) {
         Path nextPath = choicesIterator.next();
         if (nextPath.toString().endsWith(Projects.fileType())) {
-          pathChoices.add(nextPath);
+          String key = nextPath.getFileName().toString()
+              .replace(fileType(), "");
+          projects.put(key, nextPath);
         }
       }
-      System.out.println(pathChoices);
+      System.out.println(projects);
     } catch (IOException e) {
       System.err.println("ERROR: error getting possible projects: "
           + e.getMessage());
     }
-    return pathChoices;
+    return projects;
   }
+
+  // private static Set<Path> getPathChoices() {
+  // try {
+  // Files.createDirectories(Projects.projectFolder());
+  // } catch (IOException e) {
+  // System.err.println("ERROR creating necessary directories: "
+  // + e.getMessage());
+  // }
+  // Set<Path> pathChoices = new TreeSet<Path>();
+  //
+  // try (DirectoryStream<Path> choicesStream = Files
+  // .newDirectoryStream(Projects.projectFolder())) {
+  // Iterator<Path> choicesIterator = choicesStream.iterator();
+  //
+  // while (choicesIterator.hasNext()) {
+  // Path nextPath = choicesIterator.next();
+  // if (nextPath.toString().endsWith(Projects.fileType())) {
+  // pathChoices.add(nextPath);
+  // }
+  // }
+  // System.out.println(pathChoices);
+  // } catch (IOException e) {
+  // System.err.println("ERROR: error getting possible projects: "
+  // + e.getMessage());
+  // }
+  // return pathChoices;
+  // }
 }

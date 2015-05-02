@@ -42,7 +42,7 @@ define(["../../CanvasState"], function(canvasState) {
 	        textbox : this
 	 	});
 
-      this.border.elmType = "textBorder";
+		this.border.elmType = "textBorder";
       canvas.add(this.border);
 	  },
 
@@ -255,13 +255,6 @@ define(["../../CanvasState"], function(canvasState) {
 		  if(selected.elmType === "rectext") {
 		  	selected.adjustScale(selected.left, selected.top);
 		  }
-
-/*		  if (selected.elmType == "rectext") {
-		    selected.adjustScale(selected.scaleX, selected.scaleY, selected.left, selected.top);
-		  } else if (selected.elmType == "textBorder") {
-		    selected.textbox.adjustScale(selected.scaleX, selected.scaleY, selected.left + selected.padding, selected.top + selected.padding);
-		  }
-		  console.log(selected);*/
 		});
 
 		canvas.on("text:changed", function(e) {

@@ -1,5 +1,10 @@
 package storyboarder;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import sqlutil.ResultConverter;
+
 /**
  * Represents a page in a storyboarder project. Stores page number, the page's
  * json string, and the page's thumbnail.
@@ -10,7 +15,7 @@ package storyboarder;
  * @author yz38 *
  */
 class Page {
-  private final int num;
+  private final int pageNum;
   private final String json;
   private final String thumbnail;
 
@@ -26,8 +31,8 @@ class Page {
    *          The result of canvas.toDataURL, which can be turned into a
    *          thumbnail.
    */
-  Page(int num, String json, String thumbnail) {
-    this.num = num;
+  Page(int pageNum, String json, String thumbnail) {
+    this.pageNum = pageNum;
     this.json = json;
     this.thumbnail = thumbnail;
   }
@@ -36,7 +41,7 @@ class Page {
    * @return The page number of this page.
    */
   int getNum() {
-    return num;
+    return pageNum;
   }
 
   /**
@@ -56,7 +61,7 @@ class Page {
 
   @Override
   public String toString() {
-    return "{num: " + num + ", json: " + json + ", thumbnail: " + thumbnail
+    return "{num: " + pageNum + ", json: " + json + ", thumbnail: " + thumbnail
         + "}";
   }
 
@@ -65,7 +70,7 @@ class Page {
     final int prime = 31;
     int result = 1;
     result = prime * result + json.hashCode();
-    result = prime * result + num;
+    result = prime * result + pageNum;
     result = prime * result + thumbnail.hashCode();
     return result;
   }
@@ -82,8 +87,22 @@ class Page {
       return false;
     }
     Page o = (Page) obj;
-    return num == o.getNum() && json.equals(o.getJson())
+    return pageNum == o.getNum() && json.equals(o.getJson())
         && thumbnail.equals(o.getThumbnail());
+  }
+
+  static class Converter implements ResultConverter<Page> {
+
+    private static final int NUM = 1;
+    private static final int JSON = 2;
+    private static final int THUMBNAIL = 3;
+
+    @Override
+    public Page convert(ResultSet rs) throws SQLException {
+      return new Page(rs.getInt(NUM), rs.getString(JSON),
+          rs.getString(THUMBNAIL));
+    }
+
   }
 
 }
