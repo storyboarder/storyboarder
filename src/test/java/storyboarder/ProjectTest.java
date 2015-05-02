@@ -21,13 +21,13 @@ public class ProjectTest {
 
   private static final List<Page> pages = ImmutableList.of(new Page(1,
       "foo bar", "derp"), new Page(2, "page two!", "yurp"), new Page(3,
-      "page three!", "shmurp"), new Page(4, "page four!", "nurp"));
+          "page three!", "shmurp"), new Page(4, "page four!", "nurp"));
 
   private static Project testProj;
 
   @BeforeClass
   public static void createTestDatabase() throws ClassNotFoundException,
-  SQLException, IOException {
+    SQLException, IOException {
     Files.deleteIfExists(dbPath);
     testProj = new Project(dbPath);
   }
@@ -48,7 +48,7 @@ public class ProjectTest {
 
   @Test
   public void addTest() throws ClassNotFoundException, SQLException,
-    IOException {
+  IOException {
     createTestDatabase();
     boolean thrown = false;
     try {
@@ -97,7 +97,7 @@ public class ProjectTest {
 
   @Test
   public void getPageTest() throws ClassNotFoundException, SQLException,
-  IOException {
+    IOException {
     createTestDatabase();
 
     assertTrue(addPages());
@@ -105,13 +105,11 @@ public class ProjectTest {
       assertEquals(page, testProj.getPage(page.getNum()));
     }
 
-    testProj.ge
-
   }
 
   @Test
   public void everythingTest() throws ClassNotFoundException, SQLException,
-    IOException {
+  IOException {
     createTestDatabase();
     assertEquals(0, testProj.getPageCount());
 
