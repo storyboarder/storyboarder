@@ -2,6 +2,7 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Main canvas
 	var canvas;
+	var canvasId = "canvas";
 	// Helper canvas to paint grid or indicators etc.
 	var helperCanvas;
 	// Socket for multiplayer
@@ -180,8 +181,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	/* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
-	var init = function(callback) {
-		console.log("INIT");
+	var init = function() {
 		$canvas = $("#" + canvasId);
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
@@ -196,8 +196,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		helperCanvas = new fabric.Canvas("helperCanvas", {
 			selection: false
 		});
-
-		if (typeof callback != "undefined") callback();
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
