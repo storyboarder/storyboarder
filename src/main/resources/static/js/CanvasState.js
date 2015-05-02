@@ -320,61 +320,60 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas._objects.map(m);
 		},
 		filterElements: function(e) {
-//            return elements.filter(e);
 			return canvas._objects.filter(e);
-        },
-        getOppositeDirection: getOppositeDirection,
-        getDimension: getDimension,
-        contains: contains,
-        addPanel: addPanel,
-        addImage: addImage,
-        setControls: setControls,
-        getPageEdge: function(c) {
-            return pageEdges[c];
-        },
-        getPageEdges: function() {
-            return pageEdges;
-        },
-        deleteElement: deleteElement,
-        load_page: function(canvasId, json, callback) {
-        		var that = this;
-            init_page(function() {
-            	console.log("loading from json: ", json);
-            	canvas.loadFromJSON(json, function() {
-            		canvas.renderAll.bind(canvas);
-            		canvas.renderAll();
-            		if (typeof callback != "undefined") {
-            			callback();
-            		}
-            	});
-            });
-        },
-        load_project: function(canvasId, json, callback) {
-					var that = this;
-					init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
-						console.log("loading canvas from json...", json);
-						canvas.loadFromJSON(json, function() {
-							console.log(canvas);
-							console.log("done loading");
-							canvas.renderAll.bind(canvas);
-							canvas.renderAll();
-							if (typeof callback != "undefined") {
-								callback();
-							}
-						});
+		},
+		getOppositeDirection: getOppositeDirection,
+		getDimension: getDimension,
+		contains: contains,
+		addPanel: addPanel,
+		addImage: addImage,
+		setControls: setControls,
+		getPageEdge: function(c) {
+				return pageEdges[c];
+		},
+		getPageEdges: function() {
+				return pageEdges;
+		},
+		deleteElement: deleteElement,
+		load_page: function(canvasId, json, callback) {
+				var that = this;
+				init_page(function() {
+					console.log("loading from json: ", json);
+					canvas.loadFromJSON(json, function() {
+						canvas.renderAll.bind(canvas);
+						canvas.renderAll();
+						if (typeof callback != "undefined") {
+							callback();
+						}
 					});
+				});
+		},
+		load_project: function(canvasId, json, callback) {
+			var that = this;
+			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
+				console.log("loading canvas from json...", json);
+				canvas.loadFromJSON(json, function() {
+					console.log(canvas);
+					console.log("done loading");
+					canvas.renderAll.bind(canvas);
+					canvas.renderAll();
+					if (typeof callback != "undefined") {
+						callback();
+					}
+				});
+			});
 
-					console.log("ENDING LOAD");
-        },
-        init: init,
-        init_page: init_page,
-        init_project: init_project,
-        addElement: addElement,
-        setPageMargin: function(p) {
-            pageMargin = p;
-        },
-        setPanelMargin: function(p) {
-//        	throw "setting panel margin";
+			console.log("ENDING LOAD");
+		},
+		init: init,
+		init_page: init_page,
+		init_project: init_project,
+		addElement: addElement,
+		setPageMargin: function(p) {
+				pageMargin = p;
+		},
+		setPanelMargin: function(p) {
+		//        	throw "setting panel margin";
 			panelMargin = p;
 		},
 		setGridSpacing: function(p) {
