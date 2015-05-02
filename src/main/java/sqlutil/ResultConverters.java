@@ -13,7 +13,8 @@ import java.sql.SQLException;
  */
 public final class ResultConverters {
   private ResultConverters() {
-    throw new UnsupportedOperationException("This class cannot have instances.");
+    String message = "This class cannot have instances.";
+    throw new UnsupportedOperationException(message);
   }
 
   /**
