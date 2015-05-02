@@ -62,7 +62,8 @@ final class GUI {
   private static Project project;
 
   private GUI() {
-    throw new UnsupportedOperationException("This class cannot have instances.");
+    String message = "This class cannot have instances.";
+    throw new UnsupportedOperationException(message);
   }
 
   /**

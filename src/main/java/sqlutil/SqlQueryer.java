@@ -80,7 +80,9 @@ public class SqlQueryer implements AutoCloseable {
    *          desired object.
    * @param <T>
    *          the type of object to be returned.
-   * @return The object created by 'converter' from the single ResultSet row.
+   * @return The object created by 'converter' from the single ResultSet row, or
+   *         null if the query returns no elements, or an error occurs while
+   *         querying the database.
    */
   public <T> T queryOne(String query, ResultConverter<T> converter) {
     try (PreparedStatement prep = conn.prepareStatement(query)) {
@@ -133,7 +135,8 @@ public class SqlQueryer implements AutoCloseable {
 
   /**
    * @see java.lang.AutoCloseable#close()
-   * @Throws Exception - if this resource cannot be closed
+   * @throws Exception
+   *           if this resource cannot be closed
    */
   @Override
   public void close() throws Exception {

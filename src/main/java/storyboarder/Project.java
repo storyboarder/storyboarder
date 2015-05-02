@@ -8,6 +8,15 @@ import java.util.List;
 import sqlutil.ResultConverters;
 import sqlutil.SqlQueryer;
 
+/**
+ * Represents a Storyboarder project. Stores pages of a project in a database
+ * using their JSON strings.
+ * 
+ * @author fbystric
+ * @author ktsakas
+ * @author narobins
+ * @author yz38
+ */
 class Project implements AutoCloseable {
 
   private static final String OUT_OF_BOUNDS_MSG =
@@ -17,30 +26,63 @@ class Project implements AutoCloseable {
 
   private final SqlQueryer queryer;
 
+  /**
+   * Constructs a project for the given path.
+   *
+   * @param path
+   *          The path to the database that stores the project, or to the path
+   *          where such a database is to be created.
+   * @throws ClassNotFoundException
+   *           if the class cannot be located
+   *
+   * @throws SQLException
+   *           If a database access error occurs while connecting to the
+   *           database.
+   */
   Project(Path path) throws ClassNotFoundException, SQLException {
     this.path = path;
     queryer = new SqlQueryer(path);
     queryer.execute(Projects.createTableSql());
   }
 
+  /**
+   * @return the name of this project.
+   */
   String name() {
     return path.getFileName().toString().replace(Projects.fileType(), "");
   }
 
+  /**
+   * @return the number of pages in this project.
+   */
   int getPageCount() {
     return queryer.queryOne(Projects.pageCountSql(),
         ResultConverters.singleColumnConverter(1, Integer.class));
   }
 
+  /**
+   * @param pageNum
+   *          the number of the page being requested.
+   * @return The page with the number 'pageNum', or null if there is no such
+   *         page.
+   */
   Page getPage(int pageNum) {
-    throwIfOutOfBounds(pageNum);
     return queryer.queryOne(Projects.getPageSql(pageNum), new Page.Converter());
   }
 
+  /**
+   * @return a list of all the pages in this project.
+   */
   List<Page> getAllPages() {
     return queryer.query(Projects.getAllPagesSql(), new Page.Converter());
   }
 
+  /**
+   * TODO
+   *
+   * @param page
+   * @return
+   */
   boolean savePage(Page page) {
     throwIfOutOfBounds(page.getNum());
     return queryer.execute(Projects.savePageSql(page));
