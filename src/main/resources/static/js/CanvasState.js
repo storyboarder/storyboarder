@@ -324,42 +324,43 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		filterElements: function(e) {
 //            return elements.filter(e);
 			return canvas._objects.filter(e);
-		},
-		getOppositeDirection: getOppositeDirection,
-		getDimension: getDimension,
-		contains: contains,
-		addPanel: addPanel,
-		addImage: addImage,
-		setControls: setControls,
-		getPageEdge: function(c) {
-			return pageEdges[c];
-		},
-		getPageEdges: function() {
-			return pageEdges;
-		},
-		deleteElement: deleteElement,
-		load: function(canvasId, json, callback) {
-				console.log(json);
-				var that = this;
-			init(canvasId, json.width, json.height, function() {
-				that.setPageMargin(json.pageMargin);
-				that.setPanelMargin(json.panelMargin);
-				canvas.loadFromJSON(json, function() {
-					canvas.renderAll.bind(canvas);
-					canvas.renderAll();
-					if (typeof callback != "undefined") {
-						console.log(callback);
-						callback();
-					}
-				});
-			});
-		},
-		init: init,
-		addElement: addElement,
-		setPageMargin: function(p) {
-			pageMargin = p;
-		},
-		setPanelMargin: function(p) {
+        },
+        getOppositeDirection: getOppositeDirection,
+        getDimension: getDimension,
+        contains: contains,
+        addPanel: addPanel,
+        addImage: addImage,
+        setControls: setControls,
+        getPageEdge: function(c) {
+            return pageEdges[c];
+        },
+        getPageEdges: function() {
+            return pageEdges;
+        },
+        deleteElement: deleteElement,
+        load: function(canvasId, json, callback) {
+        		console.log(json);
+        		var that = this;
+            init(canvasId, json.width, json.height, function() {
+            	that.setPageMargin(json.pageMargin);
+            	that.setPanelMargin(json.panelMargin);
+            	console.log("loading canvas from json...", json);
+            	canvas.loadFromJSON(json, function() {
+            		canvas.renderAll.bind(canvas);
+            		canvas.renderAll();
+            		if (typeof callback != "undefined") {
+            			console.log(callback);
+            			callback();
+            		}
+            	});
+            });
+        },
+        init: init,
+        addElement: addElement,
+        setPageMargin: function(p) {
+            pageMargin = p;
+        },
+        setPanelMargin: function(p) {
 //        	throw "setting panel margin";
 			panelMargin = p;
 		},

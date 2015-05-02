@@ -11,6 +11,8 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import sqlutil.SqlString;
+
 public class SqlStringTest {
   @Test
   public void constructionNoParamsTest() {

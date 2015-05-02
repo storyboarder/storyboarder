@@ -30,32 +30,44 @@ import spark.template.freemarker.FreeMarkerEngine;
 final class GUI {
   private static final Gson GSON = new Gson();
 
+  /**
+   * The name given to parameters passed to Spark routes in requests.
+   */
   private static final String PARAM = ":action";
 
-  private static final String NULL_PROJ_JSON =
-      GSON.toJson("ERROR: Need to initialize the project!");
-
-  private static final String OUT_OF_BOUNDS_JSON =
-      GSON.toJson("ERROR: Index out of bounds!");
-
+  /**
+   * The JSON error message returned whenever a request is made that does not
+   * contain one of the possible arguments.
+   */
   private static final String INVALID_PARAM_JSON =
       GSON.toJson("ERROR: Invalid parameter in post request string!");
 
-  private final int port;
+  /**
+   * The JSON error message returned when a project request is made before a
+   * project is created or loaded.
+   */
+  private static final String NULL_PROJ_JSON =
+      GSON.toJson("ERROR: Need to initialize the project!");
+
+  /**
+   * The JSON error message returned whenever a request is made that would or
+   * did result in an IndexOutOfBounds error.
+   */
+  private static final String OUT_OF_BOUNDS_JSON =
+      GSON.toJson("ERROR: Index out of bounds!");
 
   private Project project;
 
   GUI(int port, Project project) {
-    this.port = port;
+    Spark.setPort(port);
     this.project = project;
   }
 
   GUI(int port) {
-    this.port = port;
+    Spark.setPort(port);
   }
 
   void start() {
-    Spark.setPort(port);
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
 
@@ -66,14 +78,15 @@ final class GUI {
   /**
    * Serializes the current project.
    *
-   * @return The number of pages in a project, and the first page of the
-   *         project. The first page element will be null if the number of pages
-   *         is zero.
+   * @return The number of pages in a project, the name of the project, and the
+   *         first page of the project. The first page element will be 'empty
+   *         project' if the number of pages is zero.
    */
   private Object stringifyProject() {
     int numPages = project.getPageCount();
     Map<String, Object> data = new HashMap<String, Object>();
     data.put("numPages", numPages);
+    data.put("name", project.name());
     data.put("page", "empty project");
     if (numPages > 0) {
       data.put("page", project.getPage(1));
@@ -82,6 +95,14 @@ final class GUI {
     return GSON.toJson(data);
   }
 
+  /**
+   * Handles all actions that involve the entire Project.
+   *
+   * @author fbystric
+   * @author ktsakas
+   * @author narobins
+   * @author yz38
+   */
   private class ProjectActions implements Route {
 
     @Override
@@ -96,7 +117,7 @@ final class GUI {
         case "load":
           return load(qm);
         case "choices":
-          return GSON.toJson(Projects.pathChoiceNames());
+          return GSON.toJson(Projects.getProjects().keySet());
         default:
           return INVALID_PARAM_JSON;
 
@@ -104,45 +125,73 @@ final class GUI {
     }
 
     private Object create(QueryParamsMap qm) {
-      String fileName = qm.value("name");
-      if (!fileName.endsWith(Projects.fileType())) {
-        fileName += Projects.fileType();
+
+      String givenName = qm.value("name").replace(Projects.fileType(), "");
+      Map<String, Path> projects = Projects.getProjects();
+
+      String fileName = givenName;
+
+      int i = 2;
+      while (projects.containsKey(fileName)) {
+        fileName = givenName + i;
+        i++;
       }
+      fileName += Projects.fileType();
+
       Path newFile = Projects.projectFolder().resolve(fileName);
 
-      if (Projects.addPathChoice(newFile)) {
-        try {
-          project = new Project(newFile);
-        } catch (ClassNotFoundException | SQLException e) {
-          e.printStackTrace();
-          return GSON.toJson("ERROR creating project.");
-        }
-        return stringifyProject();
-      } else {
-        return GSON.toJson("Project already exists!");
-      }
-    }
-
-    private Object load(QueryParamsMap qm) {
-      if (qm.value("choice") == null) {
-        return GSON.toJson("Need choice field.");
-      }
-      int choice = GSON.fromJson(qm.value("choice"), Integer.class);
-
+      // if (Projects.addPathChoice(newFile)) {
       try {
-        Path newFile = Projects.getPathChoice(choice);
         project = new Project(newFile);
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
-        return GSON.toJson("ERROR loading project.");
-      } catch (IndexOutOfBoundsException e) {
-        return OUT_OF_BOUNDS_JSON;
+        return GSON.toJson("ERROR creating project.");
       }
       return stringifyProject();
+      // } else {
+      // return GSON.toJson("Project already exists!");
+      // }
+    }
+
+    private Object load(QueryParamsMap qm) {
+      // if (qm.value("choice") == null) {
+      // return GSON.toJson("Need choice field.");
+      // }
+      // int choice = GSON.fromJson(qm.value("choice"), Integer.class);
+      //
+      // try {
+      // Path newFile = Projects.getPathChoice(choice);
+      // project = new Project(newFile);
+      // } catch (ClassNotFoundException | SQLException e) {
+      // e.printStackTrace();
+      // return GSON.toJson("ERROR loading project.");
+      // } catch (IndexOutOfBoundsException e) {
+      // return OUT_OF_BOUNDS_JSON;
+      // }
+      String name = qm.value("name");
+      if (name == null) {
+        return GSON.toJson("Need a name field");
+      }
+      try {
+        Path newFile = Projects.getProjects().get(name);
+        project = new Project(newFile);
+        return stringifyProject();
+      } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        return GSON.toJson("ERROR loading project.");
+      }
     }
 
   }
 
+  /**
+   * Handles all actions that involve individual Pages of a Project.
+   *
+   * @author fbystric
+   * @author ktsakas
+   * @author narobins
+   * @author yz38
+   */
   private class PageActions implements Route {
 
     @Override
@@ -154,12 +203,15 @@ final class GUI {
         return NULL_PROJ_JSON;
       }
 
-      if (req.params(PARAM).equals("getAll")) {
-        return getAll();
+      // Check for params that don't need a QueryParamsMap
+      switch (req.params(PARAM)) {
+        case "getAll":
+          return getAll();
       }
 
       QueryParamsMap qm = req.queryMap();
 
+      // All other params need a pageNum
       if (qm.value("pageNum") == null) {
         return GSON.toJson("Need a pageNum field");
       }
@@ -196,7 +248,7 @@ final class GUI {
       return GSON.toJson(project.getPage(pageNum));
     }
 
-    private String save(QueryParamsMap qm, int pageNum) {
+    private Object save(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
         return OUT_OF_BOUNDS_JSON;
       }
@@ -207,7 +259,7 @@ final class GUI {
       }
     }
 
-    private String move(QueryParamsMap qm, int pageNum) {
+    private Object move(QueryParamsMap qm, int pageNum) {
       if (!project.inBounds(pageNum)) {
         return OUT_OF_BOUNDS_JSON;
       }
@@ -228,7 +280,7 @@ final class GUI {
       }
     }
 
-    private String add(QueryParamsMap qm, int pageNum) {
+    private Object add(QueryParamsMap qm, int pageNum) {
       if (pageNum != project.getPageCount() + 1) {
         return OUT_OF_BOUNDS_JSON;
       }
