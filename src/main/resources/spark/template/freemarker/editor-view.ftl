@@ -119,8 +119,8 @@
                 <option value="verdana">Verdana</option>
               </select><br>
               
-              <label for="font-size">Font size: </label><span id="fsize">10</span>
-              <input type="range" value="10" min="0" max="100" id="font-size"><br>
+              <!--<label for="font-size">Font size: </label><span id="fsize">10</span>
+              <input type="range" value="10" min="0" max="100" id="font-size"><br>/-->
               <label for="font-color">Font color:</label>
               <input type="color" value="#000000" id="font-color"><br>
           </div>  
