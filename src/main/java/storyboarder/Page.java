@@ -15,7 +15,7 @@ import sqlutil.ResultConverter;
  * @author yz38 *
  */
 class Page {
-  private final int num;
+  private final int pageNum;
   private final String json;
   private final String thumbnail;
 
@@ -31,8 +31,8 @@ class Page {
    *          The result of canvas.toDataURL, which can be turned into a
    *          thumbnail.
    */
-  Page(int num, String json, String thumbnail) {
-    this.num = num;
+  Page(int pageNum, String json, String thumbnail) {
+    this.pageNum = pageNum;
     this.json = json;
     this.thumbnail = thumbnail;
   }
@@ -41,7 +41,7 @@ class Page {
    * @return The page number of this page.
    */
   int getNum() {
-    return num;
+    return pageNum;
   }
 
   /**
@@ -61,7 +61,7 @@ class Page {
 
   @Override
   public String toString() {
-    return "{num: " + num + ", json: " + json + ", thumbnail: " + thumbnail
+    return "{num: " + pageNum + ", json: " + json + ", thumbnail: " + thumbnail
         + "}";
   }
 
@@ -70,7 +70,7 @@ class Page {
     final int prime = 31;
     int result = 1;
     result = prime * result + json.hashCode();
-    result = prime * result + num;
+    result = prime * result + pageNum;
     result = prime * result + thumbnail.hashCode();
     return result;
   }
@@ -87,7 +87,7 @@ class Page {
       return false;
     }
     Page o = (Page) obj;
-    return num == o.getNum() && json.equals(o.getJson())
+    return pageNum == o.getNum() && json.equals(o.getJson())
         && thumbnail.equals(o.getThumbnail());
   }
 
