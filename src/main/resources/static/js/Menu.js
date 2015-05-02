@@ -39,14 +39,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$('.ui.modal.create-project').modal('show');
 		},
 		"AddPage": function() {
+			console.log("menu ADD PAGE");
 			var idx = $("#page-thumbs").children(".page-thumb").length;
-			console.log(idx);
 			var $html = $(makePageThumb(idx));
 			$("#page-thumbs").append($html);
 			var that = this;
-			var $currentPageHTML = $currentPage;
 			editor.action("AddPage", {callback: function(numPages) {
-				console.log("menu callback");
 				that.SetHeading({currentPage: numPages, numPages: numPages});
 				that.SetCurrentPage($html);
 			}});
@@ -60,13 +58,16 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.action("GetPage", {pageNum: idx});
 		},
 		"RemovePage": function(item) {
+			console.log("menu REMOVE PAGE");
 			var idx = item.attr("data-num");
-			console.log("menu removing page" + idx);
 			var that = this;
-			editor.action("RemovePage", {pageNum: idx, callback: function() {
-				that.UpdatePages();
+			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
+				that.UpdatePages(curr, num);
+				if (num == 0) {
+//					console.log("can't have 0 pages. Adding page...");
+					that.AddPage();
+				}
 			}});
-			item.parent(".page-thumb").remove();
 		},
 		"SetPageDimensions": function(w, h) {
 			console.log("SET PAGE DIMENSIONS: ", w, h);
@@ -77,7 +78,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("create project with name ", $("#project-name").val());
 			this.UpdatePages(0, 0);
 			$('.ui.modal.create-project').modal('hide');
-			console.log($('#canvas').width());
 			width = parseInt($("#page-width").val());
 			height = parseInt($("#page-height").val());
 			this.SetPageDimensions(width, height);
@@ -108,19 +108,23 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if (typeof $currentPage != "undefined") {
 				$currentPage.removeClass("current");
 			}
-			console.log($currPg);
+//			console.log($currPg);
 			$currPg.addClass("current");
 			$currentPage = $currPg;
 		},
 		"UpdatePages": function(curr, num) {
+			console.log("UPDATE PAGES", curr, num);
 			$("#page-thumbs").empty();
 			for (var i = 0; i < num; i++) {
 				$("#page-thumbs").append(makePageThumb(i));
 			}
 			this.SetHeading({currentPage: curr, numPages: num});
 			if ($("#page-thumbs").length > 0) {
-				console.log($("#page-thumbs").children().first());
-				this.SetCurrentPage($("#page-thumbs").children().first());
+//				console.log($("#page-thumbs").children().first());
+//				console.log($("#page-thumbs").eq(curr - 1));
+				this.SetCurrentPage($("#page-thumbs").eq(curr - 1));
+//				this.SetCurrentPage($("#page-thumbs").children().first());
+//				console.log($currentPage);
 			}
 		},
 		"SetHeading": function(params) {
@@ -155,18 +159,20 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("new project");
 			$('.ui.modal.create-project').modal('show');
 		},
-	  "ReorderPages": function() {
-	    console.log("reordering pages");
-	    var arr = $( "#page-thumbs" ).sortable( "toArray" );
-	    console.log(arr);
+	  "MovePage": function(start, end) {
+	    console.log("reordering pages: " + start + " to " + end);
+	    editor.action("MovePage", {from: start, to: end});
 	  },
 	};
 
 	var makePageThumb = function(i) {
+		if (typeof i !== "number") {
+			throw "IllegalType: " + i;
+		}
 		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
-			'<a class="page-thumb view" id="GetPage" href="#" data-num=' + i + '>' + i + '</a>' +
-			'<a href="#" class="remove-page view" id="RemovePage" data-num=' + i + '><i class="fa fa-x fa-remove"></i></a></li>';
+			'<a class="page-thumb view" id="GetPage" href="#" data-num="' + i + '">' + i + '</a>' +
+			'<a href="#" class="remove-page view" id="RemovePage" data-num="' + i + '"><i class="fa fa-x fa-remove"></i></a></li>';
 	};
 
 	var init_project = function() {
@@ -290,13 +296,17 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$('.ui.radio.checkbox').checkbox();
 
+		var page_thumb_idx;
+
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
 			cancel: "a.remove-page",
-			change: function(event, ui) {
-				console.log(event);
-				console.log(ui);
-				views.ReorderPages();
+			start: function(event, ui) {
+				page_thumb_idx = ui.item.index();
+			},
+			stop: function(event, ui) {
+				console.log("moved element " + (1 + page_thumb_idx) + " to " + (1 + ui.item.index()));
+				views.MovePage();
 			}
 		});
 		$("#page-thumbs").disableSelection();

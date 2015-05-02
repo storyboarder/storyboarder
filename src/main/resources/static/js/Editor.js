@@ -68,7 +68,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				response.page.json = JSON.parse(response.page.json);
 //				console.log(response.page);
 				numPages = response.numPages;
-				console.log(response.page);
+//				console.log(response.page);
 				currentPage = 1; //TODO check if valid index?
 //				if (typeof response.page === "string" || !("json" in response.page)) {
 //					console.log("empty project:", response.page);
@@ -105,7 +105,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 					name: params.name
 				}, function(responseJSON) {
 					response = JSON.parse(responseJSON);
-					console.log(response);
+//					console.log(response);
 					projectName = response.name;
 					that.AddPage();
 					params.editor.update();
@@ -126,12 +126,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"])
+			console.log({pageNum: params.pageNum});
 			$.post("/pages/get", {
 					pageNum: params.pageNum
 				},
 				function(response) {
 					console.log("get page called with page " + params.pageNum);
+//					console.log(response);
 					var responseObject = JSON.parse(response);
+//					console.log(responseObject);
 					checkPage(responseObject);
 					currentPage = responseObject.pageNum; // TODO check for errors(?)
 					canvasState.load_page("canvas", JSON.parse(responseObject.json), function() {
@@ -180,9 +183,30 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"RemovePage": function(params) {
+//			console.log(params);
 			checkParams(params, ["pageNum"]);
 			console.log("EDITOR REMOVE PAGE");
-
+			$.post("/pages/delete", {pageNum: params.pageNum}, function(responseJSON) {
+				response = JSON.parse(responseJSON);
+//				console.log(response);
+				if ("message" in response) {
+					numPages--;
+					if (currentPage == params.pageNum) { // deleted the page you're on
+						console.log("deleted the page you're on (" + currentPage + ")");
+						currentPage--;
+						if (currentPage < 1) {
+							currentPage = 1;
+							canvasState.init_page();
+						}
+					} else if (currentPage > params.pageNum) { // deleted a page before the current page
+						currentPage--;
+					}
+					console.log("EDITOR: " + currentPage + "/" + numPages);
+				}
+				if (typeof params.callback != "undefined") {
+					params.callback(currentPage, numPages);
+				}
+			});
 		},
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
@@ -193,7 +217,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				pageJSON = canvasState.getState();
 				$.post("/pages/add", makePage(numPages, pageJSON, ""), function(response) {
 					console.log("add page called with num: " + numPages + " in project " + projectName);
-					console.log("response: ", JSON.parse(response));
+//					console.log("response: ", JSON.parse(response));
 
 					currentPage = numPages;
 					console.log(currentPage + "/" + numPages);
@@ -211,6 +235,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"MovePage": function(params) {
+			console.log("MOVEPAGE");
 			checkParams(params, ["from", "to"]);
 			$.post("/pages/move", params, function(response) {
 				console.log("Move page called with: ", params);
@@ -279,9 +304,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			throw object;
 			return;
 		}
-		console.log(typeof object);
+//		console.log(object, requiredParams);
 		for (var i = 0; i < requiredParams.length; i++) {
 			if (!(requiredParams[i] in object)) {
+				console.log(object);
 				throw "ERROR: need a field: " + requiredParams[i];
 			}
 		}

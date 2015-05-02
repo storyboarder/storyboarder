@@ -152,7 +152,7 @@ define(["../../CanvasState"], function(canvasState) {
       canvas.on("mouse:up", function () {
         //times++;
         //console.log(times);
-        console.log(canvas);
+//        console.log(canvas);
       });
 
       return this;
