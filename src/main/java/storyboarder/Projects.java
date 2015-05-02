@@ -5,9 +5,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import sqlutil.SqlString;
 
@@ -60,14 +60,15 @@ public final class Projects {
    * @return an SQL string used to create the table used to store pages.
    */
   static String createTableSql() {
-    String sql = "CREATE TABLE IF NOT EXISTS ? (num INTEGER primary key, json TEXT, thumbnail TEXT);";
+    String sql = "CREATE TABLE IF NOT EXISTS ? "
+        + "(num INTEGER primary key, json TEXT, thumbnail TEXT);";
     return SqlString.of(sql, tableName()).getSql();
   }
 
   /**
-   *
    * @param pageNum
-   * @return
+   *          The page that is being queried from the database.
+   * @return an SQL string used to query that page from the database.
    */
   static String getPageSql(int pageNum) {
     String sql = "SELECT * FROM ? WHERE num = ?;";
@@ -75,33 +76,59 @@ public final class Projects {
         .getSql();
   }
 
+  /**
+   * @return an SQL string used to get all of the pages from the database.
+   */
   static String getAllPagesSql() {
     String sql = "SELECT * FROM ?;";
     return SqlString.of(sql, tableName()).getSql();
   }
 
+  /**
+   * @param page
+   *          the Page to save to the database.
+   * @return an SQL string used to save that page.
+   */
   static String savePageSql(Page page) {
     String sql = "REPLACE INTO ? VALUES (?, '?', '?');";
-    SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
-    builder.addParam(page.getNum()).addParam(page.getJson())
-    .addParam(page.getThumbnail());
-    return builder.build().getSql();
-  }
-
-  static String addPageSql(Page page) {
-    String sql = "INSERT INTO ? VALUES (?, '?', '?');";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
     builder.addParam(page.getNum()).addParam(page.getJson())
         .addParam(page.getThumbnail());
     return builder.build().getSql();
   }
 
+  /**
+   * @param page
+   *          the Page to add to the database.
+   * @return an SQL string used to add that page to the database.
+   */
+  static String addPageSql(Page page) {
+    String sql = "INSERT INTO ? VALUES (?, '?', '?');";
+    SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
+    builder.addParam(page.getNum()).addParam(page.getJson())
+    .addParam(page.getThumbnail());
+    return builder.build().getSql();
+  }
+
+  /**
+   * @param pageNum
+   *          the number of the page to be deleted from the database.
+   * @return an SQL string used to delete that page from the database.
+   */
   static String deletePageSql(int pageNum) {
     String sql = "DELETE FROM ? WHERE num = ?;";
     return SqlString.of(sql, tableName()).builder().addParam(pageNum).build()
         .getSql();
   }
 
+  /**
+   * @param lower
+   *          the lower bound.
+   * @param upper
+   *          the upper bound.
+   * @return an SQL string used to decrement the number of each page between
+   *         'lower' and 'upper', exclusive.
+   */
   static String updateNumsSql(int lower, int upper) {
     String sql = "UPDATE ? SET num = num - 1 WHERE num > ? AND num < ?;";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
@@ -109,6 +136,13 @@ public final class Projects {
     return builder.build().getSql();
   }
 
+  /**
+   * @param from
+   *          The number to change.
+   * @param to
+   *          The number to change it to.
+   * @return an SQL string used to change one page number to another.
+   */
   static String changeNumSql(int from, int to) {
     String sql = "UPDATE ? SET num = ? WHERE num = ?";
     SqlString.Builder builder = SqlString.of(sql, tableName()).builder();
@@ -116,11 +150,18 @@ public final class Projects {
     return builder.build().getSql();
   }
 
+  /**
+   * @return an SQL string used to count the number of pages in the database.
+   */
   static String pageCountSql() {
     String sql = "SELECT COUNT(*) FROM ?";
     return SqlString.of(sql, tableName()).getSql();
   }
 
+  /**
+   * @return a mapping of project name to project for all of the existing
+   *         projects in the project folder.
+   */
   public static Map<String, Path> getProjects() {
     try {
       Files.createDirectories(Projects.projectFolder());
@@ -128,7 +169,7 @@ public final class Projects {
       System.err.println("ERROR creating necessary directories: "
           + e.getMessage());
     }
-    Map<String, Path> projects = new HashMap<String, Path>();
+    Map<String, Path> projects = new TreeMap<String, Path>();
     try (DirectoryStream<Path> choicesStream = Files
         .newDirectoryStream(Projects.projectFolder())) {
       Iterator<Path> choicesIterator = choicesStream.iterator();

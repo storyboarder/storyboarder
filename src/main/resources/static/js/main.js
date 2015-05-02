@@ -11,47 +11,46 @@ require.config({
 		semanticui: "semantic"
 	},
 	shim: {
-	  "semanticui": {
-	    deps: ["jquery"],
-	    exports: "semanticui"
-	  },
-	  "jqueryui": {
-	    deps: ["jquery"],
-	    exports: "jqueryui"
-	  }
+		"semanticui": {
+			deps: ["jquery"],
+			exports: "semanticui"
+		},
+		"jqueryui": {
+			deps: ["jquery"],
+			exports: "jqueryui"
+		}
 	},
 
 	callback: function() {
-    // should prompt user for project initialization
-    // but for the moment values are hard-coded
-    // also, should be initialized from editor, but for the moment Main will do it
+		// should prompt user for project initialization
+		// but for the moment values are hard-coded
+		// also, should be initialized from editor, but for the moment Main will do it
 
-    var canvas = document.getElementById('canvas');
-    canvas.width = 400;
-    canvas.height = 600;
-//    require(['CanvasState'], function(CanvasState) {
-//      canvasState = CanvasState.getCanvasState();
-//      canvasState.setPageMargin(20);
-//      canvasState.setGridSpacing(20);
-//      canvasState.setPanelMargin(5);
-//      canvasState.init(canvas);
+		var canvas = document.getElementById('canvas');
+		canvas.width = 400;
+		canvas.height = 600;
+		//    require(['CanvasState'], function(CanvasState) {
+		//      canvasState = CanvasState.getCanvasState();
+		//      canvasState.setPageMargin(20);
+		//      canvasState.setGridSpacing(20);
+		//      canvasState.setPanelMargin(5);
+		//      canvasState.init(canvas);
 
-//      console.log(canvasState);
+		//      console.log(canvasState);
 
-      require(["Menu", "Editor"], function(menu, editor) {
-        // editor.init("canvas");
-//        console.log(menu);
-        menu.init();
-        console.log("editor:");
-        console.log(editor);
-//        editor.test(); /* */
-      });
-//    });
+
+		require(["Menu", "Editor"], function(menu, editor) {
+			editor.init();
+			//        console.log(menu);
+			menu.init();
+			console.log("editor:");
+			console.log(editor);
+//		  editor.test();
+		});
 
 	}
 });
 
 function quit() {
-  $.post("/quit", {}, function(responseJSON){});
+	$.post("/quit", {}, function(responseJSON) {});
 }
-

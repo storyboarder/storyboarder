@@ -26,8 +26,9 @@ public class ProjectTest {
   }
 
   @AfterClass
-  public static void deleteDatabase() throws SQLException, IOException {
+  public static void deleteDatabase() throws Exception {
     Files.deleteIfExists(dbPath);
+    testProj.close();
   }
 
   @Test

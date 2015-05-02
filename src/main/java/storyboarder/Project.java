@@ -67,6 +67,7 @@ class Project implements AutoCloseable {
    *         page.
    */
   Page getPage(int pageNum) {
+    throwIfOutOfBounds(pageNum);
     return queryer.queryOne(Projects.getPageSql(pageNum), new Page.Converter());
   }
 

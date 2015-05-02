@@ -24,11 +24,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"Save": function() {
 			console.log("save called");
 			editor.action("SavePage", {});
-			//TODO call editor
 		},
 		"Export": function() {
 			editor.action("Export");
-			//TODO call editor (and a modal?)
 		},
 		"Load": function() {
 			console.log("load called");
@@ -161,7 +159,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 	  "MovePage": function(start, end) {
 	    console.log("reordering pages: " + start + " to " + end);
-	    editor.action("MovePage", {from: start, to: end});
+	    editor.action("MovePage", {pageNum: start, newSpot: end});
 	  },
 	};
 
@@ -218,7 +216,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var init = function() {
 		console.log("Menu initing");
 
-
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
@@ -266,7 +263,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {
-			view($(this));
+			if (!($(this).is('.ui-draggable-dragging'))) {
+				view($(this));
+			}
 		});
 
 		$(".toolset .title").click(function() {
@@ -301,12 +300,14 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
 			cancel: "a.remove-page",
+			distance: 10,
 			start: function(event, ui) {
 				page_thumb_idx = ui.item.index();
 			},
 			stop: function(event, ui) {
 				console.log("moved element " + (1 + page_thumb_idx) + " to " + (1 + ui.item.index()));
-				views.MovePage();
+				console.log(ui.item);
+				views.MovePage(1 + page_thumb_idx, 1 + ui.item.index());
 			}
 		});
 		$("#page-thumbs").disableSelection();

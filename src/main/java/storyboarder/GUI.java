@@ -155,6 +155,7 @@ final class GUI {
       if (!(project == null)) {
         try {
           project.close();
+          project = null;
         } catch (Exception e) {
           e.printStackTrace();
           return JsonMessages.makeError("unable to close project.");

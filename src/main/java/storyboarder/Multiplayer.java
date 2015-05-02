@@ -14,9 +14,21 @@ import org.java_websocket.server.WebSocketServer;
 
 /**
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".
+ *
+ * @author ktsakas
+ * @author fbystric
+ * @author narobins
+ * @author yz38 *
  */
 class Multiplayer extends WebSocketServer {
 
+  /**
+   * Constructs a Multiplayer server at the given port.
+   * 
+   * @param port
+   *          The port at which to host
+   * @throws UnknownHostException
+   */
   Multiplayer(int port) throws UnknownHostException {
     super(new InetSocketAddress(port));
     System.out.println("Listening for multiplayer requests on port " + port
@@ -53,7 +65,7 @@ class Multiplayer extends WebSocketServer {
    */
 
   public static void main(String[] args) throws InterruptedException,
-    IOException {
+  IOException {
     WebSocketImpl.DEBUG = true;
     int port = 8887; // 843 flash policy port
     try {
