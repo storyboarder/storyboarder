@@ -12,7 +12,7 @@
     </div>
 
     <div id="editor">
-    <p id="heading"><span id="title">Storyboarder</span> <span id="currentPage">0</span>/<span id="numPages">0</span></p>
+    <p id="heading"><span id="title">Storyboarder</span> - <span id="currentPage">0</span>/<span id="numPages">0</span></p>
         <div class="previous-page">
           <a href="#" data-content="Previous page"><i class="fa fa-x fa-caret-left"></i></a>
         </div>

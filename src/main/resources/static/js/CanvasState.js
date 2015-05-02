@@ -1,14 +1,15 @@
+//TODO canvasId should probably be a module-level variable
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var canvas;
     var helperCanvas;
     var socket;
+    var canvasId = "canvas"
 
     var width;
     var height;
     var pageMargin;
     var panelMargin;
     var pageEdges; // edges of panel area (between pageMargin and panelMargin)
-//    var elements;
     var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
     var edgeDirections = ["left", "top", "right", "bottom"];
     var snap; // snapUtil object
@@ -149,76 +150,73 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
     var deleteElement = function(e) {
         canvas.remove(e);
     };
-    var init = function(canvasId, w, h, callback) {
-        console.log("initing page...");
+    /* Should be called when a new page is loaded (project variables stay the same) */
+    var init_page = function(callback) {
+    	console.log("INIT PAGE");
+    	if (typeof canvas === "undefined") {
+    		init();
+    	}
+    	canvas.clear();
+    	helperCanvas.clear();
+			pageEdges = {
+					left: pageMargin,
+					top: pageMargin,
+					right: canvas.getWidth() - pageMargin,
+					bottom: canvas.getHeight() - pageMargin
+			};
+			addPanel($.extend({}, pageEdges));
+			previousState = CanvasState.getState();
+			CanvasState.listenCanvas();
 
-        width = w;
-        height = h;
-        $canvas = $("#" + canvasId);
-        if (typeof canvas !== "undefined") {
-        	canvas.dispose();
-        	console.log(canvas);
-        	canvas.selection = false;
-        } else {
-					canvas = new fabric.Canvas(canvasId, {
-							selection: false
-					});
-        }
-        // Create helper canvas
-        console.log($("#helperCanvas").length);
-        if ($("#helperCanvas").length == 0) {
-        	console.log("ADDING HELPER CANVAS");
-					$('<canvas id="helperCanvas"></canvas>').css({
-							position: "absolute",
-							top: $canvas.offset().top,
-							left: $canvas.offset().left
-					}).insertAfter($canvas);
-
-					helperCanvas = new fabric.Canvas("helperCanvas", {
-							selection: false
-					});
-        } else {
-        	helperCanvas.dispose();
-        }
-        canvas.setDimensions({
-            width: w,
-            height: h
-        });
-				helperCanvas.setDimensions({
-						width: w,
-						height: h
-				});
-        console.log(canvas);
-//        elements = [];
-        pageEdges = {
-            left: pageMargin,
-            top: pageMargin,
-            right: canvas.getWidth() - pageMargin,
-            bottom: canvas.getHeight() - pageMargin
-        };
-        /* add the first panel */
-        addPanel($.extend({}, pageEdges));
-        /* adding a circle because why not */
-//        var circle = new fabric.Circle({
-//            radius: 20,
-//            fill: 'green',
-//            left: 100,
-//            top: 100
-//        });
-//        canvas.add(circle);
-
-        previousState = CanvasState.getState();
-        CanvasState.listenCanvas();
-
-        require(["SnapUtil"], function(snapUtil) {
-            snap = snapUtil;
-            snap.init(CanvasState);
-            if (typeof callback != "undefined") {
-                callback();
-            }
-        });
+			require(["SnapUtil"], function(snapUtil) {
+					snap = snapUtil;
+					snap.init(CanvasState);
+					if (typeof callback != "undefined") {
+							callback();
+					}
+			});
     };
+    /* Should be called when a project is loaded or created (sets project variables, initializes first page) */
+    var init_project = function(w, h, panelM, pageM, callback) {
+    	console.log("INIT PROJECT");
+    	if (typeof canvas === "undefined") {
+    		init();
+    	}
+    	width = w;
+    	height = h;
+    	pageMargin = pageM
+    	panelMargin = panelM
+    	canvas.setDimensions({
+    		width: w,
+    		height: h
+    	});
+    	helperCanvas.setDimensions({
+    		width: w,
+    		height: h
+    	});
+			init_page(callback);
+    };
+    /* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
+    var init = function(callback) {
+    	console.log("INIT");
+    	$canvas = $("#" + canvasId);
+			canvas = new fabric.Canvas(canvasId, {
+					selection: false
+			});
+			console.log("ADDING HELPER CANVAS");
+			$('<canvas id="helperCanvas"></canvas>').css({
+					position: "absolute",
+					top: $canvas.offset().top,
+					left: $canvas.offset().left
+			}).insertAfter($canvas);
 
+			helperCanvas = new fabric.Canvas("helperCanvas", {
+					selection: false
+			});
+			if (typeof callback != "undefined") {
+				callback();
+			}
+    };
     var CanvasState = {
         storeState: function() {
 //            console.log("storing a new state...");
@@ -337,24 +335,34 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             return pageEdges;
         },
         deleteElement: deleteElement,
-        load: function(canvasId, json, callback) {
-        		console.log(json);
+        load_page: function(canvasId, json, callback) {
         		var that = this;
-            init(canvasId, json.width, json.height, function() {
-            	that.setPageMargin(json.pageMargin);
-            	that.setPanelMargin(json.panelMargin);
+            init_page(function() {
+            	canvas.loadFromJSON(json, function() {
+            		canvas.renderAll.bind(canvas);
+            		canvas.renderAll();
+            		if (typeof callback != "undefined") {
+            			callback();
+            		}
+            	});
+            });
+        },
+        load_project: function(canvasId, json, callback) {
+        		var that = this;
+            init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
             	console.log("loading canvas from json...", json);
             	canvas.loadFromJSON(json, function() {
             		canvas.renderAll.bind(canvas);
             		canvas.renderAll();
             		if (typeof callback != "undefined") {
-            			console.log(callback);
             			callback();
             		}
             	});
             });
         },
         init: init,
+        init_page: init_page,
+        init_project: init_project,
         addElement: addElement,
         setPageMargin: function(p) {
             pageMargin = p;
