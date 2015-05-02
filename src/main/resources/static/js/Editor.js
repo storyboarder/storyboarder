@@ -57,13 +57,19 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log("LOAD PROJ");
 			$.post("/projects/load", {choice: params.choice}, function(responseJSON) {
 				response = JSON.parse(responseJSON);
+				console.log(response);
 				numPages = response.numPages;
-				currentPage = response.page.num;
-				console.log(currentPage + "/" + numPages);
-				canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
+				if (typeof response.page === "string" || !("json" in response.page)) {
+					console.log("empty project:", response.page);
+					canvasState.init("canvas", 200, 200); //TODO not this
+				} else {
+					currentPage = response.page.num;
+					console.log(currentPage + "/" + numPages);
+					canvasState.load("canvas", JSON.parse(response.page.json), params.editor.init); // parse JSON received
 
-				if (typeof params.callback != "undefined") {
-					params.callback(response.numPages);
+					if (typeof params.callback != "undefined") {
+						params.callback(currentPage, numPages);
+					}
 				}
 			});
 		},
@@ -160,18 +166,21 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				console.log("response: ", JSON.parse(response));
 			});
 		},
-		"AddPage": function() {
+		"AddPage": function(params) {
 			console.log("ADD PAGE");
-			currentPage++;
+//			currentPage++;
 			numPages++;
 			console.log(currentPage, "/", numPages);
 			pageJSON = canvasState.getState();
 //			console.log(pageJSON);
 //			console.log(currentPage, pageJSON);
-//			console.log(makePage(currentPage, pageJSON, ""));
-			$.post("/pages/add", makePage(currentPage, pageJSON, ""), function(response) {
-				console.log("add page called with num: " + currentPage);
+			console.log(makePage(numPages, pageJSON, ""));
+			$.post("/pages/add", makePage(numPages, pageJSON, ""), function(response) {
+				console.log("add page called with num: " + numPages);
 				console.log("response: ", JSON.parse(response));
+				if (typeof params != "undefined" && typeof params.callback != undefined) {
+					callback(numPages);
+				}
 			});
 		},
 		"AddPageTest": function(page) {

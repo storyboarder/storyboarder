@@ -343,6 +343,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
             init(canvasId, json.width, json.height, function() {
             	that.setPageMargin(json.pageMargin);
             	that.setPanelMargin(json.panelMargin);
+            	console.log("loading canvas from json...", json);
             	canvas.loadFromJSON(json, function() {
             		canvas.renderAll.bind(canvas);
             		canvas.renderAll();

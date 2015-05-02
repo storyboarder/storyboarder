@@ -41,7 +41,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log(idx);
 			var html = getPageThumb(idx);
 			$("#page-thumbs").append(html);
-			editor.action("AddPage");
+			var that = this;
+			editor.action("AddPage", {callback: function(numPages) {
+				console.log("menu callback");
+				$("#heading #numPages").html(numPages);
+			}});
+			console.log($("#heading #numPages").val());
 		},
 		"GetPage": function(item) {
 			var idx = parseInt(item.attr("data-num"));
@@ -62,6 +67,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$('#page').height(parseInt($("#page-height").val()));
 			console.log($('#canvas').width());
 			$("#editor").css("visibility", "visible");
+			$("#heading #title").html($("#project-name").val());
+			$("#heading #currentPage").html("1");
+			$("#heading #numPages").html("1");
 			editor.action("CreateProj", {
 				canvas: $("#canvas"),
 				width: parseInt($("#page-width").val()),
@@ -79,12 +87,29 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				}
 			});
 		},
+		"UpdatePages": function(curr, num) {
+			$("#page-thumbs").empty();
+			for (var i = 0; i < num; i++) {
+				console.log(i);
+				$("#page-thumbs").append(getPageThumb(i));
+			}
+			$("#heading #numPages").html(num);
+			$("#heading #currentPage").html(curr);
+		},
+
 		"LoadProject": function(item) {
 			var num = item.attr("id");
+			console.log(item);
+			$("#heading #title").html(item[0].firstChild.textContent);
 			console.log("load project");
+			var that = this;
+			console.log(that);
 			var result = editor.action("LoadProj", {
 				choice: num,
-				callback: updatePages
+				callback: function(currentPage, numPages) {
+					console.log(that);
+					that.UpdatePages(currentPage, numPages);
+				}
 			});
 			$("#editor").css("visibility", "visible");
 			$('.ui.modal.load-project').modal('hide');
@@ -155,12 +180,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 	};
 
-	var updatePages = function(num) {
-		$("#page-thumbs").empty();
-		for (var i = 0; i < num; i++) {
-			console.log(i);
-			$("#page-thumbs").append(getPageThumb(i));
-		}
+	var updatePages = function(curr, num) {
+		views.UpdatePages(curr, num);
 	};
 
 	var set_value = function(item) {
