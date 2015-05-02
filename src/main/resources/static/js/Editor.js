@@ -3,6 +3,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var currentPage; // index of current page
 	var numPages;
 	var socket;
+	var width;
+	var height;
 	var editorObj = this;
 
 	/* Actions are one-time functions, unlike tools. */
@@ -85,8 +87,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		"CreateProj": function(params) {
 			console.log("CREATE PROJ");
 			var canvas = params.canvas;
-			var width = params.width;
-			var height = params.height;
+			width = params.width;
+			height = params.height;
 			var pageMargin = params.pageMargin;
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
@@ -209,14 +211,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			});
 		},
 		"Export": function(params) {
-			var pdf = new jsPDF();
+			console.log(width, height);
+			var pdf = new jsPDF('portrait', 'pt', [height * 72/96, width * 72/96]);
 			var $dummyCanvas = $('<canvas id="dummyCanvas"></canvas>')
-				// .css({display: "none"})
+				.css({display: "none"})
 				.appendTo(document.body);
 			var dummyCanvas = new fabric.Canvas('dummyCanvas');
 			dummyCanvas.setDimensions({
-				width: w,
-				height: h
+				width: width,
+				height: height
 			});
 
 			actions.GetAllPages(function(response) {
@@ -224,7 +227,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 				for (var i = 0; i < response.length; i++) {
 					var page = response[i];
-					dummyCanvas.loadFromJSON(page, dummyCanvas.renderAll.bind(dummyCanvas));
+					console.log("Current: ", JSON.parse(canvasState.getState()));
+					console.log("Page: ", JSON.parse(page.json));
+					dummyCanvas.loadFromJSON(JSON.parse(page.json), dummyCanvas.renderAll.bind(dummyCanvas));
 					var img = dummyCanvas.toDataURL('png');
 					console.log(img);
 
