@@ -53,6 +53,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				displayChoices(responseObject);
 			});
 		},
+		"GetThumbs": function(params) {
+			checkParams(params, ["callback"]);
+			$.post("/projects/load", {
+				name: projectName
+			}, function(responseJSON) {
+				params.callback(JSON.parse(responseJSON));
+			});
+		},
 		"LoadProj": function(params) {
 
 			checkParams(params, ["name"]);
@@ -61,7 +69,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			}, function(responseJSON) {
 				var responseObject = JSON.parse(responseJSON);
 
-				console.log("LOAD PROJ, params: ", params, "response: ", responseObject);
+				console.log("LOAD PROJ, params: ", params);
+				console.log(responseObject);
 				throwErrorIfApplicable(params);
 				
 				setCurrentPage(responseObject.page);
@@ -118,7 +127,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				},
 				function(response) {
 					var responseObject = JSON.parse(response);
-					console.log("get page called with page ", params, " Response: ", responseObject);
+//					console.log("get page called with page ", params, " Response: ", responseObject);
 					
 					throwErrorIfApplicable(responseObject);
 
@@ -146,7 +155,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}
 			});
 		},
-		"SavePage": function() {
+		"SavePage": function(params) {
 			console.log("save called");
 			if (currPageObj.pageNum <= 0 || currPageObj.pageNum > numPages) {
 				throw "invalid currentPage: " + currPageObj.pageNum + "/" + numPages;
@@ -157,6 +166,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			$.post("/pages/save", getCurrentPageJSON(), function(response) {
 				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
 			});
+
+			document.dispatchEvent(new CustomEvent("thumbnail", {detail: {pageNum: currPageObj.pageNum, thumbnail: currPageObj.thumbnail}}));
+			console.log(canvasState.getCanvas().__eventListeners);
+
 		},
 		"SavePageTest": function(page) {
 			checkPage(page);
@@ -195,7 +208,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
 			numPages++;
-			//TODO save previous page
 			canvasState.init_page(function() {
 				setCurrentPage(makePage(numPages, canvasState.getState(), ""));
 				console.log(currPageObj);
@@ -219,11 +231,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"MovePage": function(params) {
 			console.log("MOVEPAGE");
-			console.log(params);
 			checkParams(params, ["pageNum", "newSpot"]);
+			if (currPageObj.pageNum == params.pageNum) {
+				currPageObj.pageNum = params.newSpot;
+			}
 			$.post("/pages/move", {pageNum: params.pageNum, newSpot: params.newSpot}, function(response) {
 				var responseObject = JSON.parse(response);
-				console.log("Move page called with: ", params);
 				console.log("response: ", responseObject);
 			});
 		},
@@ -287,7 +300,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 
 	var setCurrentPage = function(pgObj) {
 		checkPage(pgObj);
-		console.log(pgObj);
+//		console.log(pgObj);
 		if (pgObj.json && typeof pgObj.json == "string") {
 //			console.log(pgObj.json, "is a string");
 			pgObj.json = JSON.parse(pgObj.json);
@@ -357,6 +370,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			actions.SavePage();
 			actions.SyncPage(delta);
 		});
+
 	};
 
 	var activate = toolset.activate;

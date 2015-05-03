@@ -192,11 +192,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			lockScalingX: true,
 			lockScalingY: true,
 			hasRotatingPoint: false //,
-				// edges: edges
 		});
 		panel.edges = edges;
 		setControls(panel);
 		addElement(panel, "panel");
+		canvas.sendToBack(panel);
 		return panel;
 	};
 
@@ -251,6 +251,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
+		CanvasState.listenCanvas();
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
@@ -269,7 +270,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		};
 		addPanel($.extend({}, pageEdges));
 		previousState = CanvasState.getState();
-		CanvasState.listenCanvas();
 		if (typeof callback !== "undefined") {
 			callback();
 		}
@@ -354,8 +354,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"helper", "elmType", "edges",
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
-				"selectable", "id"
-
+				"selectable", "id",
+				"_controlsVisibility"
 			]), {
 				width: width,
 				height: height,
@@ -368,7 +368,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				return !obj.helper;
 			});
 
-			console.log(state);
+//			console.log(state);
 
 			return JSON.stringify(state);
 		},
@@ -421,7 +421,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-					console.log(canvas);
+//					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}
@@ -432,12 +432,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
-				console.log("canvas", canvas);
 				canvas.loadFromJSON(json, function() {
-					console.log("done loading");
 					canvas.renderAll.bind(canvas);
 					/* for text: */
-					console.log("should be loaded......", canvas);
 					that.mapElements(
 						function(found) {
 							if (found.elmType === "rectext") {
@@ -455,7 +452,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					);
 					/* / end for text */
 
-					console.log(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {
 						callback();

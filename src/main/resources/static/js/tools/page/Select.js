@@ -68,12 +68,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
-		console.log(canvasState);
 		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
 		//		console.log("SELECT", canvas);
-		console.log(canvasState);
 		//		console.log(canvas.getObjects());
 		//canvas.getObjects()[1].selectable = true;
 		//		console.log("SELECT", canvas);
@@ -99,11 +97,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		}
 
 		canvasState.mapElements(function(found) { // map
-			console.log(found);
+//			console.log(found);
 
 			if (selectable.hasOwnProperty(found.elmType)) {
 				var options = selectable[found.elmType];
-				//				console.log(options);
 				for (property in options) {
 					found.set(property, options[property]);
 				}
@@ -117,8 +114,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.on('object:moving', function(options) {
 			target = options.target;
-			console.log("target", target);
-			console.log("canvas", canvas);
 			if (snap.isSnapActive() && options.target.elmType != "panel") {
 				target = options.target;
 				var borders = canvasState.snapBorders({
@@ -269,7 +264,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		};
 
-		console.log(canvas.__eventListeners);
 		return this;
 	};
 
@@ -279,9 +273,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.deactivateAll();
 		canvasState.mapElements(
 			function(found) { // map
-				found.set({
-					selectable: false
-				});
+				if (!found.active) {
+					found.set({
+						selectable: false
+					});
+				}
 			}
 		);
 
