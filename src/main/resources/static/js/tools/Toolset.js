@@ -1,5 +1,7 @@
 define(function(require) {
-	var currentTool = null;
+	// Name of the current tool
+	var currentTool;
+
 	// Set of available tools
 	var toolset = {
 		"Split": require("./panel/Split"),
@@ -25,6 +27,13 @@ define(function(require) {
 		}
 	};
 
+	// Reactivates the current tool to account for updated canvas state
+	var reactivate = function() {
+		if (typeof currentTool != "undefined") {
+			activate(currentTool);
+		}
+	};
+
 	// Set tool property
 	var set = function(toolname, property, value) {
 		toolset[toolname].set(property, value);
@@ -32,6 +41,7 @@ define(function(require) {
 
 	return {
 		activate: activate,
+		reactivate: reactivate,
 		set: set
 	};
 });

@@ -29,7 +29,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	}; //for copy paste
 
 
-
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
 	var addElement = function(e, elmType) {
@@ -258,6 +257,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var init_page = function(callback) {
 		console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
+			console.log("canvas is undefined. initing now...");
 			init();
 		}
 		canvas.clear();
@@ -348,11 +348,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.off('change', this.storeState.bind(this));
 		},
 		getState: function() {
+
 			var state = $.extend(this.getCanvas().toJSON([
 				"helper", "elmType", "edges",
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
-				"selectable"
+				"selectable", "id"
+
 			]), {
 				width: width,
 				height: height,
@@ -413,6 +415,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
+					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}
@@ -424,11 +427,28 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
 				console.log("canvas", canvas);
-
 				canvas.loadFromJSON(json, function() {
-					console.log(canvas);
 					console.log("done loading");
 					canvas.renderAll.bind(canvas);
+					/* for text: */
+					console.log("should be loaded......", canvas);
+					that.mapElements(
+						function(found) {
+							if (found.elmType === "rectext") {
+								console.log("objects", canvas._objects);
+								var result = canvas._objects.filter(function( obj ) {
+								  return (obj.id === found.id && obj.elmType === "textBorder");
+								});
+
+								console.log("results", result);
+								found.border = result[0];
+								that.deleteElement(result[0]);
+								that.addElement(this.border, "textBorder");
+							}
+						}
+					);
+					/* / end for text */
+
 					console.log(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {

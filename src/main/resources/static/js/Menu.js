@@ -65,7 +65,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"GetPage": function(item) {
 			this.SetCurrentPage(item);
-			var idx = parseInt(item.attr("data-num"));
+			var idx = parseInt(item.parent().attr("id"));
 			this.SetHeading({
 				currentPage: idx
 			});
@@ -77,7 +77,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"RemovePage": function(item) {
 			console.log("menu REMOVE PAGE");
-			var idx = item.attr("data-num");
+			var idx = parseInt(item.parent().attr("id"));
 			var that = this;
 			editor.action("RemovePage", {
 				pageNum: idx,
@@ -148,11 +148,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				numPages: num
 			});
 			if ($("#page-thumbs").length > 0) {
-				//				console.log($("#page-thumbs").children().first());
-				//				console.log($("#page-thumbs").eq(curr - 1));
-				this.SetCurrentPage($("#page-thumbs").eq(curr - 1));
-				//				this.SetCurrentPage($("#page-thumbs").children().first());
-				//				console.log($currentPage);
+				this.SetCurrentPage(getNthPageThumb(curr));
 			}
 		},
 		"SetHeading": function(params) {
@@ -199,6 +195,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				pageNum: start,
 				newSpot: end
 			});
+	    getNthPageThumb(start).attr("id", start);
+	    getNthPageThumb(end).attr("id", end);
 		},
 	};
 
@@ -208,8 +206,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		}
 		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
-			'<a class="page-thumb view" id="GetPage" href="#" data-num="' + i + '">' + i + '</a>' +
-			'<a href="#" class="remove-page view" id="RemovePage" data-num="' + i + '"><i class="fa fa-x fa-remove"></i></a></li>';
+			'<a class="page-thumb view" id="GetPage" href="#">' + i + '</a>' +
+			'<a href="#" class="remove-page view" id="RemovePage"><i class="fa fa-x fa-remove"></i></a></li>';
+	};
+
+	/* 1-indexed */
+	var getNthPageThumb = function(n) {
+		return $("#page-thumbs").children().eq(n - 1);
 	};
 
 	var init_project = function() {

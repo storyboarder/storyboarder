@@ -10,48 +10,53 @@ define(["../../CanvasState"], function(canvasState) {
 
 		type: "rectext",
 
-		initialize: function(text, options) {
-			options || (options = {});
 
-			this.callSuper('initialize', text, options);
-			this.set({
-				elmType: "rectext",
-				transparentCorners: true,
-				lockRotation: true,
-				hasRotatingPoint: false,
-				backgroundColor: "rgba(0, 0, 0, 0)"
-			});
+	initialize: function(text, options) {
+	    options || (options = { });
+	   	var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+		var id = randLetter + Date.now();
 
-			this.setControlsVisibility({
-				mt: false,
-				mb: false,
-				mr: false,
-				ml: false
-			})
+	    this.callSuper('initialize', text, options);
+	    this.set({
+	    	id: id,
+	    	elmType: "rectext",
+	    	transparentCorners : true,
+	    	lockRotation : true,
+	    	hasRotatingPoint : false,
+	    	backgroundColor : "rgba(0, 0, 0, 0)"
+	    });
 
-			this.border = new fabric.Rect({
-				left: options.left - options.padding,
-				top: options.top - options.padding,
-				width: options.width + (options.padding * options.scaleX * 2),
-				height: options.height + (options.padding * options.scaleY * 2),
-				fill: "rgba(0, 0, 0, 0)", // transparent
-				stroke: "black",
-				strokeWeight: 2,
-				hasRotatingPoint: false,
-				textbox: this,
-				helper: true
-			});
+	    this.setControlsVisibility({
+	    	mt: false,
+	    	mb: false,
+	    	mr: false,
+	    	ml: false
+	    })
 
-			canvasState.addElement(this.border, "textBorder");
-		},
+	    this.border = new fabric.Rect({
+	        left: options.left - options.padding,
+	        top: options.top - options.padding,
+	        width: options.width + (options.padding * options.scaleX * 2),
+	        height: options.height + (options.padding * options.scaleY * 2),
+	        fill: "rgba(0, 0, 0, 0)", // transparent
+	        stroke: "black",
+	        strokeWeight: 2,
+	        hasRotatingPoint: false,
+	        textbox : this,
+	        id : id
+	 	});
+
+      	canvasState.addElement(this.border, "textBorder");
+	  },
 
 
-		toObject: function() {
-			return fabric.util.object.extend(this.callSuper('toObject'), {
-				border: this.border.toObject(),
-				elmType: "rectext"
-			});
-		},
+	  toObject: function() {
+	    return fabric.util.object.extend(this.callSuper('toObject'), {
+	      border: this.border.toObject(),
+	      elmType : "rectext",
+	      id: this.get("id")
+	    });
+	  },
 
 		_render: function(ctx) {
 			this.callSuper('_render', ctx);
