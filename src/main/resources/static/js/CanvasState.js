@@ -178,6 +178,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var init_page = function(callback) {
 		console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
+			console.log("canvas is undefined. initing now...");
 			init();
 		}
 		canvas.clear();
@@ -343,13 +344,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
-                console.log("canvas", canvas);
-
 				canvas.loadFromJSON(json, function() {
-					console.log(canvas);
 					console.log("done loading");
 					canvas.renderAll.bind(canvas);
-					console.log(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {
 						callback();

@@ -1,6 +1,6 @@
 define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], function(jsPDF, canvasState, toolset, snapUtil) {
 	var projectName;
-	var currentPage; // index of current page
+	var currPageObj; // stores current page object {pageNum: <>, json: <>, thumbnail: <>}
 	var numPages;
 	var socket;
 	var editorObj = this;
@@ -18,7 +18,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		"SyncPage": function(delta) {
 			socket.send(JSON.stringify({
 				projectName: projectName,
-				currentPage: currentPage,
+				currentPage: currPageObj.pageNum,
 				delta: delta
 			}));
 		},
@@ -64,24 +64,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				console.log("LOAD PROJ, params: ", params, "response: ", responseObject);
 				throwErrorIfApplicable(params);
 				
-				checkPage(responseObject.page);
+				setCurrentPage(responseObject.page);
 				projectName = params.name;
-				responseObject.page.json = JSON.parse(responseObject.page.json);
-				//				console.log(responseObject.page);
 				numPages = responseObject.numPages;
-				console.log(responseObject.page);
-				currentPage = 1; //TODO check if valid index?
-				//				if (typeof responseObject.page === "string" || !("json" in responseObject.page)) {
-				//					console.log("empty project:", responseObject.page);
-				//					throw "empty project";
-				//				} else {
-				console.log(currentPage + "/" + numPages);
-				canvasState.load_project("canvas", responseObject.page.json, params.editor.update); // parse JSON received
+				canvasState.load_project("canvas", currPageObj.json, params.editor.update);
 
 				if (typeof params.callback != "undefined") {
 					params.callback(responseObject);
 				}
-				//				}
 			});
 		},
 		"CreateProj": function(params) {
@@ -94,17 +84,16 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
 			canvas.height = height;
-			currentPage = 1;
-			numPages = 1;
-			console.log(currentPage, "/", numPages);
-
+			numPages = 0;
 			projectName = params.name;
 
 			var that = this;
 			canvasState.init_project(width, height, panelMargin, pageMargin, function() {
 				$.post("/projects/create", {name: params.name}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
-					console.log("create proj called, response: ", response);
+					console.log(response);
+					setCurrentPage({pageNum: 0, json: "", thumbnail: ""});
+
 					projectName = response.name;
 					that.AddPage();
 					activate("Select");
@@ -124,7 +113,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"])
-			console.log({pageNum: params.pageNum});
 			$.post("/pages/get", {
 					pageNum: params.pageNum
 				},
@@ -134,9 +122,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					
 					throwErrorIfApplicable(responseObject);
 
-					checkPage(responseObject);
-					currentPage = responseObject.pageNum; // TODO check for errors(?)
-					canvasState.load_page("canvas", JSON.parse(responseObject.json));
+					setCurrentPage(responseObject);
+					canvasState.load_page("canvas", currPageObj.json);
 					return responseObject;
 					// }
 				});
@@ -157,15 +144,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"SavePage": function() {
 			console.log("save called");
-			if (currentPage <= 0 || currentPage > numPages) {
-				throw "invalid currentPage: " + currentPage + "/" + numPages;
+			if (currPageObj.pageNum <= 0 || currPageObj.pageNum > numPages) {
+				throw "invalid currentPage: " + currPageObj.pageNum + "/" + numPages;
 			}
-			pageJSON = canvasState.getState();
+			setCurrentPage({pageNum: currPageObj.pageNum, json: canvasState.getState(), thumbnail: ""}) //TODO save thumbnail
 
-			var page = makePage(currentPage, pageJSON, "");
-
-			$.post("/pages/save", page, function(response) {
-				console.log("Save called with: ", page, ", response: ", JSON.parse(response));
+			$.post("/pages/save", getCurrentPageJSON(), function(response) {
+				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
 			});
 		},
 		"SavePageTest": function(page) {
@@ -185,36 +170,34 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 //				console.log(response);
 				if ("message" in response) {
 					numPages--;
-					if (currentPage == params.pageNum) { // deleted the page you're on
-						console.log("deleted the page you're on (" + currentPage + ")");
-						currentPage--;
-						if (currentPage < 1) {
-							currentPage = 1;
-							canvasState.init_page();
+					if (currPageObj.pageNum == params.pageNum) { // deleted the page you're on
+						console.log("deleted the page you're on (" + currPageObj.pageNum + ")");
+						currPageObj.pageNum--;
+						if (currPageObj.pageNum < 1) {
+							currPageObj.pageNum = 1;
+							canvasState.init_page(); //TODO should call editor get page
 						}
-					} else if (currentPage > params.pageNum) { // deleted a page before the current page
-						currentPage--;
+					} else if (currPageObj.pageNum > params.pageNum) { // deleted a page before the current page
+						currPageObj.pageNum--;
 					}
-					console.log("EDITOR: " + currentPage + "/" + numPages);
+					console.log("EDITOR: " + currPageObj.pageNum + "/" + numPages);
 				}
 				if (typeof params.callback != "undefined") {
-					params.callback(currentPage, numPages);
+					params.callback(currPageObj.pageNum, numPages);
 				}
 			});
 		},
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
 			numPages++;
-			console.log(currentPage, "/", numPages);
 			//TODO save previous page
 			canvasState.init_page(function() {
-				pageJSON = canvasState.getState();
-				$.post("/pages/add", makePage(numPages, pageJSON, ""), function(response) {
+				setCurrentPage(makePage(numPages, canvasState.getState(), ""));
+				console.log(currPageObj);
+				$.post("/pages/add", getCurrentPageJSON(), function(response) {
 					console.log("add page called with num: " + numPages + " in project " + projectName);
 //					console.log("response: ", JSON.parse(response));
-
-					currentPage = numPages;
-					console.log(currentPage + "/" + numPages);
+					console.log(currPageObj.pageNum + "/" + numPages);
 					if (typeof params != "undefined" && typeof params.callback != undefined) {
 						params.callback(numPages);
 					}
@@ -296,6 +279,25 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 	};
 
+	var setCurrentPage = function(pgObj) {
+		checkPage(pgObj);
+		console.log(pgObj);
+		if (pgObj.json && typeof pgObj.json == "string") {
+			console.log(pgObj.json, "is a string");
+			pgObj.json = JSON.parse(pgObj.json);
+			console.log("parsed to ", pgObj.json);
+		}
+		currPageObj = pgObj;
+	};
+
+	var getCurrentPageJSON = function() {
+		return {
+			pageNum: currPageObj.pageNum,
+			json: JSON.stringify(currPageObj.json),
+			thumbnail: currPageObj.thumbnail
+		};
+	};
+
 	var checkParams = function(object, requiredParams) {
 		for (var i = 0; i < requiredParams.length; i++) {
 			if (!(requiredParams[i] in object)) {
@@ -329,13 +331,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		if (typeof canvasState.getCanvas() != "undefined") {
 			throw "Editor should not need to be initialized more than once.";
 		}
+		currPageObj = {};
 		console.log("INIT EDITOR");
 		canvasState.init("canvas");
 
 		socket = new WebSocket("ws://localhost:8888");
 		socket.onmessage = function(e) {
 			var data = JSON.parse(e.data);
-			if (data.projectName == projectName && data.currentPage == currentPage) {
+			if (data.projectName == projectName && data.currentPage == currPageObj.pageNum) {
 				canvasState.applyDeltaToState(data.delta);
 			}
 			console.log(canvasState.getCanvas());
