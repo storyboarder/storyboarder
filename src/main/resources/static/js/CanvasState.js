@@ -341,13 +341,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		canvas.add(new fabric.Circle({
+		var circle = new fabric.Circle({
 			radius: 100,
 			fill: '#eef',
 			scaleY: 0.5,
 			originX: 'center',
 			originY: 'center'
-		}));
+		});
+		canvas.add(circle);
 	};
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
 	var init_project = function(w, h, panelM, pageM, createProjCallback) {

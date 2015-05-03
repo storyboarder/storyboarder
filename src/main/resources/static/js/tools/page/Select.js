@@ -72,7 +72,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		console.log("HOHO", canvas.getActiveObject());
 		canvas.on("mouse:down", function() {
 			var obj = canvas.getActiveObject();
-			canvas.setActiveObject(obj);
+			//canvas.setActiveObject(obj);
 			console.log("HAHA canvas", canvas);
 			console.log("HOHO canvas", obj);
 		});
@@ -102,6 +102,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			},
 			"image": {
 				selectable: true
+			},
+			"circle": {
+				selectable: true
 			}
 
 		}
@@ -109,10 +112,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvasState.mapElements(function(found) { // map
 			console.log(found);
 			var options = {};
-			if (selectable.hasOwnProperty(found.elmType)) { 
+			if (selectable.hasOwnProperty(found.elmType)) {
 				options = selectable[found.elmType];
 				// console.log(options);
-			} else if (selectable.hasOwnProperty(found.type)){ // just for paths
+			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
 				options = selectable[found.type];
 			} else {
 				console.log("unexpected type: " + found.elmType);
@@ -129,8 +132,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.on('object:moving', function(options) {
 			target = options.target;
-			console.log("target", target);
-			console.log("canvas", canvas);
+			//console.log("target", target);
+			//console.log("canvas", canvas);
 			if (snap.isSnapActive() && options.target.elmType != "panel") {
 				target = options.target;
 				var borders = canvasState.snapBorders({
