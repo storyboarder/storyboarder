@@ -390,7 +390,7 @@ final class GUI {
 
     private Object delete(int pageNum) {
       if (project.removePage(pageNum)) {
-        return JsonMessages.makeMessage("Sueccess deleting page " + pageNum);
+        return JsonMessages.makeMessage("Success deleting page " + pageNum);
       } else {
         return JsonMessages.makeError("Failure deleting page " + pageNum);
       }
@@ -428,7 +428,7 @@ final class GUI {
      *         there is an error moving the page.
      */
     private Object move(int pageNum, int newSpot) {
-      if (!(project.inBounds(pageNum) && !project.inBounds(newSpot))) {
+      if (!(project.inBounds(pageNum) && project.inBounds(newSpot))) {
         return OUT_OF_BOUNDS_JSON;
       }
 

@@ -8,19 +8,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
+
 public class ProjectTest {
   private static final Path dbPath = Paths.get("test.sqlite3");
+
+  private static final List<Page> pages = ImmutableList.of(new Page(1,
+      "foo bar", "derp"), new Page(2, "page two!", "yurp"), new Page(3,
+          "page three!", "shmurp"), new Page(4, "page four!", "nurp"));
 
   private static Project testProj;
 
   @BeforeClass
   public static void createTestDatabase() throws ClassNotFoundException,
-  SQLException, IOException {
+    SQLException, IOException {
     Files.deleteIfExists(dbPath);
     testProj = new Project(dbPath);
   }
@@ -31,15 +38,107 @@ public class ProjectTest {
     testProj.close();
   }
 
+  public static boolean addPages() {
+    boolean result = true;
+    for (Page page : pages) {
+      result &= testProj.addPage(page);
+    }
+    return result;
+  }
+
   @Test
-  public void everythingTest() {
+  public void addTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    createTestDatabase();
+    boolean thrown = false;
+    try {
+      testProj.addPage(new Page(0, "", ""));
+    } catch (IndexOutOfBoundsException e) {
+      thrown = true;
+    }
+    assertTrue(thrown);
+
+    thrown = false;
+    try {
+      testProj.addPage(new Page(-1, "", ""));
+    } catch (IndexOutOfBoundsException e) {
+      thrown = true;
+    }
+    assertTrue(thrown);
+
+    // now add some pages
+    assertTrue(addPages());
+
+    thrown = false;
+    try {
+      testProj.addPage(new Page(0, "", ""));
+    } catch (IndexOutOfBoundsException e) {
+      thrown = true;
+    }
+    assertTrue(thrown);
+
+    thrown = false;
+    try {
+      testProj.addPage(new Page(-1, "", ""));
+    } catch (IndexOutOfBoundsException e) {
+      thrown = true;
+    }
+    assertTrue(thrown);
+
+    thrown = false;
+    try {
+      testProj.addPage(new Page(pages.size() + 2, "", ""));
+    } catch (IndexOutOfBoundsException e) {
+      thrown = true;
+    }
+    assertTrue(thrown);
+
+  }
+
+  @Test
+  public void getPageTest() throws ClassNotFoundException, SQLException,
+    IOException {
+    createTestDatabase();
+
+    assertTrue(addPages());
+    for (Page page : pages) {
+      assertEquals(page, testProj.getPage(page.getNum()));
+    }
+
+  }
+
+  @Test
+  public void getAllPagesTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    createTestDatabase();
+    assertTrue(addPages());
+    List<Page> testPages = testProj.getAllPages();
+    for (int i = 0; i < pages.size(); i++) {
+      assertEquals(pages.get(i), testPages.get(i));
+    }
+  }
+
+  @Test
+  public void setPageTest() throws ClassNotFoundException, SQLException,
+    IOException {
+    createTestDatabase();
+    assertTrue(addPages());
+    Page newPage1 = new Page(1, "asdf", "aslihgakjfh");
+    Page newPage2 = new Page(2, "afkgh", "bar!");
+    Page newPage4 = new Page(4, "foo!", "bar!");
+  }
+
+  @Test
+  public void everythingTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    createTestDatabase();
     assertEquals(0, testProj.getPageCount());
 
-    Page page1 = new Page(1, "foo bar", "derp");
-    Page page2 = new Page(2, "page two!", "yurp");
-    Page page4 = new Page(4, "page four!", "nurp");
+    Page page1 = pages.get(0);
+    Page page2 = pages.get(1);
+    Page page4 = pages.get(3);
 
-    assertTrue(testProj.addPage("foo bar", "derp"));
+    assertTrue(testProj.addPage(page1.getJson(), page1.getThumbnail()));
     assertEquals(1, testProj.getPageCount());
 
     assertTrue(testProj.addPage(page2));

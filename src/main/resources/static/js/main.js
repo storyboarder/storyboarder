@@ -45,7 +45,7 @@ require.config({
 			menu.init();
 			console.log("editor:");
 			console.log(editor);
-		  // editor.test();
+			// editor.test();
 		});
 
 	}
