@@ -266,7 +266,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"AddImage": function(params) {
-			canvasState.addImage(params);
+			console.log("image to be added ", params.img);
+			canvasState.addImage(params.img);
 		},
 		"AddURL": function(params) {
 			console.log("ADDING IMAGE!!!");
@@ -274,10 +275,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				/*				var nameArray = params.url.match(/\/(?:.(?!\/))+$/igm);
 								var picName = nameArray[0].substring(1);
 				*/
-				fabric.Image.fromURL(params.url, function(img) {
-					var group = { img: img };
-					canvasState.addImage(group);
-				});
+				
+				canvasState.addImage(params.url);
 			}
 		},
 	};

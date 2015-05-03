@@ -54,12 +54,12 @@ public final class Main {
 
     GUI.start(sparkPort);
 
-    // int socketPort = DEFAULT_SOCKET_PORT;
-    // if (options.has(socketSpec)) {
-    // socketPort = options.valueOf(socketSpec);
-    // }
-    // Multiplayer server = new Multiplayer(socketPort);
-    // server.start();
+	int socketPort = DEFAULT_SOCKET_PORT;
+	if (options.has(socketSpec)) {
+		socketPort = options.valueOf(socketSpec);
+	}
+	Multiplayer server = new Multiplayer(socketPort);
+	server.start();
 
   }
 }
