@@ -248,7 +248,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			return (historyIdx <= history.length - 1);
 		},
 		revertState: function() {
-			console.log("reverting state");
 			if (!this.canRevert()) return;
 
 			// Move previous state one back
