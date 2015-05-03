@@ -14,9 +14,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
 
-			var group = {
-				url: $("#image-url").val()
-			};
+			var group = { url: $("#image-url").val() };
 			editor.action("AddURL", group);
 		},
 		"Save": function() {
@@ -27,21 +25,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.action("Export");
 		},
 		"Load": function() {
-			// console.log("load called");
-			// $('.ui.modal.load-project').modal('show');
-			$('.ui.modal.load-project')
-				.modal('setting', 'closable', true)
-				.modal('show');
-
-			$("#project-choices").empty();
-			editor.action("GetChoices", function(choices) {
-				for (c in choices) {
-					$("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
-				}
-				$("#project-choices .item a").click(function() {
-					views["LoadProject"]($(this));
-				});
-			});
+			console.log("load called");
+			$('.ui.modal.load-project').modal('show');
 		},
 		"New": function() {
 			console.log("new called");
@@ -53,42 +38,30 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			var $html = $(makePageThumb(idx));
 			$("#page-thumbs").append($html);
 			var that = this;
-			editor.action("AddPage", {
-				callback: function(numPages) {
-					that.SetHeading({
-						currentPage: numPages,
-						numPages: numPages
-					});
-					that.SetCurrentPage($html);
-				}
-			});
+			editor.action("AddPage", {callback: function(numPages) {
+				that.SetHeading({currentPage: numPages, numPages: numPages});
+				that.SetCurrentPage($html);
+			}});
 		},
 		"GetPage": function(item) {
 			this.SetCurrentPage(item);
-			var idx = parseInt(item.parent().attr("id"));
-			this.SetHeading({
-				currentPage: idx
-			});
+			var idx = parseInt(item.attr("data-num"));
+			this.SetHeading({currentPage: idx});
 			console.log("menu getting page" + idx);
 			//TODO save current page
-			editor.action("GetPage", {
-				pageNum: idx
-			});
+			editor.action("GetPage", {pageNum: idx});
 		},
 		"RemovePage": function(item) {
 			console.log("menu REMOVE PAGE");
-			var idx = parseInt(item.parent().attr("id"));
+			var idx = item.attr("data-num");
 			var that = this;
-			editor.action("RemovePage", {
-				pageNum: idx,
-				callback: function(curr, num) {
-					that.UpdatePages(curr, num);
-					if (num == 0) {
-						//					console.log("can't have 0 pages. Adding page...");
-						that.AddPage();
-					}
+			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
+				that.UpdatePages(curr, num);
+				if (num == 0) {
+//					console.log("can't have 0 pages. Adding page...");
+					that.AddPage();
 				}
-			});
+			}});
 		},
 		"SetPageDimensions": function(w, h) {
 			console.log("SET PAGE DIMENSIONS: ", w, h);
@@ -121,11 +94,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 					that.SetCurrentPage($currPg);
 					console.log($("#page-thumbs"));
 					console.log(response);
-					that.SetHeading({
-						title: response.name,
-						currentPage: 1,
-						numPages: 1
-					});
+					that.SetHeading({title: response.name, currentPage: 1, numPages: 1});
 				}
 			});
 		},
@@ -133,7 +102,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if (typeof $currentPage != "undefined") {
 				$currentPage.removeClass("current");
 			}
-			//			console.log($currPg);
+//			console.log($currPg);
 			$currPg.addClass("current");
 			$currentPage = $currPg;
 		},
@@ -143,12 +112,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			for (var i = 0; i < num; i++) {
 				$("#page-thumbs").append(makePageThumb(i));
 			}
-			this.SetHeading({
-				currentPage: curr,
-				numPages: num
-			});
+			this.SetHeading({currentPage: curr, numPages: num});
 			if ($("#page-thumbs").length > 0) {
-				this.SetCurrentPage(getNthPageThumb(curr));
+//				console.log($("#page-thumbs").children().first());
+//				console.log($("#page-thumbs").eq(curr - 1));
+				this.SetCurrentPage($("#page-thumbs").eq(curr - 1));
+//				this.SetCurrentPage($("#page-thumbs").children().first());
+//				console.log($currentPage);
 			}
 		},
 		"SetHeading": function(params) {
@@ -164,20 +134,14 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"LoadProject": function(item) {
 			var num = item.attr("id");
-			this.SetHeading({
-				title: item[0].firstChild.textContent
-			});
+			this.SetHeading({title: item[0].firstChild.textContent});
 			console.log("load project");
 			var that = this;
 			var result = editor.action("LoadProj", {
 				name: item[0].textContent,
 				callback: function(response) {
 					console.log(response);
-					that.SetHeading({
-						title: response.title,
-						currentPage: 1,
-						numPages: response.numPages
-					});
+					that.SetHeading({title: response.title, currentPage: 1, numPages: response.numPages});
 					that.UpdatePages(1, response.numPages);
 					that.SetPageDimensions(response.page.json.width, response.page.json.height);
 				}
@@ -189,15 +153,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("new project");
 			$('.ui.modal.create-project').modal('show');
 		},
-		"MovePage": function(start, end) {
-			console.log("reordering pages: " + start + " to " + end);
-			editor.action("MovePage", {
-				pageNum: start,
-				newSpot: end
-			});
-	    getNthPageThumb(start).attr("id", start);
-	    getNthPageThumb(end).attr("id", end);
-		},
+	  "MovePage": function(start, end) {
+	    console.log("reordering pages: " + start + " to " + end);
+	    editor.action("MovePage", {pageNum: start, newSpot: end});
+	  },
 	};
 
 	var makePageThumb = function(i) {
@@ -206,13 +165,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		}
 		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
-			'<a class="page-thumb view" id="GetPage" href="#">' + i + '</a>' +
-			'<a href="#" class="remove-page view" id="RemovePage"><i class="fa fa-x fa-remove"></i></a></li>';
-	};
-
-	/* 1-indexed */
-	var getNthPageThumb = function(n) {
-		return $("#page-thumbs").children().eq(n - 1);
+			'<a class="page-thumb view" id="GetPage" href="#" data-num="' + i + '">' + i + '</a>' +
+			'<a href="#" class="remove-page view" id="RemovePage" data-num="' + i + '"><i class="fa fa-x fa-remove"></i></a></li>';
 	};
 
 	var init_project = function() {
@@ -235,7 +189,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	var set_value = function(item) {
 		//    console.log("set value called");
-		console.log(item);
+		    console.log(item);
 		var val = item.val();
 		console.log(item.attr('data-action'), item.attr('name'), item.attr('id'));
 		val = isNaN(val) ? val : parseInt(val);
@@ -321,15 +275,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$('#filepath').change(function(e) {
 			var reader = new FileReader();
 			reader.onload = function(event) {
-				var imgObj = new Image();
-				imgObj.src = event.target.result;
-				imgObj.onload = function() {
-					var image = new fabric.Image(imgObj);
-					var group = {
-						img: image
-					};
+				new fabric.Image.fromURL(reader.result, function (img) {
+					var group = { img: img };
 					editor.action("AddImage", group);
-				}
+				});
 			}
 			reader.readAsDataURL(e.target.files[0]);
 		});
@@ -354,53 +303,53 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$("#page-thumbs").disableSelection();
 
 
-		$("#font-size").change(function(e) {
+		$("#font-size").change(function (e) {
 			$("#fsize").text($("#font-size").val());
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fontSize = $("#font-size").val();
 				canvas.renderAll();
 				active.adjustScale(active.left, active.top);
 			}
 		});
 
-		$("#font-color").change(function(e) {
+		$("#font-color").change(function (e) {
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fill = $("#font-color").val();
 				canvas.renderAll();
 			}
 		});
 
 
-		$("#font-family").change(function(e) {
+		$("#font-family").change(function (e) {
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fontFamily = $('#font-family :selected').val();
 				canvas.renderAll();
 				active.adjustScale(active.left, active.top);
 			}
 		});
 
-		$('#drawing-color').change(function() {
-			console.log('color!');
-			canvas.freeDrawingBrush.color = $('#drawing-color').val();
-		});
+		$('#drawing-color').change(function () {
+	        console.log('color!');
+	        canvas.freeDrawingBrush.color = $('#drawing-color').val();
+      	});
 
-		$('#drawing-line-width').change(function() {
-			console.log('width!');
-			canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
-		});
+	    $('#drawing-line-width').change(function () {
+		    console.log('width!');
+		    canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+	    });
 
-		$("#page-thumbs").disableSelection();
+	    $( "#page-thumbs" ).disableSelection();
 
 		init_project();
 
 		console.log("Editor: ", editor);
-		editor.setProperty("Fill", "fillColor", $("#fill-color").val());
-		$("#fill-color").on('input', function() {
-			editor.setProperty("Fill", "fillColor", $(this).val());
-		});
+	    editor.setProperty("Fill", "fillColor", $("#fill-color").val());
+	    $("#fill-color").on('input', function() {
+	    	editor.setProperty("Fill", "fillColor", $(this).val());
+	    });
 	};
 
 	return {

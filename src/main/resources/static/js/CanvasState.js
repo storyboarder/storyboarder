@@ -62,7 +62,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			callback && callback(img);
 		});
 	};*/
-	
+
+	// Stupid fucking fix
+	// but if you override fromObject and pass 
+	// undefined to loadImage it will load images from a URL
+	fabric.Image.fromObject = function(object, callback) {
+		fabric.util.loadImage(object.src, function(img) {
+			fabric.Image.prototype._initFilters.call(object, object, function(filters) {
+				object.filters = filters || [];
+				var instance = new fabric.Image(img, object);
+				callback && callback(instance);
+			});
+		}, null, undefined);
+	};
+
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
 	var addElement = function(e, elmType) {
@@ -149,71 +162,50 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	// Add image to canvas
-	var addImage = function(src) {
-		var img = new Image();
-		console.log(src);
-		img.src = src;
-		img.onload = function() {
-			alert(this.width + 'x' + this.height);
-			var canvas = fabric.util.createCanvasElement();
-			canvas.width = this.width;
-			canvas.height = this.height;
+	var addImage = function(img) {
+		var active = canvas.getActiveObject();
 
-			// Copy the image contents to the canvas
-			var ctx = canvas.getContext("2d");
-			ctx.drawImage(this, 0, 0, this.width, this.height);
+		// Set position and scale
+		img.set({
+			left: 100,
+			top: 100,
+			scaleX: 0.2,
+			scaleY: 0.2
+		});
 
-			// Get the data-URL formatted image
-			// Firefox supports PNG and JPEG. You could check img.src to
-			// guess the original format, but be aware the using "image/jpg"
-			// will re-encode the image.
-			var dataURL = canvas.toDataURL("image/png");
+		// Disable controls on image
+		img.setControlsVisibility({
+			mt: false,
+			mb: false,
+			ml: false,
+			mr: false
+		});
 
-			console.log("img width: ", img.width, " height: ", img.height);
+		if (active && active.elmType === "panel") {
+			var panel = active;
 
-			var active = canvas.getActiveObject();
+			img.clipTo = function(ctx) {
+				ctx.save();
 
-			// Set position and scale
+				ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+				ctx.rect(
+					panel.left, panel.top, // Just x, y position starting from top left corner of canvas
+					panel.width, panel.height // Width and height of clipping rect
+				);
+
+				ctx.restore();
+			};
+
 			img.set({
-				left: 100,
-				top: 100,
-				scaleX: 0.2,
-				scaleY: 0.2
+				left: panel.left + 15,
+				top: panel.top + 15
 			});
-
-			// Disable controls on image
-			img.setControlsVisibility({
-				mt: false,
-				mb: false,
-				ml: false,
-				mr: false
-			});
-
-			if (active && active.elmType === "panel") {
-				var panel = active;
-
-				img.clipTo = function(ctx) {
-					ctx.save();
-
-					ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
-					ctx.rect(
-						panel.left, panel.top, // Just x, y position starting from top left corner of canvas
-						panel.width, panel.height // Width and height of clipping rect
-					);
-
-					ctx.restore();
-				};
-
-				img.set({
-					left: panel.left + 15,
-					top: panel.top + 15
-				});
-			}
-
-			// Add image element to canvas
-			addElement(img, "image");
-			canvas.renderAll();
 		}
+
+		// Add image element to canvas
+		addElement(img, "image");
+		canvas.renderAll();
+		canvas.trigger("change");
 	};
 
 	// ---
@@ -420,8 +412,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"helper", "elmType", "edges",
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
-				"selectable", "id"
-
+				"selectable", "id", "crossOrigin"
 			]), {
 				width: width,
 				height: height,
@@ -433,8 +424,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			state.objects = state.objects.filter(function(obj) {
 				return !obj.helper;
 			});
-
-			console.log(state);
 
 			return JSON.stringify(state);
 		},
@@ -494,6 +483,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
 				console.log("canvas", canvas);
+
 				canvas.loadFromJSON(json, function() {
 					console.log("done loading");
 					canvas.renderAll.bind(canvas);
@@ -503,8 +493,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 						function(found) {
 							if (found.elmType === "rectext") {
 								console.log("objects", canvas._objects);
-								var result = canvas._objects.filter(function( obj ) {
-								  return (obj.id === found.id && obj.elmType === "textBorder");
+								var result = canvas._objects.filter(function(obj) {
+									return (obj.id === found.id && obj.elmType === "textBorder");
 								});
 
 								console.log("results", result);
