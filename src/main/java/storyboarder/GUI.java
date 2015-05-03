@@ -1,6 +1,7 @@
 package storyboarder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -8,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -79,6 +84,29 @@ final class GUI {
 
     Spark.post("/projects/" + PARAM, new ProjectActions());
     Spark.post("/pages/" + PARAM, new PageActions());
+    Spark.post("/images/upload", new ImageUpload());
+  }
+
+  private static class ImageUpload implements Route {
+    @Override
+    public Object handle(Request request, Response response) {
+      MultipartConfigElement multipartConfigElement = new MultipartConfigElement(
+          "/tmp");
+      request.raw().setAttribute("org.eclipse.multipartConfig",
+          multipartConfigElement);
+
+      try {
+        Part filePart = request.raw().getPart("file");
+
+        InputStream sInputStream = filePart.getInputStream();
+        filePart.write(filePart.getName());
+
+      } catch (IOException | ServletException e) {
+        e.printStackTrace();
+      }
+
+      return null;
+    }
   }
 
   /**

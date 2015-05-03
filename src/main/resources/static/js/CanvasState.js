@@ -1,4 +1,8 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
+	$(document).on('keydown', function(event) {
+		console.log("key pressed: ", event);
+		copyPasteHandler(event);
+	});
 	// Main canvas
 	var canvas;
 	var canvasId = "canvas";
@@ -28,6 +32,40 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		content: "empty"
 	}; //for copy paste
 
+	/*fabric.ImageData = fabric.util.createClass(fabric.Image, {
+		type: "imageData",
+
+		initialize: function(element, options) {
+			console.log("initing image data");
+			this.callSuper('initialize', element, options);
+		},
+
+		toObject: function() {
+			var canvas = fabric.util.createCanvasElement();
+			canvas.width = this.width;
+			canvas.height = this.height;
+
+			// Copy the image contents to the canvas
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0, this.width, this.height);
+
+			// Get the data-URL formatted image
+			// Firefox supports PNG and JPEG. You could check img.src to
+			// guess the original format, but be aware the using "image/jpg"
+			// will re-encode the image.
+			var dataURL = canvas.toDataURL("image/png");
+
+			return fabric.util.object.extend(this.callSuper('toObject'), {
+				src: dataURL
+			});
+		}
+	});*/
+
+	/*fabric.ImageData.fromObject = function (object, callback) {
+		fabric.Image.fromURL(object.dataURL, function(img) {
+			callback && callback(img);
+		});
+	};*/
 
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
@@ -46,6 +84,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//Event handler for copy paste (callback for document.onkeydown)
 	var copyPasteHandler = function(event) {
+		console.log("key down: ", event);
 		var key;
 		if (window.event) {
 			key = window.event.keyCode;
@@ -64,6 +103,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				if (event.ctrlKey || event.metaKey) {
 					event.preventDefault();
 					paste();
+					canvas.trigger("change");
 				}
 		}
 	}
@@ -99,7 +139,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.add(item);
 			});
 		} else if (clipboard.type == "single") {
+			console.log("copied object", clipboard.content);
 			var clonedObj = clipboard.content.clone();
+			console.log("cloned object", clonedObj);
 			clonedObj.set({
 				left: clonedObj.left + 5,
 				top: clonedObj.top + 5
@@ -111,50 +153,71 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	// Add image to canvas
-	var addImage = function(params) {
-		var img = params.img;
-		var active = canvas.getActiveObject();
+	var addImage = function(src) {
+		var img = new Image();
+		console.log(src);
+		img.src = src;
+		img.onload = function() {
+			alert(this.width + 'x' + this.height);
+			var canvas = fabric.util.createCanvasElement();
+			canvas.width = this.width;
+			canvas.height = this.height;
 
-		// Set position and scale
-		img.set({
-			left: 100,
-			top: 100,
-			scaleX: 0.2,
-			scaleY: 0.2
-		});
+			// Copy the image contents to the canvas
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(this, 0, 0, this.width, this.height);
 
-		// Disable controls on image
-		img.setControlsVisibility({
-			mt: false,
-			mb: false,
-			ml: false,
-			mr: false
-		});
+			// Get the data-URL formatted image
+			// Firefox supports PNG and JPEG. You could check img.src to
+			// guess the original format, but be aware the using "image/jpg"
+			// will re-encode the image.
+			var dataURL = canvas.toDataURL("image/png");
 
-		if (active && active.elmType === "panel") {
-			var panel = active;
+			console.log("img width: ", img.width, " height: ", img.height);
 
-			img.clipTo = function(ctx) {
-				ctx.save();
+			var active = canvas.getActiveObject();
 
-				ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
-				ctx.rect(
-					panel.left, panel.top, // Just x, y position starting from top left corner of canvas
-					panel.width, panel.height // Width and height of clipping rect
-				);
-
-				ctx.restore();
-			};
-
+			// Set position and scale
 			img.set({
-				left: panel.left + 15,
-				top: panel.top + 15
+				left: 100,
+				top: 100,
+				scaleX: 0.2,
+				scaleY: 0.2
 			});
-		}
 
-		// Add image element to canvas
-		addElement(img, "image");
-		canvas.renderAll();
+			// Disable controls on image
+			img.setControlsVisibility({
+				mt: false,
+				mb: false,
+				ml: false,
+				mr: false
+			});
+
+			if (active && active.elmType === "panel") {
+				var panel = active;
+
+				img.clipTo = function(ctx) {
+					ctx.save();
+
+					ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+					ctx.rect(
+						panel.left, panel.top, // Just x, y position starting from top left corner of canvas
+						panel.width, panel.height // Width and height of clipping rect
+					);
+
+					ctx.restore();
+				};
+
+				img.set({
+					left: panel.left + 15,
+					top: panel.top + 15
+				});
+			}
+
+			// Add image element to canvas
+			addElement(img, "image");
+			canvas.renderAll();
+		}
 	};
 
 	// ---
@@ -247,6 +310,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
 	var init = function() {
+		// document.onkeydown = function(event) {
+		// 	console.log("key down");
+		// 	copyPasteHandler(event);
+		// };
 		$canvas = $("#" + canvasId);
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
@@ -256,6 +323,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
 	var init_page = function(callback) {
+
 		console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
 			console.log("canvas is undefined. initing now...");
@@ -273,6 +341,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
+		var circle = new fabric.Circle({
+			radius: 100,
+			fill: '#eef',
+			scaleY: 0.5,
+			originX: 'center',
+			originY: 'center'
+		});
+		canvas.add(circle);
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -294,8 +370,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	var CanvasState = {
 		storeState: function() {
-			console.log("storing a new state...");
 			var state = this.getState();
+			console.log("storing a new state...", state);
 
 			var delta = jsondiffpatch.diff(state, previousState);
 			history[++historyIdx] = delta;
@@ -439,8 +515,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 						function(found) {
 							if (found.elmType === "rectext") {
 								console.log("objects", canvas._objects);
-								var result = canvas._objects.filter(function( obj ) {
-								  return (obj.id === found.id && obj.elmType === "textBorder");
+								var result = canvas._objects.filter(function(obj) {
+									return (obj.id === found.id && obj.elmType === "textBorder");
 								});
 
 								console.log("results", result);

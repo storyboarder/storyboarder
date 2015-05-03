@@ -71,10 +71,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
-		//		console.log("SELECT", canvas);
-		//		console.log(canvas.getObjects());
-		//canvas.getObjects()[1].selectable = true;
-		//		console.log("SELECT", canvas);
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -87,29 +83,37 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true,
 				editable: false
 			},
-			"draw": {
-				// there's no draw, gotta check if path or stroke something exists
+			"path": {
 				selectable: true
 			},
 			"image": {
 				selectable: true
+			},
+			"circle": {
+				selectable: true
 			}
+
 		}
 
 		canvasState.mapElements(function(found) { // map
-//			console.log(found);
-
+			console.log(found);
+			var options = {};
 			if (selectable.hasOwnProperty(found.elmType)) {
-				var options = selectable[found.elmType];
-				for (property in options) {
-					found.set(property, options[property]);
-				}
+				options = selectable[found.elmType];
+				// console.log(options);
+			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
+				options = selectable[found.type];
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
 					selectable: false
 				});
 			}
+
+			for (property in options) {
+				found.set(property, options[property]);
+			}
+
 		});
 
 		canvas.on('object:moving', function(options) {
