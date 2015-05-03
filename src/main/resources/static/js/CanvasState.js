@@ -153,9 +153,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			remove(canvas.getActiveGroup());
 			canvas.getActiveGroup().forEachObject(remove);
 			canvas.discardActiveGroup();
-			// for (var i in activeObjects) {
-			// 	remove(activeObjects[i]);
-			// }
 		} else if (canvas.getActiveObject()) {
 			remove(canvas.getActiveObject())
 		}
@@ -163,7 +160,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas.trigger("change");
 
 		function remove(obj) {
-			if (obj.elmType !== 'panel' && !(obj.helper === undefined)) {
+			if (obj.elmType !== 'panel' && obj.helper === undefined) {
 				canvas.remove(obj);
 			}
 		}
@@ -336,16 +333,16 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		/*var circle = new fabric.Circle({
-			radius: 100,
-			fill: '#eef',
-			scaleY: 0.5,
-			originX: 'center',
-			originY: 'center'
-		});
-		canvas.add(circle);
+		// var circle = new fabric.Circle({
+		// 	radius: 100,
+		// 	fill: '#eef',
+		// 	scaleY: 0.5,
+		// 	originX: 'center',
+		// 	originY: 'center'
+		// });
+		// canvas.add(circle);
 
-		CanvasState.initHistory(); */
+		CanvasState.initHistory(); 
 
 	};
 
