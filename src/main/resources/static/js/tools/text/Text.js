@@ -38,7 +38,8 @@ define(["../../CanvasState"], function(canvasState) {
 				stroke: "black",
 				strokeWeight: 2,
 				hasRotatingPoint: false,
-				textbox: this
+				textbox: this,
+				helper: true
 			});
 
 			canvasState.addElement(this.border, "textBorder");

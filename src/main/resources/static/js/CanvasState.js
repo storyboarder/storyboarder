@@ -266,7 +266,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		getState: function() {
 			var state = $.extend(this.getCanvas().toJSON([
-				"helper", "elmType", "edges", "lockMovementX", "lockMovementY"
+				"helper", "elmType", "edges",
+				"lockMovementX", "lockMovementY",
+				"lockScalingX", "lockScalingY",
+				"selectable"
 			]), {
 				width: width,
 				height: height,
