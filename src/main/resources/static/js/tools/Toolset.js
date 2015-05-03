@@ -20,14 +20,22 @@ define(function(require) {
 			}
 			
 			console.log("activating from toolset:", toolname);
+			console.log(toolname, toolset, toolset[toolname]);
 			currentTool = toolset[toolname].activate();
 		} else {
 			throw "Tool not found: " + toolname;
 		}
 	};
 
+	var set = function(toolname, property, value) {
+		console.log("setting prop");
+		console.log(toolname, property, value);
+		toolset[toolname].set(property, value);
+	};
+
 	return {
 		activate: activate,
+		set: set,
 		test: function() {
 			//TODO could this cause issues when doing asynchronous operations?
 			activate("Split");

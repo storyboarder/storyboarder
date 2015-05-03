@@ -354,6 +354,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	    $( "#page-thumbs" ).disableSelection();
 
 		init_project();
+
+		console.log("Editor: ", editor);
+	    editor.setProperty("Fill", "fillColor", $("#fill-color").val());
+	    $("#fill-color").on('input', function() {
+	    	editor.setProperty("Fill", "fillColor", $(this).val());
+	    });
 	};
 
 	return {

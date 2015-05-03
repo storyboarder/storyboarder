@@ -353,9 +353,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		});
 	};
 
-	var activate = function(toolname) {
-		toolset.activate(toolname);
-	};
+	var activate = toolset.activate;
+
+	var setProperty = toolset.set;
 
 	var action = function(name, params) {
 		if (name in actions) {
@@ -527,6 +527,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		init: init,
 		activate: activate,
 		action: action,
+		setProperty: setProperty,
 		test: test
 	};
 
