@@ -257,17 +257,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
-
-		document.onkeydown = function(e) { // remove elements when delete is pressed
-			var key = e.keyCode;
-			var selected = canvas.getActiveObject();
-			if (key === 8 && selected) {
-				if (selected.elmType === 'rectext' || selected.elmType === "image") {
-					canvas.remove(selected);
-				}
-			}
-		};
-
 		return this;
 	};
 

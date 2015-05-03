@@ -1,5 +1,6 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	$(document).on('keydown', function(event) {
+		console.log("key pressed", event);
 		copyPasteHandler(event);
 	});
 	// Main canvas
@@ -89,8 +90,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		} else {
 			key = event.keyCode;
 		}
-
 		switch (key) {
+			case 8:
+				event.preventDefault();
+				deleteActive();
 			case 67: // Ctrl+C
 				if (event.ctrlKey || event.metaKey) {
 					event.preventDefault();
@@ -118,36 +121,74 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//paste object from cliboard
 	var paste = function(params) {
+		var offset = 20;
 		console.log("paste called, clipboard: ", clipboard);
 		if (clipboard.type == "group") {
 			var clonedObjects = [];
 			var groupObjects = clipboard.content.objects;
 			for (var i in groupObjects) {
-				var newObj = groupObjects[i].clone();
+				var newObj = groupObjects[i].clone(function(callbackRes) {
+					callbackRes.set({
+						left: callbackRes.left + offset,
+						top: callbackRes.top + offset
+					});
+					canvas.add(callbackRes);
+				});
 				clonedObjects[i] = newObj;
 			}
 			var clonedGroup = new fabric.Group(clonedObjects, {
-				left: clipboard.content.left + 20,
-				top: clipboard.content.top + 20
+				left: clipboard.content.left + offset,
+				top: clipboard.content.top + offset
 			});
 			//clipboard = makeClipboard("group", clonedGroup);
 			var destroyedGroup = clonedGroup.destroy();
 			var items = destroyedGroup.getObjects();
 			items.forEach(function(item) {
-				canvas.add(item);
+				if (item !== undefined) {
+					canvas.add(item);
+				}
 			});
 		} else if (clipboard.type == "single") {
 			console.log("copied object", clipboard.content);
-			var clonedObj = clipboard.content.clone();
-			console.log("cloned object", clonedObj);
-			clonedObj.set({
-				left: clonedObj.left + 5,
-				top: clonedObj.top + 5
+			var clonedObj = clipboard.content.clone(function(callbackRes) {
+				callbackRes.set({
+					left: callbackRes.left + offset,
+					top: callbackRes.top + offset
+				});
+				canvas.add(callbackRes);
 			});
-			clipboard = makeClipboard("single", clonedObj);
-			canvas.add(clonedObj);
+			if (clonedObj !== undefined) {
+				console.log("cloned object", clonedObj);
+				clonedObj.set({
+					left: clonedObj.left + offset,
+					top: clonedObj.top + offset
+				});
+				clipboard = makeClipboard("single", clonedObj);
+				canvas.add(clonedObj);
+			}
 		}
 		canvas.renderAll();
+	};
+
+	var deleteActive = function(key) {
+		if (canvas.getActiveGroup()) {
+			remove(canvas.getActiveGroup());
+      		canvas.getActiveGroup().forEachObject(remove);
+      		canvas.discardActiveGroup();
+			// for (var i in activeObjects) {
+			// 	remove(activeObjects[i]);
+			// }
+		} else if (canvas.getActiveObject()) {
+			remove(canvas.getActiveObject())
+		}
+		canvas.renderAll();
+		canvas.trigger("change");
+
+		function remove(obj) {
+			//if (obj.elmType !== 'panel' && !(obj.helper === undefined)) {
+				canvas.remove(obj);
+			//}
+		}
 	};
 
 	// Add image to canvas
@@ -347,18 +388,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			originY: 'center'
 		});
 		canvas.add(circle);
-
-		var text = new fabric.Text("hello!", {
-			fontSize: 30,
-			originX: 'left',
-			originY: 'top',
-			textAlign: 'center',
-			left: 100,
-			top: 100,
-			borderColor: 'green',
-			borderScaleFactor: 2
-		});
-		canvas.add(text);
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -454,14 +483,16 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				return !obj.helper;
 			});
 
-//			console.log(state);
+			//			console.log(state);
 
 			return JSON.stringify(state);
 		},
 		getThumbnail: function() {
 			var thumb_width = 120;
 
-			return canvas.toDataURL({multiplier: thumb_width / width});
+			return canvas.toDataURL({
+				multiplier: thumb_width / width
+			});
 		},
 		applyDeltaToState: function(delta) {
 			this.unlistenCanvas();
@@ -507,7 +538,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-//					console.log(canvas);
+					//					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}
