@@ -124,6 +124,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 
 					setCurrentPage(responseObject);
 					canvasState.load_page("canvas", currPageObj.json);
+					canvasState.load_page("canvas", JSON.parse(responseObject.json, function() {
+						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
+					}));
 					return responseObject;
 					// }
 				});
