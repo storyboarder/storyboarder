@@ -124,6 +124,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 
 					setCurrentPage(responseObject);
 					canvasState.load_page("canvas", currPageObj.json, function() {
+						toolset.reactivate();
 //						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
 					});
 					return responseObject;
@@ -163,12 +164,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"RemovePage": function(params) {
-//			console.log(params);
 			checkParams(params, ["pageNum"]);
 			console.log("EDITOR REMOVE PAGE");
+			var that = this;
 			$.post("/pages/delete", {pageNum: params.pageNum}, function(responseJSON) {
 				response = JSON.parse(responseJSON);
-//				console.log(response);
 				if ("message" in response) {
 					numPages--;
 					if (currPageObj.pageNum == params.pageNum) { // deleted the page you're on
@@ -176,8 +176,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 						currPageObj.pageNum--;
 						if (currPageObj.pageNum < 1) {
 							currPageObj.pageNum = 1;
-							canvasState.init_page(); //TODO should call editor get page
 						}
+						that.GetPage({pageNum: currPageObj.pageNum});
+
 					} else if (currPageObj.pageNum > params.pageNum) { // deleted a page before the current page
 						currPageObj.pageNum--;
 					}
@@ -195,6 +196,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			canvasState.init_page(function() {
 				setCurrentPage(makePage(numPages, canvasState.getState(), ""));
 				console.log(currPageObj);
+				toolset.reactivate();
 				$.post("/pages/add", getCurrentPageJSON(), function(response) {
 					console.log("add page called with num: " + numPages + " in project " + projectName);
 //					console.log("response: ", JSON.parse(response));
