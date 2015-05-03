@@ -18,12 +18,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			actions.SyncPage();
 		},
 		"SyncPage": function(delta) {
-			socket.send(JSON.stringify($.extend(
-				delta, {
-					"projectName": projectName,
-					"currentPage": currentPage
-				}
-			)));
+			socket.send(JSON.stringify({
+				projectName: projectName,
+				currentPage: currentPage,
+				delta: delta
+			}));
 		},
 		"ToggleGrid": function(params) {
 			console.log("toggle-grid");
@@ -67,6 +66,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				throwErrorIfApplicable(params);
 				
 				checkPage(responseObject.page);
+				projectName = params.name;
 				responseObject.page.json = JSON.parse(responseObject.page.json);
 				//				console.log(responseObject.page);
 				numPages = responseObject.numPages;
@@ -307,13 +307,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 	var init = function(canvasId, callback) {
 		console.log("INIT EDITOR");
 		canvasState.init("canvas");
-		toolset.init();
 
 		socket = new WebSocket("ws://localhost:8888");
 		socket.onmessage = function(e) {
 			var data = JSON.parse(e.data);
 			if (data.projectName == projectName && data.currentPage == currentPage) {
-				canvasState.applyDeltaToState(data);
+				canvasState.applyDeltaToState(data.delta);
 			}
 		};
 

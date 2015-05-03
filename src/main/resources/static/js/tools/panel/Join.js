@@ -8,19 +8,18 @@ define(["../../CanvasState"], function(canvasState) {
 	var addPanelEdge = function(line) {
 		canvas.add(line); /* do not add to elements array */
 		panelEdges.push(line);
-		line.bringToFront();
 	};
 
 	var initPanelEdge = function(coords) {
 		console.log("coords of line", coords);
 		var line = new fabric.Line(coords, {
-			fill: 'black',
 			stroke: deselected,
 			strokeWidth: 1,
 			selectable: true,
 			padding: canvasState.getPanelMargin(),
 			hasBorders: false,
-			hasControls: false
+			hasControls: false,
+			helper: true
 		});
 		return line;
 	};
@@ -116,6 +115,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 	/* activate returns this (the tool) */
 	var activate = function() {
+		canvas = canvasState.getCanvas();
 
 		console.log("join activated");
 		initPanelEdges();
@@ -132,6 +132,7 @@ define(["../../CanvasState"], function(canvasState) {
 		console.log(panelEdges);
 
 		canvas.on("object:selected", function(options) {
+			console.log("click merge the thing");
 			console.log(options.target);
 			merge(options.target);
 			initPanelEdges();
@@ -146,19 +147,13 @@ define(["../../CanvasState"], function(canvasState) {
 			canvas.remove(panelEdges[line]);
 		}
 		panelEdges = [];
-		canvas.__eventListeners["object:selected"] = [];
+		canvas.off("object:selected");
 	};
 
 	/* the following code should probably be the same for all tools */
 	return {
 		name: "Join",
-		init: function() {
-			canvas = canvasState.getCanvas();
-		},
 		activate: activate,
-		deactivate: deactivate,
-		test: function() {
-
-		}
+		deactivate: deactivate
 	};
 });

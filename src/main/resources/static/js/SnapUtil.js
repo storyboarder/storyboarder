@@ -27,10 +27,11 @@ define([], function() {
 				var line = new fabric.Line(
 					[i * gridSpacing, 0, i * gridSpacing, height], {
 						stroke: color,
-						selectable: false
+						selectable: false,
+						helper: true
 					}
 				);
-				canvasState.getHelperCanvas().add(line);
+				canvasState.getCanvas().add(line);
 
 				//canvas.add(line);
 				line.sendToBack();
@@ -40,10 +41,11 @@ define([], function() {
 				var line = new fabric.Line(
 					[0, j * gridSpacing, width, j * gridSpacing], {
 						stroke: color,
-						selectable: false
+						selectable: false,
+						helper: true
 					}
 				);
-				canvasState.getHelperCanvas().add(line);
+				canvasState.getCanvas().add(line);
 				//canvas.add(line);
 				line.sendToBack();
 				this.grid.push(line);
@@ -53,7 +55,7 @@ define([], function() {
 		clear: function() {
 			for (g in this.grid) {
 				//canvasState.getCanvas().remove(this.grid[g]);
-				canvasState.getHelperCanvas().remove(this.grid[g]);
+				canvasState.getCanvas().remove(this.grid[g]);
 			}
 			this.grid = [];
 		},

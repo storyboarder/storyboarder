@@ -27,11 +27,6 @@ define(function(require) {
 	};
 
 	return {
-		init: function() {
-			for (var i in toolset) {
-				toolset[i].init();
-			}
-		},
 		activate: activate,
 		test: function() {
 			//TODO could this cause issues when doing asynchronous operations?

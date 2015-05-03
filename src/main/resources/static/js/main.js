@@ -4,7 +4,7 @@ require.config({
 		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min",
 		jqueryui: "jquery-ui",
 		fabricjs: "http://fabricjs.com/lib/fabric",
-		jsondiffpatch: "https://cdn.rawgit.com/benjamine/jsondiffpatch/master/public/build/jsondiffpatch.min",
+		jsondiffpatch: "https://cdn.rawgit.com/benjamine/jsondiffpatch/master/public/build/jsondiffpatch-full.min",
 		jsPDF: "https://cdn.rawgit.com/MrRio/jsPDF/master/dist/jspdf.min",
 		tools: "tools",
 		view: "view",
@@ -45,7 +45,7 @@ require.config({
 			menu.init();
 			console.log("editor:");
 			console.log(editor);
-		  editor.test();
+		  // editor.test();
 		});
 
 	}

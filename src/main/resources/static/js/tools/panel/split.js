@@ -1,7 +1,6 @@
 define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	var previewDivideLine;
 	var canvas;
-	var helperCanvas;
 	var threshold = 2;
 	var snap = Snap.snap;
 
@@ -25,7 +24,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		// Set preview line coordinates and paint to canvas
 		previewDivideLine.set(coords);
-		helperCanvas.renderAll();
+		canvas.renderAll();
 	};
 
 
@@ -36,7 +35,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 		// Horizontal split
 		if (direction == "horizontal") {
-			if (!(obj.edges.top < pos && pos < obj.edges.bottom)) {
+			if (!(panelEdges.top < pos && pos < panelEdges.bottom)) {
 				throw "Split position " + pos + " is out of the target panel.";
 			}
 			// New height of the old panel
@@ -83,15 +82,19 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 		previewDivideLine = new fabric.Line([0, 0, 0, 0], {
 			stroke: 'red',
 			strokeWidth: 1,
-			selectable: false
+			selectable: false,
+			helper: true
 		});
 
 		// Add preview line to helper canvas
-		helperCanvas.add(previewDivideLine);
+		canvas.add(previewDivideLine);
 	};
 
 	// Split activate function
 	var activate = function() {
+		// Get canvas
+		canvas = canvasState.getCanvas();
+
 		// Make all panels selectable
 		canvasState.mapElements(function(e) {
 			if (e.elmType == "panel") {
@@ -181,7 +184,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	// Deactivate split tool
 	var deactivate = function() {
 		// Remove preview line
-		helperCanvas.remove(previewDivideLine);
+		canvas.remove(previewDivideLine);
 		// Deactivate event listeners
 		canvas.off("mouse:move");
 		canvas.off("object:selected");
@@ -192,10 +195,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	// (its the same for all tools)
 	return {
 		name: "Split",
-		init: function() {
-			canvas = canvasState.getCanvas();
-			helperCanvas = canvasState.getHelperCanvas();
-		},
 		activate: activate,
 		deactivate: deactivate
 	};

@@ -40,6 +40,9 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	/* activate returns this (the tool) */
 	var activate = function() {
+		canvas = canvasState.getCanvas();
+		console.log(canvasState);
+		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
 //		console.log("SELECT", canvas);
@@ -290,12 +293,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	return {
 		name: "Select",
-		init: function() {
-			canvas = canvasState.getCanvas();
-			console.log(canvasState);
-			snapPoint = canvasState.snapPoint;
-//			console.log("select tool inited with canvas: ", canvas);
-		},
 		activate: activate,
 		deactivate: deactivate
 	};

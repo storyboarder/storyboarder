@@ -1,6 +1,9 @@
 define(["../../CanvasState"], function (canvasState) {
+	var canvas;
 
 	var activate = function() {
+		canvas = canvasState.getCanvas();
+
 		var selected;
 		canvas.on("mouse:down", function(coor) {
 			selected = coor.target;
@@ -17,16 +20,12 @@ define(["../../CanvasState"], function (canvasState) {
 	};
 
 	var deactivate = function() {
-    	canvas.__eventListeners["mouse:down"] = [];
+    	canvas.off("mouse:down");
 	};
 
 	
 	return {
 		name: "Fill",
-		init: function () {
-			console.log("init fill");
-			canvas = canvasState.getCanvas();
-		},
 		activate: activate,
 		deactivate: deactivate
 	};

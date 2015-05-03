@@ -3,8 +3,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Main canvas
 	var canvas;
 	var canvasId = "canvas";
-	// Helper canvas to paint grid or indicators etc.
-	var helperCanvas;
 	// Socket for multiplayer
 	var socket;
 
@@ -186,16 +184,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
-		console.log("ADDING HELPER CANVAS");
-		$('<canvas id="helperCanvas"></canvas>').css({
-			position: "absolute",
-			top: $canvas.offset().top,
-			left: $canvas.offset().left
-		}).insertAfter($canvas);
-
-		helperCanvas = new fabric.Canvas("helperCanvas", {
-			selection: false
-		});
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
@@ -205,7 +193,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			init();
 		}
 		canvas.clear();
-		helperCanvas.clear();
 		pageEdges = {
 			left: pageMargin,
 			top: pageMargin,
@@ -233,13 +220,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 		width = w;
 		height = h;
-		pageMargin = pageM
-		panelMargin = panelM
+		pageMargin = pageM;
+		panelMargin = panelM;
 		canvas.setDimensions({
-			width: w,
-			height: h
-		});
-		helperCanvas.setDimensions({
 			width: w,
 			height: h
 		});
@@ -311,31 +294,34 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.off('object:removed');*/
 		},
 		getState: function() {
-			return JSON.stringify($.extend(this.getCanvas().toJSON([
-				"elmType", "edges", "lockMovementX", "lockMovementY"
+			var canvasState = $.extend(this.getCanvas().toJSON([
+				"helper", "elmType", "edges", "lockMovementX", "lockMovementY"
 			]), {
 				width: width,
 				height: height,
 				pageMargin: pageMargin,
 				panelMargin: panelMargin
-			}));
+			});
+
+			// Remove helper objects from canvas
+			canvasState.objects = canvasState.objects.filter(function (obj) {
+				return !obj.helper;
+			});
+
+			console.log(canvasState);
+
+			return JSON.stringify(canvasState);
 		},
 		applyDeltaToState: function(delta) {
 			this.unlistenCanvas();
 
-			console.log("Delta: ", delta);
-			console.log("Old state: ", previousState);
 			previousState = jsondiffpatch.patch(previousState, delta);
-			console.log("New state: ", previousState);
 			canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
 
 			this.listenCanvas();
 		},
 		getCanvas: function() {
 			return canvas;
-		},
-		getHelperCanvas: function() {
-			return helperCanvas;
 		},
 		getWidth: function() {
 			return canvas.width;
