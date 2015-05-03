@@ -16,6 +16,7 @@ define(["../../CanvasState"], function (canvasState) {
 			if (selected && selected.elmType === "panel") {
 				selected.fill = fillColor;
 				canvas.renderAll();
+				canvas.trigger("change");
 			}
 		});
 

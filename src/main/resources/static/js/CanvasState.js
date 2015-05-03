@@ -34,6 +34,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Add image to canvas
 	var addImage = function(params) {
 		var img = params.img;
+		var active = canvas.getActiveObject();
 
 		// Set position and scale
 		img.set({
@@ -51,8 +52,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			mr: false
 		});
 
-		if (params.active && params.active.elmType === "panel") {
-			var panel = params.active;
+		if (active && active.elmType === "panel") {
+			var panel = active;
 
 			img.clipTo = function(ctx) {
 				ctx.save();
@@ -217,6 +218,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			previousState = state;
 			canvas.trigger('stateUpdated', jsondiffpatch.reverse(delta));
 
+			// console.log("History length: ", history.length);
+
 			return delta;
 		},
 		canRevert: function() {
@@ -257,15 +260,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		listenCanvas: function() {
 			canvas.on('change', this.storeState.bind(this));
-			/*canvas.on('object:modified', this.storeState.bind(this));
-			canvas.on('object:added', this.storeState.bind(this));
-			canvas.on('object:removed', this.storeState.bind(this));*/
 		},
 		unlistenCanvas: function() {
 			canvas.off('change', this.storeState.bind(this));
-			/*canvas.off('object:modified');
-			canvas.off('object:added');
-			canvas.off('object:removed');*/
 		},
 		getState: function() {
 			var state = $.extend(this.getCanvas().toJSON([

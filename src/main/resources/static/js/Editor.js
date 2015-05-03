@@ -293,10 +293,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 								var picName = nameArray[0].substring(1);
 				*/
 				fabric.Image.fromURL(params.url, function(img) {
-					var group = {
-						img: img,
-						active: params.active
-					}
+					var group = { img: img };
 					canvasState.addImage(group);
 				});
 			}
@@ -345,17 +342,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			if (data.projectName == projectName && data.currentPage == currentPage) {
 				canvasState.applyDeltaToState(data.delta);
 			}
+			console.log(canvasState.getCanvas());
 		};
 
-		// If a change is made to the canvas
-		// update its state in history
-		canvasState.getCanvas().on('change', function() {
-			canvasState.storeState();
-		});
 		// When its state is updated
 		// save and sync the page
-		// This does not count changes from syncing
-		// so we do not get into an infinite loop
+		// This listener gets called on undo and redo as well
 		canvasState.getCanvas().on('stateUpdated', function (delta) {
 			actions.SavePage();
 			actions.SyncPage(delta);

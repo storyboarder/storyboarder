@@ -14,11 +14,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
 
-			var group = {
-				url: $("#image-url").val(),
-				active: canvas.getActiveObject()
-			}
-
+			var group = { url: $("#image-url").val() };
 			editor.action("AddURL", group);
 		},
 		"Save": function() {
@@ -283,10 +279,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				imgObj.src = event.target.result;
 				imgObj.onload = function() {
 					var image = new fabric.Image(imgObj);
-					var group = {
-						img: image,
-						active: canvas.getActiveObject()
-					}
+					var group = { img: image };
 					editor.action("AddImage", group);
 				}
 			}
