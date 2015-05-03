@@ -1,18 +1,12 @@
 define(["../../CanvasState"], function(canvasState) {
-	var panelEdges;
 	var canvas;
+	var panelEdges = [];
 	var selected = "blue";
 	var deselected = "#bbb";
-	var currentLine;
 
-	var addPanelEdge = function(line) {
-		canvas.add(line); /* do not add to elements array */
-		panelEdges.push(line);
-	};
-
-	var initPanelEdge = function(coords) {
-		console.log("coords of line", coords);
-		var line = new fabric.Line(coords, {
+	// Adds a join indicator to the canvas
+	var addJoinIndicator = function(coords, props) {
+		var line = new fabric.Line(coords, $.extend({
 			stroke: deselected,
 			strokeWidth: 1,
 			selectable: true,
@@ -20,137 +14,154 @@ define(["../../CanvasState"], function(canvasState) {
 			hasBorders: false,
 			hasControls: false,
 			helper: true
-		});
+		}, props));
+
+		canvas.add(line);
+		panelEdges.push(line);
+
 		return line;
 	};
 
-	var initPanelEdges = function() {
-		if (panelEdges) {
-			panelEdges.map(function(e) {
-				canvas.remove(e);
-			});
-		}
+	// Empties join idicators array
+	// and removes them from canvas
+	var clearJoinIndicators = function () {
+		// * DO NOT REMOVE BIND(CANVAS)
+		panelEdges.forEach(canvas.remove.bind(canvas));
 		panelEdges = [];
-		canvasState.mapElements(function(p1, rank1) {
-			if (p1.elmType == "panel") {
-				canvasState.mapElements(function(p2, rank2) {
-					if (p2.elmType == "panel" && rank2 > rank1) {
-						matchPanels(p1, p2);
-					}
-				});
-			}
-		});
-		console.log(panelEdges);
 	};
 
+	// Calculates which panels can be joined
+	// and shows join indicators for those panels
+	var initJoinIndicators = function() {
+		// Remove previous indicators
+		clearJoinIndicators();
+
+		// Loop though each panel
+		// against every other panel
+		canvasState.mapElements(function(panel1, idx1) {
+			if (panel1.elmType != "panel") return;
+
+			canvasState.mapElements(function(panel2, idx2) {
+				if (panel2.elmType == "panel" && idx2 > idx1) {
+					matchPanels(panel1, panel2);
+				}
+			});
+		});
+	};
+
+	// Checks if two panels share sides
+	// and if yes shows a join indicator
 	var matchPanels = function(p1, p2) {
-		var line;
+		// If two panels align top and bottom
 		if (p1.edges.bottom == p2.edges.bottom &&
 			p1.edges.top == p2.edges.top) {
+			// Find which is the left and which the right
+			var leftPanel = p1,
+				rightPanel = p2;
 			if (p1.edges.left == p2.edges.right) {
-				line = initPanelEdge([p1.edges.left, p1.edges.top, p1.edges.left, p1.edges.bottom]);
-				line.leftPanel = p2;
-				line.rightPanel = p1;
-				line.elmType = "vertical";
-			} else if (p1.edges.right == p2.edges.left) {
-				line = initPanelEdge([p2.edges.left, p2.edges.top, p2.edges.left, p2.edges.bottom]);
-				line.leftPanel = p1;
-				line.rightPanel = p2;
-				line.elmType = "vertical";
+				leftPanel = p2;
+				rightPanel = p1;
 			}
+
+			// Show indicator that they can be joined
+			addJoinIndicator([
+				leftPanel.edges.right, leftPanel.edges.top, leftPanel.edges.right, leftPanel.edges.bottom
+			], {
+				leftPanel: leftPanel,
+				rightPanel: rightPanel,
+				direction: "vertical"
+			});
+		// If two panels align left and right
 		} else if (p1.edges.left == p2.edges.left &&
 			p1.edges.right == p2.edges.right) {
+			// Find which panel is top and which bottom
+			var topPanel = p1,
+				bottomPanel = p2;
 			if (p1.edges.top == p2.edges.bottom) {
-				line = initPanelEdge([p1.edges.left, p1.edges.top, p1.edges.right, p1.edges.top]);
-				line.topPanel = p2;
-				line.bottomPanel = p1;
-				line.elmType = "horizontal";
-			} else if (p1.edges.bottom == p2.edges.top) {
-				line = initPanelEdge([p2.edges.left, p2.edges.top, p2.edges.right, p2.edges.top]);
-				line.topPanel = p1;
-				line.bottomPanel = p2;
-				line.elmType = "horizontal";
+				topPanel = p2;
+				bottomPanel = p1;
 			}
-		}
-		if (line) {
-			addPanelEdge(line);
-			if (line.elmType == "horizontal") {
-				console.log(line.topPanel.edges, line.bottomPanel.edges);
-			} else {
-				console.log(line.leftPanel.edges, line.rightPanel.edges);
-			}
+
+			// Show indicator that they can be joined
+			addJoinIndicator([
+				topPanel.edges.left, topPanel.edges.bottom, topPanel.edges.right, topPanel.edges.bottom
+			], {
+				topPanel: topPanel,
+				bottomPanel: bottomPanel,
+				direction: "horizontal"
+			});
 		}
 	};
 
+	// Merges two panels given the join indicator
 	var merge = function(p) {
-		console.log("merge", p);
-		var toKeep, toDelete;
-		switch (p.elmType) {
+		var toResize, toDelete;
+		switch (p.direction) {
 			case "horizontal":
 				var topPanel = p.topPanel;
 				var bottomPanel = p.bottomPanel;
+
 				topPanel.edges.bottom = bottomPanel.edges.bottom;
 				topPanel.height = topPanel.edges.bottom - topPanel.edges.top - 2 * canvasState.getPanelMargin();
+
 				toDelete = bottomPanel;
-				toKeep = topPanel;
+				toResize = topPanel;
 				break;
 			case "vertical":
 				var leftPanel = p.leftPanel;
 				var rightPanel = p.rightPanel;
+
 				leftPanel.edges.right = rightPanel.edges.right;
 				leftPanel.width = leftPanel.edges.right - leftPanel.edges.left - 2 * canvasState.getPanelMargin();
+
 				toDelete = rightPanel;
-				toKeep = leftPanel;
+				toResize = leftPanel;
 				break;
 			default:
-				console.log("unexpected type:", p.elmType);
+				throw "Unexpected direction: " + p.direction;
 				break;
 		}
-		console.log("p", p);
-		toKeep.setCoords();
+
+		// Update size and coordinates
+		toResize.setCoords();
+		// Remove joined panel and indicator
 		canvas.remove(p);
-		canvasState.deleteElement(toDelete);
+		canvas.remove(toDelete);
+		// Triger change event
 		canvas.trigger("change");
 	};
 
-	/* activate returns this (the tool) */
+	// Activate join tool
 	var activate = function() {
+		// Get canvas
 		canvas = canvasState.getCanvas();
 
-		console.log("join activated");
-		initPanelEdges();
+		initJoinIndicators();
 
-		canvasState.mapElements(
-			function(e) { // map
-				if (e.elmType == "panel") {
-					e.set({
-						selectable: false
-					});
-				}
+		canvasState.mapElements(function(e) { // map
+			if (e.elmType == "panel") {
+				e.set({
+					selectable: false
+				});
 			}
-		);
-		console.log(panelEdges);
-
-		canvas.on("object:selected", function(options) {
-			console.log("click merge the thing");
-			console.log(options.target);
-			merge(options.target);
-			initPanelEdges();
 		});
+
+		// Listen for click event to join panels
+		canvas.on("object:selected", function(options) {
+			merge(options.target);
+			initJoinIndicators();
+		});
+
 		return this;
 	};
 
-
+	// Deactivate join tool
 	var deactivate = function() {
-		console.log("join deactivated");
-		for (var line in panelEdges) {
-			canvas.remove(panelEdges[line]);
-		}
-		panelEdges = [];
+		clearJoinIndicators();
 		canvas.off("object:selected");
 	};
 
-	/* the following code should probably be the same for all tools */
+	// Join tool public api
 	return {
 		name: "Join",
 		activate: activate,

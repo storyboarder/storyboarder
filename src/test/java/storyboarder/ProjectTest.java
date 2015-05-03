@@ -1,6 +1,7 @@
 package storyboarder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +22,7 @@ public class ProjectTest {
   private static final Path dbPath = Paths.get("test.sqlite3");
 
   private static final List<Page> pages = ImmutableList.of(new Page(1,
-      "foo bar", "derp"), new Page(2, "page two!", "yurp"), new Page(3,
+      "page one!", "derp"), new Page(2, "page two!", "yurp"), new Page(3,
           "page three!", "shmurp"), new Page(4, "page four!", "nurp"));
 
   private static Project testProj;
@@ -171,6 +172,45 @@ public class ProjectTest {
     for (int i = 0; i < newPages.size(); i++) {
       assertEquals(i + 1, newPages.get(i).getNum());
     }
+  }
+
+  @Test
+  public void movePageTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    reInit();
+    testProj.movePage(1, 4);
+    List<Page> newPages = testProj.getAllPages();
+
+    assertEquals(pages.get(0).getJson(), newPages.get(3).getJson());
+    assertEquals(pages.get(1).getJson(), newPages.get(0).getJson());
+    assertEquals(pages.get(2).getJson(), newPages.get(1).getJson());
+    assertEquals(pages.get(3).getJson(), newPages.get(2).getJson());
+
+    testProj.movePage(4, 1);
+    newPages = testProj.getAllPages();
+    for (int i = 0; i < newPages.size(); i++) {
+      assertEquals(pages.get(i), newPages.get(i));
+    }
+
+    testProj.movePage(3, 2);
+    newPages = testProj.getAllPages();
+    assertEquals(pages.get(0), newPages.get(0));
+    assertEquals(pages.get(3), newPages.get(3));
+
+    assertEquals(pages.get(1).getJson(), newPages.get(2).getJson());
+    assertEquals(pages.get(2).getJson(), newPages.get(1).getJson());
+  }
+
+  @Test
+  public void inBoundsTest() throws ClassNotFoundException, SQLException,
+    IOException {
+    reInit();
+    assertFalse(testProj.inBounds(-1));
+    assertFalse(testProj.inBounds(0));
+    for (int i = 0; i < pages.size(); i++) {
+      assertTrue(testProj.inBounds(i + 1));
+    }
+    assertFalse(testProj.inBounds(pages.size() + 1));
   }
 
   @Test

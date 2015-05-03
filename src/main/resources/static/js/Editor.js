@@ -1,4 +1,4 @@
-define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasState, toolset) {
+define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], function(jsPDF, canvasState, toolset, snapUtil) {
 	var projectName;
 	var currentPage; // index of current page
 	var numPages;
@@ -26,30 +26,31 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log("toggle-grid");
 			console.log(params);
 			if (params.checked) {
-				canvasState.drawGrid(params.name);
+				snapUtil.drawGrid(params.name);
 			} else {
-				canvasState.clearGrid(params.name);
+				snapUtil.clearGrid(params.name);
 			}
 		},
 		"SetSnap": function(params) {
 			var obj = {};
 			obj[params.id] = params.value;
-			canvasState.setSnap(params.name, obj);
+			snapUtil.setSnap(params.name, obj);
 		},
 		"PanelRows": function(params) {
-			canvasState.setPanelRows(params.value);
-			canvasState.clearPanelGrid(params.name);
-			canvasState.drawPanelGrid(params.name);
+			snapUtil.setPanelRows(params.value);
+			snapUtil.clearPanelGrid(params.name);
+			snapUtil.drawPanelGrid(params.name);
 		},
 		"PanelColumns": function(params) {
-			canvasState.setPanelColumns(params.value);
-			canvasState.clearPanelGrid(params.name);
-			canvasState.drawPanelGrid(params.name);
+			snapUtil.setPanelColumns(params.value);
+			snapUtil.clearPanelGrid(params.name);
+			snapUtil.drawPanelGrid(params.name);
 		},
 		"GetChoices": function(displayChoices) {
-			console.log("getting project choices");
 			$.post("/projects/choices", {}, function(responseJSON) {
-				displayChoices(JSON.parse(responseJSON));
+				var responseObject = JSON.parse(responseJSON);
+				console.log("getting project choices, response: ", responseObject);
+				displayChoices(responseObject);
 			});
 		},
 		"LoadProj": function(params) {
@@ -93,19 +94,17 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
 			canvas.height = height;
-			currentPage = 0;
-			numPages = 0;
+			currentPage = 1;
+			numPages = 1;
 			console.log(currentPage, "/", numPages);
 
 			projectName = params.name;
 
 			var that = this;
 			canvasState.init_project(width, height, panelMargin, pageMargin, function() {
-				$.post("/projects/create", {
-					name: params.name
-				}, function(responseJSON) {
-					response = JSON.parse(responseJSON);
-//					console.log(response);
+				$.post("/projects/create", {name: params.name}, function(responseJSON) {
+					var response = JSON.parse(responseJSON);
+					console.log("create proj called, response: ", response);
 					projectName = response.name;
 					that.AddPage();
 					activate("Select");
@@ -153,9 +152,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 		},
 		"GetAllPages": function(callback) {
 			$.post("/pages/getAll", {}, function(responseJSON) {
-				console.log("get all pages called");
-				console.log("response: ", JSON.parse(responseJSON));
-				callback(JSON.parse(responseJSON));
+				responseObject = JSON.parse(responseJSON);
+				console.log("get all pages called, response: ", responseObject);
+				callback(responseObject);
 			});
 		},
 		"SavePage": function() {
@@ -164,14 +163,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 				throw "invalid currentPage: " + currentPage + "/" + numPages;
 			}
 			pageJSON = canvasState.getState();
-			//			console.log(currentPage, pageJSON);
 
 			var page = makePage(currentPage, pageJSON, "");
 
-			console.log(page);
-
 			$.post("/pages/save", page, function(response) {
-				console.log("response: ", JSON.parse(response));
+				console.log("Save called with: ", page, ", response: ", JSON.parse(response));
 			});
 		},
 		"SavePageTest": function(page) {
@@ -295,10 +291,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 								var picName = nameArray[0].substring(1);
 				*/
 				fabric.Image.fromURL(params.url, function(img) {
-					var group = {
-						img: img,
-						active: params.active
-					}
+					var group = { img: img };
 					canvasState.addImage(group);
 				});
 			}
@@ -347,11 +340,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			if (data.projectName == projectName && data.currentPage == currentPage) {
 				canvasState.applyDeltaToState(data.delta);
 			}
+			console.log(canvasState.getCanvas());
 		};
 
-		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
-		canvasState.getCanvas().on('change', function() {
-			actions["SavePage"]();
+		// When its state is updated
+		// save and sync the page
+		// This listener gets called on undo and redo as well
+		canvasState.getCanvas().on('stateUpdated', function (delta) {
+			actions.SavePage();
+			actions.SyncPage(delta);
 		});
 	};
 

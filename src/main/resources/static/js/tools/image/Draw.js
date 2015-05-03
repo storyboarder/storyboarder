@@ -129,7 +129,7 @@ define(["../../CanvasState"], function(canvasState) {
 		console.log("LOOK HERE");
 		console.log(newGroup);
 		console.log(6);
-		canvas._objects.splice(start, times);
+		canvas.getObjects().splice(start, times);
 		canvasState.addElement(newGroup, "draw");
 		//canvas.setActiveGroup(newGroup);
 		//canvas.bringToFront(newGroup);
@@ -139,7 +139,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 	var activate = function() {
 		canvas = canvasState.getCanvas();
-		//start = canvas._objects.length;
+		//start = canvas.getObjects().length;
 		//console.log("start " + start);
 
 		console.log("draw activated");
@@ -172,7 +172,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 				for(i = start; i <= times + 1; i++) {
 				console.log(1);
-				group.push(canvas._objects[i]);
+				group.push(canvas.getObjects()[i]);
 				}
 				console.log(2);
 				addGroup(group);
