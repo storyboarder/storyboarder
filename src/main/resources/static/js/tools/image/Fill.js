@@ -14,7 +14,7 @@ define(["../../CanvasState"], function (canvasState) {
 			selected = coor.target;
 
 			if (selected && selected.elmType === "panel") {
-				selected["fill"] = fillColor;
+				selected.fill = fillColor;
 				canvas.renderAll();
 			}
 		});
