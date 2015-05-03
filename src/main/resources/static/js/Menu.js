@@ -64,7 +64,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			});
 		},
 		"GetPage": function(item) {
-			this.SetCurrentPage(item);
+			this.SetCurrentPage(item.parent());
 			var idx = parseInt(item.parent().attr("id"));
 			this.SetHeading({
 				currentPage: idx
@@ -138,6 +138,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$currentPage = $currPg;
 		},
 		"UpdatePages": function(curr, num) {
+			editor.action("GetAllPages", {callback: function(response) {
+				console.log(response);
+				for (r in response) {
+					console.log(response[r].thumbnail);
+				}
+			}});
 			console.log("UPDATE PAGES", curr, num);
 			$("#page-thumbs").empty();
 			for (var i = 0; i < num; i++) {
@@ -353,6 +359,19 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 		$("#page-thumbs").disableSelection();
 
+		$(".next-page").click(function() {
+			var nextItem = $("#page-thumbs .page-thumb.current").next(".page-thumb");
+			if (nextItem.length != 0) {
+				views.GetPage(nextItem.children("a"));
+			}
+		});
+
+		$(".previous-page").click(function() {
+			var prevItem = $("#page-thumbs .page-thumb.current").prev(".page-thumb");
+			if (prevItem.length != 0) {
+				views.GetPage(prevItem.children("a"));
+			}
+		});
 
 		$("#font-size").change(function(e) {
 			$("#fsize").text($("#font-size").val());
@@ -371,7 +390,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				canvas.renderAll();
 			}
 		});
-
 
 		$("#font-family").change(function(e) {
 			var active = canvas.getActiveObject();

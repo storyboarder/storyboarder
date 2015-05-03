@@ -137,11 +137,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				console.log("Delete project called with ", params, " Response: ", responseObject);
 			});
 		},
-		"GetAllPages": function(callback) {
+		"GetAllPages": function(params) {
 			$.post("/pages/getAll", {}, function(responseJSON) {
 				responseObject = JSON.parse(responseJSON);
 				console.log("get all pages called, response: ", responseObject);
-				callback(responseObject);
+				if (typeof params.callback != "undefined") {
+					params.callback(responseObject);
+				}
 			});
 		},
 		"SavePage": function() {
@@ -149,7 +151,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			if (currPageObj.pageNum <= 0 || currPageObj.pageNum > numPages) {
 				throw "invalid currentPage: " + currPageObj.pageNum + "/" + numPages;
 			}
-			setCurrentPage({pageNum: currPageObj.pageNum, json: canvasState.getState(), thumbnail: ""}) //TODO save thumbnail
+			console.log(canvasState.getThumbnail());
+			setCurrentPage({pageNum: currPageObj.pageNum, json: canvasState.getState(), thumbnail: canvasState.getThumbnail()}); //TODO save thumbnail
 
 			$.post("/pages/save", getCurrentPageJSON(), function(response) {
 				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
