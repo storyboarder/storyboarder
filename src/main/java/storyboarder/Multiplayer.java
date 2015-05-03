@@ -8,7 +8,8 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 /**
- * A simple WebSocketServer implementation. Keeps track of a "chatroom".
+ * A simple WebSocketServer implementation. Keeps track of a "chatroom". Allows
+ * multiple users to work on one project.
  *
  * @author ktsakas
  * @author fbystric
