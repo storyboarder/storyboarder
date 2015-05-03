@@ -25,7 +25,8 @@ define(["../../CanvasState"], function(canvasState) {
 	// Empties join idicators array
 	// and removes them from canvas
 	var clearJoinIndicators = function () {
-		panelEdges.forEach(canvas.remove);
+		// * DO NOT REMOVE BIND(CANVAS)
+		panelEdges.forEach(canvas.remove.bind(canvas));
 		panelEdges = [];
 	};
 
@@ -92,6 +93,7 @@ define(["../../CanvasState"], function(canvasState) {
 		}
 	};
 
+	// Merges two panels given the join indicator
 	var merge = function(p) {
 		var toResize, toDelete;
 		switch (p.direction) {
@@ -122,7 +124,8 @@ define(["../../CanvasState"], function(canvasState) {
 
 		// Update size and coordinates
 		toResize.setCoords();
-		// Remove joined panel
+		// Remove joined panel and indicator
+		canvas.remove(p);
 		canvas.remove(toDelete);
 		// Triger change event
 		canvas.trigger("change");

@@ -122,22 +122,17 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	// Returns the direction opposite to the one given
 	var getOppositeDirection = function(edgeDir) {
-		switch (edgeDir) {
-			case "top":
-				return "bottom";
-				break;
-			case "bottom":
-				return "top";
-				break;
-			case "left":
-				return "right";
-				break;
-			case "right":
-				return "left";
-				break;
-			default:
-				throw "Invalid edge direction " + edgeDir;
-				break;
+		var opposites = {
+			"top": "bottom",
+			"bottom": "top",
+			"left": "right",
+			"right": "left"
+		};
+
+		if ( edgeDir in opposites ) {
+			return opposites[edgeDir];
+		} else {
+			throw "Invalid edge direction " + edgeDir;
 		}
 	};
 
@@ -311,10 +306,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
 		mapElements: function(cb) {
-			return canvas._objects.map(cb);
+			return canvas.getObjects().map(cb);
 		},
 		filterElements: function(cb) {
-			return canvas._objects.filter(cb);
+			return canvas.getObjects().filter(cb);
 		},
 		getOppositeDirection: getOppositeDirection,
 		getDimension: getDimension,
