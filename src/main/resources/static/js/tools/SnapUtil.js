@@ -1,5 +1,4 @@
 define(["../CanvasState"], function(canvasState) {
-
 	var canvasState;
 
 	// grid snap

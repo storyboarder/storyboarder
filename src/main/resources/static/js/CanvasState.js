@@ -31,11 +31,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas.add(e);
 	};
 
-	// Delete element from the canvas
-	var deleteElement = function(e) {
-		canvas.remove(e);
-	};
-
 	// Add image to canvas
 	var addImage = function(params) {
 		var img = params.img;
@@ -278,7 +273,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.off('object:removed');*/
 		},
 		getState: function() {
-			var canvasState = $.extend(this.getCanvas().toJSON([
+			var state = $.extend(this.getCanvas().toJSON([
 				"helper", "elmType", "edges", "lockMovementX", "lockMovementY"
 			]), {
 				width: width,
@@ -288,13 +283,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			});
 
 			// Remove helper objects from canvas
-			canvasState.objects = canvasState.objects.filter(function (obj) {
+			state.objects = state.objects.filter(function (obj) {
 				return !obj.helper;
 			});
 
-			console.log(canvasState);
+			console.log(state);
 
-			return JSON.stringify(canvasState);
+			return JSON.stringify(state);
 		},
 		applyDeltaToState: function(delta) {
 			this.unlistenCanvas();
@@ -315,11 +310,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
-		mapElements: function(m) {
-			return canvas._objects.map(m);
+		mapElements: function(cb) {
+			return canvas._objects.map(cb);
 		},
-		filterElements: function(e) {
-			return canvas._objects.filter(e);
+		filterElements: function(cb) {
+			return canvas._objects.filter(cb);
 		},
 		getOppositeDirection: getOppositeDirection,
 		getDimension: getDimension,
@@ -333,7 +328,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		getPageEdges: function() {
 			return pageEdges;
 		},
-		deleteElement: deleteElement,
 		load_page: function(canvasId, json, callback) {
 			var that = this;
 			init_page(function() {

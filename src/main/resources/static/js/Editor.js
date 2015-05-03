@@ -93,8 +93,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			var panelMargin = params.panelMargin;
 			canvas.width = width;
 			canvas.height = height;
-			currentPage = 0;
-			numPages = 0;
+			currentPage = 1;
+			numPages = 1;
 			console.log(currentPage, "/", numPages);
 
 			projectName = params.name;

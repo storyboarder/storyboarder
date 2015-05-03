@@ -1,7 +1,7 @@
 
 //TODO: fix bug with resizing panels outside of valid page area
 
-define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
+define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	var canvas;
 	var snapPoint;
@@ -120,7 +120,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 			target = options.target;
 			console.log("target", target);
 			console.log("canvas", canvas);
-		  if (canvasState.isSnapActive() && options.target.elmType != "panel") {
+		  if (snap.isSnapActive() && options.target.elmType != "panel") {
 		    target = options.target;
 		    var borders = canvasState.snapBorders({
           	left: target.left,
@@ -184,7 +184,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 				var corner = target.__corner;
 				var obj = target;
 				var newEdges = {};
-				if (canvasState.isSnapActive()) {
+				if (snap.isSnapActive()) {
 					if (corner.indexOf('l') >= 0) {
 						newEdges.left = snapPoint({
 							x: obj.left - panelMargin
@@ -233,7 +233,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 					bottom: newEdges.bottom || obj.edges.bottom,
 				};
 			} else {
-				if (canvasState.isSnapActive()) {
+				if (snap.isSnapActive()) {
 					control = target.__corner;
 					var borders = canvasState.snapBorders({
 						left: target.left,
@@ -264,7 +264,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 			var selected = canvas.getActiveObject();
 			if (key === 8 && selected) {
 				if (selected.elmType === 'rectext' || selected.elmType === "image") {
-					canvasState.deleteElement(selected);
+					canvas.remove(selected);
 				}
 			}
 		};
@@ -285,11 +285,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 			}
 		);
 		
-		if (typeof canvas.__eventListeners != "undefined") {
-		  canvas.__eventListeners["object:scaling"] = [];
-		  canvas.__eventListeners["object:moving"] = [];
-		  canvas.__eventListeners["text:changed"] = [];
-    }
+		canvas.off("object:scaling");
+		canvas.off("object:moving");
+		canvas.off("text:changed");
 	};
 
 	return {
