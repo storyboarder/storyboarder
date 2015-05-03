@@ -335,6 +335,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
+					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}

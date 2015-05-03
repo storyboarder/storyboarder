@@ -123,12 +123,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
-					canvasState.load_page("canvas", currPageObj.json);
-					canvasState.load_page("canvas", JSON.parse(responseObject.json, function() {
-						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
-					}));
+					canvasState.load_page("canvas", currPageObj.json, function() {
+//						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
+					});
 					return responseObject;
-					// }
 				});
 		},
 		"DeleteProj": function(params) {
@@ -286,9 +284,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		checkPage(pgObj);
 		console.log(pgObj);
 		if (pgObj.json && typeof pgObj.json == "string") {
-			console.log(pgObj.json, "is a string");
+//			console.log(pgObj.json, "is a string");
 			pgObj.json = JSON.parse(pgObj.json);
-			console.log("parsed to ", pgObj.json);
+//			console.log("parsed to ", pgObj.json);
 		}
 		currPageObj = pgObj;
 	};
@@ -344,7 +342,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			if (data.projectName == projectName && data.currentPage == currPageObj.pageNum) {
 				canvasState.applyDeltaToState(data.delta);
 			}
-			console.log(canvasState.getCanvas());
+//			console.log(canvasState.getCanvas());
 		};
 
 		// When its state is updated
@@ -515,15 +513,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				name: "test_proj_2_dont_use"
 			});
 		}, wait);
-
-		//toolset.test();
-		// console.log("editor tested");
-		// console.log("toolset is now " + toolset);
-		// console.log("test activating Split...");
-		//console.log("activating split from editor 2");
-
-		//this.activateTool("Split");
-		// console.log(canvasState.getPageMargin());
 	};
 
 	return {
