@@ -68,6 +68,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				projectName = params.name;
 				numPages = responseObject.numPages;
 				canvasState.load_project("canvas", currPageObj.json, params.editor.update);
+				activate("Select");
 
 				if (typeof params.callback != "undefined") {
 					params.callback(responseObject);

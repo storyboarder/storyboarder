@@ -138,7 +138,29 @@ define(["../../CanvasState"], function(canvasState) {
 	}
 
 	var activate = function() {
+		
 		canvas = canvasState.getCanvas();
+		//var active = canvas.getActiveObject();
+		console.log("canvas", canvas);
+		console.log("canvas active", canvas.getActiveObject());/*
+		if(active.elmType === "panel") {
+			console.log("I AM HERE HERE!");
+		}*/
+/*				canvas.clipTo = function(ctx) {                     
+    ctx.beginPath();
+    var rect = new fabric.Rect({
+            fill: 'red',
+            opacity: 0,
+            left: 0,
+            top: 0,
+            width: canvas.width,
+            height: canvas.height
+    });
+    ctx.strokeStyle = 'black';
+    rect.render(ctx);
+    ctx.stroke();
+}*/
+
 		//start = canvas.getObjects().length;
 		//console.log("start " + start);
 

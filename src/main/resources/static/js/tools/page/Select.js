@@ -68,12 +68,20 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
+
+		console.log("HOHO", canvas.getActiveObject());
+		canvas.on("mouse:down", function() {
+			var obj = canvas.getActiveObject();
+			canvas.setActiveObject(obj);
+			console.log("HAHA canvas", canvas);
+			console.log("HOHO canvas", obj);
+		});
+
 		console.log(canvasState);
 		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
 		//		console.log("SELECT", canvas);
-		console.log(canvasState);
 		//		console.log(canvas.getObjects());
 		//canvas.getObjects()[1].selectable = true;
 		//		console.log("SELECT", canvas);
@@ -89,30 +97,34 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true,
 				editable: false
 			},
-			"draw": {
-				// there's no draw, gotta check if path or stroke something exists
+			"path": {
 				selectable: true
 			},
 			"image": {
 				selectable: true
 			}
+
 		}
 
 		canvasState.mapElements(function(found) { // map
 			console.log(found);
-
-			if (selectable.hasOwnProperty(found.elmType)) {
-				var options = selectable[found.elmType];
-				//				console.log(options);
-				for (property in options) {
-					found.set(property, options[property]);
-				}
+			var options = {};
+			if (selectable.hasOwnProperty(found.elmType)) { 
+				options = selectable[found.elmType];
+				// console.log(options);
+			} else if (selectable.hasOwnProperty(found.type)){ // just for paths
+				options = selectable[found.type];
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
 					selectable: false
 				});
 			}
+
+			for (property in options) {
+				found.set(property, options[property]);
+			}
+
 		});
 
 		canvas.on('object:moving', function(options) {
