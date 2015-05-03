@@ -1,6 +1,5 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	$(document).on('keydown', function(event) {
-		console.log("key pressed: ", event);
 		copyPasteHandler(event);
 	});
 	// Main canvas
@@ -84,7 +83,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//Event handler for copy paste (callback for document.onkeydown)
 	var copyPasteHandler = function(event) {
-		console.log("key down: ", event);
 		var key;
 		if (window.event) {
 			key = window.event.keyCode;
@@ -349,6 +347,18 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			originY: 'center'
 		});
 		canvas.add(circle);
+
+		var text = new fabric.Text("hello!", {
+			fontSize: 30,
+			originX: 'left',
+			originY: 'top',
+			textAlign: 'center',
+			left: 100,
+			top: 100,
+			borderColor: 'green',
+			borderScaleFactor: 2
+		});
+		canvas.add(text);
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
