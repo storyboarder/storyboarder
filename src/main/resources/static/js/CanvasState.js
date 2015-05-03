@@ -151,8 +151,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var deleteActive = function(key) {
 		if (canvas.getActiveGroup()) {
 			remove(canvas.getActiveGroup());
-      		canvas.getActiveGroup().forEachObject(remove);
-      		canvas.discardActiveGroup();
+			canvas.getActiveGroup().forEachObject(remove);
+			canvas.discardActiveGroup();
 			// for (var i in activeObjects) {
 			// 	remove(activeObjects[i]);
 			// }
@@ -163,9 +163,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas.trigger("change");
 
 		function remove(obj) {
-			//if (obj.elmType !== 'panel' && !(obj.helper === undefined)) {
+			if (obj.elmType !== 'panel' && !(obj.helper === undefined)) {
 				canvas.remove(obj);
-			//}
+			}
 		}
 	};
 
@@ -345,7 +345,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		});
 		canvas.add(circle);
 
-		CanvasState.initHistory();
+		CanvasState.initHistory(); */
 
 	};
 
@@ -367,7 +367,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
-		initHistory: function () {
+		initHistory: function() {
 			history = [];
 			historyIdx = -1;
 			previousState = CanvasState.getState();
@@ -511,7 +511,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
-				
+
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					/* for text: */
