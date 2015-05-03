@@ -534,7 +534,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					}
 				});
 			});
-
 			console.log("ENDING LOAD");
 		},
 		init: init,
@@ -547,9 +546,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		setPanelMargin: function(p) {
 			//        	throw "setting panel margin";
 			panelMargin = p;
-		},
-		setGridSpacing: function(p) {
-			// snap.setGridSpacing(p);
 		},
 		setPanelRows: function(p) {
 			panelRows = p;

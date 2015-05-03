@@ -68,7 +68,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
-		snapPoint = canvasState.snapPoint;
+		snapPoint = snap.snapPoint;
 
 		console.log("select activated");
 		canvas.selection = true; // enable group selection
@@ -120,7 +120,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			target = options.target;
 			if (snap.isSnapActive() && options.target.elmType != "panel") {
 				target = options.target;
-				var borders = canvasState.snapBorders({
+				var borders = snap.snapBorders({
 					left: target.left,
 					right: target.left + target.width,
 					top: target.top,
@@ -234,7 +234,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			} else {
 				if (snap.isSnapActive()) {
 					control = target.__corner;
-					var borders = canvasState.snapBorders({
+					var borders = snap.snapBorders({
 						left: target.left,
 						right: target.left + target.width,
 						top: target.top,
