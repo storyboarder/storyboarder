@@ -145,7 +145,8 @@ class Project implements AutoCloseable {
     if (!queryer.execute(Projects.deletePageSql(pageNum))) {
       return false;
     }
-    return queryer.execute(Projects.updateNumsSql(pageNum, getPageCount() + 1));
+    return queryer.execute(Projects.updateNumsSql(pageNum + 1,
+        getPageCount() + 1));
   }
 
   /**

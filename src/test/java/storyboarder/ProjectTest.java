@@ -1,6 +1,7 @@
 package storyboarder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -44,6 +45,19 @@ public class ProjectTest {
       result &= testProj.addPage(page);
     }
     return result;
+  }
+
+  public static void reInit() throws ClassNotFoundException, SQLException,
+  IOException {
+    createTestDatabase();
+    assertTrue(addPages());
+  }
+
+  @Test
+  public void countTest() throws ClassNotFoundException, SQLException,
+    IOException {
+    reInit();
+    assertEquals(pages.size(), testProj.getPageCount());
   }
 
   @Test
@@ -98,9 +112,7 @@ public class ProjectTest {
   @Test
   public void getPageTest() throws ClassNotFoundException, SQLException,
     IOException {
-    createTestDatabase();
-
-    assertTrue(addPages());
+    reInit();
     for (Page page : pages) {
       assertEquals(page, testProj.getPage(page.getNum()));
     }
@@ -110,8 +122,7 @@ public class ProjectTest {
   @Test
   public void getAllPagesTest() throws ClassNotFoundException, SQLException,
   IOException {
-    createTestDatabase();
-    assertTrue(addPages());
+    reInit();
     List<Page> testPages = testProj.getAllPages();
     for (int i = 0; i < pages.size(); i++) {
       assertEquals(pages.get(i), testPages.get(i));
@@ -119,13 +130,47 @@ public class ProjectTest {
   }
 
   @Test
-  public void setPageTest() throws ClassNotFoundException, SQLException,
+  public void savePageTest() throws ClassNotFoundException, SQLException,
     IOException {
-    createTestDatabase();
-    assertTrue(addPages());
+    reInit();
     Page newPage1 = new Page(1, "asdf", "aslihgakjfh");
     Page newPage2 = new Page(2, "afkgh", "bar!");
     Page newPage4 = new Page(4, "foo!", "bar!");
+  }
+
+  @Test
+  public void removePageTest() throws ClassNotFoundException, SQLException,
+  IOException {
+    reInit();
+
+    testProj.removePage(2);
+    List<Page> newPages = testProj.getAllPages();
+
+    assertEquals(pages.size() - 1, newPages.size());
+    assertEquals(pages.get(0), newPages.get(0));
+    assertNotEquals(pages.get(1), newPages.get(1));
+    assertNotEquals(pages.get(2), newPages.get(2));
+
+    assertEquals(pages.get(3).getJson(), newPages.get(2).getJson());
+
+    for (int i = 0; i < newPages.size(); i++) {
+      assertEquals(i + 1, newPages.get(i).getNum());
+    }
+    reInit();
+
+    testProj.removePage(1);
+    newPages = testProj.getAllPages();
+    assertEquals(pages.size() - 1, newPages.size());
+    assertNotEquals(pages.get(0), newPages.get(0));
+    assertNotEquals(pages.get(1), newPages.get(1));
+    assertNotEquals(pages.get(2), newPages.get(2));
+    assertEquals(pages.get(3).getJson(), newPages.get(2).getJson());
+    assertEquals(pages.get(2).getJson(), newPages.get(1).getJson());
+    assertEquals(pages.get(1).getJson(), newPages.get(0).getJson());
+
+    for (int i = 0; i < newPages.size(); i++) {
+      assertEquals(i + 1, newPages.get(i).getNum());
+    }
   }
 
   @Test
