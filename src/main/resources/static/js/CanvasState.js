@@ -248,7 +248,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.clear().renderAll();
 			canvas.loadFromJSON(previousState, canvas.renderAll.bind(canvas));
 
-
 			canvas.trigger('stateUpdated', delta);
 		},
 		restoreState: function() {
@@ -258,9 +257,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			state = this.getState();
 			historyIdx++;
 			var delta = jsondiffpatch.reverse(history[historyIdx]);
-			socket.send(JSON.stringify(delta));
 			var nextState = jsondiffpatch.patch(state, delta);
-			console.log("Restore state: ", delta, " - Idx: ", historyIdx);
 
 			// Repaint canvas
 			canvas.clear().renderAll();

@@ -347,9 +347,18 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			}
 		};
 
-		canvasState.getCanvas().on('stateUpdated', actions.SyncPage);
+		// If a change is made to the canvas
+		// update its state in history
 		canvasState.getCanvas().on('change', function() {
-			actions["SavePage"]();
+			canvasState.storeState();
+		});
+		// When its state is updated
+		// save and sync the page
+		// This does not count changes from syncing
+		// so we do not get into an infinite loop
+		canvasState.getCanvas().on('stateUpdated', function (delta) {
+			actions.SavePage();
+			actions.SyncPage(delta);
 		});
 	};
 
