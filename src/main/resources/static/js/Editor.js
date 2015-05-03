@@ -47,9 +47,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			snapUtil.drawPanelGrid(params.name);
 		},
 		"GetChoices": function(displayChoices) {
-			console.log("getting project choices");
 			$.post("/projects/choices", {}, function(responseJSON) {
-				displayChoices(JSON.parse(responseJSON));
+				var responseObject = JSON.parse(responseJSON);
+				console.log("getting project choices, response: ", responseObject);
+				displayChoices(responseObject);
 			});
 		},
 		"LoadProj": function(params) {
@@ -101,11 +102,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 
 			var that = this;
 			canvasState.init_project(width, height, panelMargin, pageMargin, function() {
-				$.post("/projects/create", {
-					name: params.name
-				}, function(responseJSON) {
-					response = JSON.parse(responseJSON);
-//					console.log(response);
+				$.post("/projects/create", {name: params.name}, function(responseJSON) {
+					var response = JSON.parse(responseJSON);
+					console.log("create proj called, response: ", response);
 					projectName = response.name;
 					that.AddPage();
 					activate("Select");
@@ -151,9 +150,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetAllPages": function(callback) {
 			$.post("/pages/getAll", {}, function(responseJSON) {
-				console.log("get all pages called");
-				console.log("response: ", JSON.parse(responseJSON));
-				callback(JSON.parse(responseJSON));
+				responseObject = JSON.parse(responseJSON);
+				console.log("get all pages called, response: ", responseObject);
+				callback(responseObject);
 			});
 		},
 		"SavePage": function() {
@@ -162,14 +161,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				throw "invalid currentPage: " + currentPage + "/" + numPages;
 			}
 			pageJSON = canvasState.getState();
-			//			console.log(currentPage, pageJSON);
 
 			var page = makePage(currentPage, pageJSON, "");
 
-			console.log(page);
-
 			$.post("/pages/save", page, function(response) {
-				console.log("response: ", JSON.parse(response));
+				console.log("Save called with: ", page, ", response: ", JSON.parse(response));
 			});
 		},
 		"SavePageTest": function(page) {
