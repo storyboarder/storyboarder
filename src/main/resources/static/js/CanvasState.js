@@ -354,6 +354,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
+                console.log("canvas", canvas);
+
 				canvas.loadFromJSON(json, function() {
 					console.log(canvas);
 					console.log("done loading");
