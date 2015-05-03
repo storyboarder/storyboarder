@@ -1,4 +1,4 @@
-define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasState, toolset) {
+define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], function(jsPDF, canvasState, toolset, snapUtil) {
 	var projectName;
 	var currentPage; // index of current page
 	var numPages;
@@ -26,25 +26,25 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 			console.log("toggle-grid");
 			console.log(params);
 			if (params.checked) {
-				canvasState.drawGrid(params.name);
+				snapUtil.drawGrid(params.name);
 			} else {
-				canvasState.clearGrid(params.name);
+				snapUtil.clearGrid(params.name);
 			}
 		},
 		"SetSnap": function(params) {
 			var obj = {};
 			obj[params.id] = params.value;
-			canvasState.setSnap(params.name, obj);
+			snapUtil.setSnap(params.name, obj);
 		},
 		"PanelRows": function(params) {
-			canvasState.setPanelRows(params.value);
-			canvasState.clearPanelGrid(params.name);
-			canvasState.drawPanelGrid(params.name);
+			snapUtil.setPanelRows(params.value);
+			snapUtil.clearPanelGrid(params.name);
+			snapUtil.drawPanelGrid(params.name);
 		},
 		"PanelColumns": function(params) {
-			canvasState.setPanelColumns(params.value);
-			canvasState.clearPanelGrid(params.name);
-			canvasState.drawPanelGrid(params.name);
+			snapUtil.setPanelColumns(params.value);
+			snapUtil.clearPanelGrid(params.name);
+			snapUtil.drawPanelGrid(params.name);
 		},
 		"GetChoices": function(displayChoices) {
 			console.log("getting project choices");

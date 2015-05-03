@@ -1,4 +1,3 @@
-//TODO canvasId should probably be a module-level variable
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Main canvas
 	var canvas;
@@ -15,8 +14,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	var controls = ["bl", "br", "mb", "ml", "mr", "mt", "tl", "tr"];
 	var edgeDirections = ["left", "top", "right", "bottom"];
-	// snapUtil object
-	var snap;
 
 	// Array of deltas in history
 	var history = [];
@@ -187,7 +184,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
-	var init_page = function(callback) {
+	var init_page = function() {
 		console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
 			init();
@@ -202,18 +199,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		addPanel($.extend({}, pageEdges));
 		previousState = CanvasState.getState();
 		CanvasState.listenCanvas();
-
-		require(["SnapUtil"], function(snapUtil) {
-			snap = snapUtil;
-			snap.init(CanvasState);
-
-			if (typeof callback != "undefined") {
-				callback();
-			}
-		});
 	};
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
-	var init_project = function(w, h, panelM, pageM, callback) {
+	var init_project = function(w, h, panelM, pageM) {
 		console.log("INIT PROJECT");
 		if (typeof canvas === "undefined") {
 			init();
@@ -226,7 +214,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			width: w,
 			height: h
 		});
-		init_page(callback);
+		init_page();
 	};
 
 	var CanvasState = {
@@ -392,16 +380,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			panelMargin = p;
 		},
 		setGridSpacing: function(p) {
-			snap.setGridSpacing(p);
+			// snap.setGridSpacing(p);
 		},
 		setPanelRows: function(p) {
 			panelRows = p;
 		},
 		setPanelColumns: function(p) {
 			panelColumns = p;
-		},
-		setSnap: function(n, p) {
-			snap.setSnap(n, p);
 		},
 		getPageMargin: function() {
 			return pageMargin;
@@ -416,26 +401,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.loadFromJson(json, function() {
 				canvas.renderAll();
 			});
-		},
-		drawGrid: function(name) {
-			snap.drawGrid(name);
-		},
-		clearGrid: function(name) {
-			snap.clearGrid(name);
-		},
-		snapPoint: function(pt) {
-			return snap.snapPoint(pt);
-		},
-		snapPointIfClose: function(pt) {
-			return snap.snapPointIfClose(pt);
-		},
-		snapBorders: function(b, c) {
-			return snap.snapBorders(b, c);
-		},
-		isSnapActive: function() {
-			return snap.isSnapActive();
-		},
-		// export
+		}
 	};
 	return CanvasState;
 });

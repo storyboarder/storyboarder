@@ -1,5 +1,6 @@
 require.config({
 	baseUrl: "js",
+	// Paths to libaries
 	paths: {
 		jquery: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min",
 		jqueryui: "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min",
@@ -29,15 +30,6 @@ require.config({
 		var canvas = document.getElementById('canvas');
 		canvas.width = 400;
 		canvas.height = 600;
-		//    require(['CanvasState'], function(CanvasState) {
-		//      canvasState = CanvasState.getCanvasState();
-		//      canvasState.setPageMargin(20);
-		//      canvasState.setGridSpacing(20);
-		//      canvasState.setPanelMargin(5);
-		//      canvasState.init(canvas);
-
-		//      console.log(canvasState);
-
 
 		require(["Menu", "Editor"], function(menu, editor) {
 			editor.init();

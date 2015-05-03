@@ -1,7 +1,7 @@
 
 //TODO: fix bug with resizing panels outside of valid page area
 
-define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
+define(["../../CanvasState", "../SnapUtil"], function(canvasState, Snap) {
 
 	var canvas;
 	var snapPoint;

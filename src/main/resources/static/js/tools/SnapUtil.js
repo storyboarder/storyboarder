@@ -1,4 +1,4 @@
-define([], function() {
+define(["../CanvasState"], function(canvasState) {
 
 	var canvasState;
 
@@ -217,12 +217,6 @@ define([], function() {
 	};
 
 	return {
-		init: function(c) {
-			console.log("snap init");
-			console.log(c);
-			canvasState = c;
-		},
-
 		setSnap: function(name, params) {
 			if (name in snaps) {
 				var snapObj = snaps[name];

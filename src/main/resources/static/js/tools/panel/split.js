@@ -1,8 +1,7 @@
-define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
+define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 	var previewDivideLine;
 	var canvas;
 	var threshold = 2;
-	var snap = Snap.snap;
 
 	// Preview line to split panels
 	var previewDivide = function(direction, panelEdges, pos) {
@@ -117,7 +116,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			canvas.deactivateAll();
 
 			// Find point to snap to
-			var point = canvasState.snapPoint({
+			var point = snapUtil.snapPoint({
 				x: options.e.offsetX,
 				y: options.e.offsetY
 			});
@@ -149,7 +148,7 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 			var panelEdges = options.target.edges;
 
 			// Find point to snap to
-			var point = canvasState.snapPoint({
+			var point = snapUtil.snapPoint({
 				x: options.e.offsetX,
 				y: options.e.offsetY
 			});
