@@ -148,7 +148,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
         return between(min, x, max);
     };
     var deleteElement = function(e) {
+        if(e.elmType === "rectext") {
+            canvas.remove(e.border);
+        }
+
         canvas.remove(e);
+        canvas.renderAll();
     };
     /* Should be called when a new page is loaded (project variables stay the same) */
     var init_page = function(callback) {
@@ -352,6 +357,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
+                console.log("canvas", canvas);
+
 				canvas.loadFromJSON(json, function() {
 					console.log(canvas);
 					console.log("done loading");
