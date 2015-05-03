@@ -68,6 +68,9 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	/* activate returns this (the tool) */
 	var activate = function() {
+		canvas = canvasState.getCanvas();
+		console.log(canvasState);
+		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
 //		console.log("SELECT", canvas);
@@ -155,10 +158,28 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 			if (target.elmType == "panel") {
 				var panelMargin = canvasState.getPanelMargin();
-				target.width *= target.scaleX;
-				target.scaleX = 1;
-				target.height *= target.scaleY;
-				target.scaleY = 1;
+
+				if (!target.active) {
+					target.scaleX = 1;
+					target.scaleY = 1;
+					target.left = target.edges.left + panelMargin;
+					target.top = target.edges.top + panelMargin;
+					return;
+				}
+				if (!(options.target.left + 1 * panelMargin < options.target.left + options.target.scaleX * options.target.width)) {
+					options.target.scaleX = 1;
+					canvas.deactivateAll().renderAll();
+					return;
+				}
+				if (!(options.target.top + 1 * panelMargin < options.target.top + options.target.scaleY * options.target.height)) {
+					options.target.scaleY = 1;
+					canvas.deactivateAll().renderAll();
+					return;
+				}
+				options.target.width *= options.target.scaleX;
+				options.target.scaleX = 1;
+				options.target.height *= options.target.scaleY;
+				options.target.scaleY = 1;
 
 				var corner = target.__corner;
 				var obj = target;
@@ -273,12 +294,6 @@ define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 
 	return {
 		name: "Select",
-		init: function() {
-			canvas = canvasState.getCanvas();
-			console.log(canvasState);
-			snapPoint = canvasState.snapPoint;
-//			console.log("select tool inited with canvas: ", canvas);
-		},
 		activate: activate,
 		deactivate: deactivate
 	};

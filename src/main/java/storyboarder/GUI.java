@@ -62,7 +62,8 @@ final class GUI {
   private static Project project;
 
   private GUI() {
-    throw new UnsupportedOperationException("This class cannot have instances.");
+    String message = "This class cannot have instances.";
+    throw new UnsupportedOperationException(message);
   }
 
   /**
@@ -154,6 +155,7 @@ final class GUI {
       if (!(project == null)) {
         try {
           project.close();
+          project = null;
         } catch (Exception e) {
           e.printStackTrace();
           return JsonMessages.makeError("unable to close project.");
@@ -330,6 +332,8 @@ final class GUI {
               }
               int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
               return move(pageNum, newSpot);
+            case "delete":
+              return delete(pageNum);
             default:
               // All other params need the whole page
               Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
@@ -384,6 +388,14 @@ final class GUI {
       return GSON.toJson(project.getPage(pageNum));
     }
 
+    private Object delete(int pageNum) {
+      if (project.removePage(pageNum)) {
+        return JsonMessages.makeMessage("Success deleting page " + pageNum);
+      } else {
+        return JsonMessages.makeError("Failure deleting page " + pageNum);
+      }
+    }
+
     /**
      * Saves a page to the current project.
      *
@@ -416,7 +428,7 @@ final class GUI {
      *         there is an error moving the page.
      */
     private Object move(int pageNum, int newSpot) {
-      if (!(project.inBounds(pageNum) && !project.inBounds(newSpot))) {
+      if (!(project.inBounds(pageNum) && project.inBounds(newSpot))) {
         return OUT_OF_BOUNDS_JSON;
       }
 

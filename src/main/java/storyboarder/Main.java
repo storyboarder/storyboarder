@@ -1,15 +1,13 @@
 package storyboarder;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 /**
+ * Hosts a Storyboarder project. Runs a {@link GUI} server and a
+ * {@link Multiplayer} server.
+ *
  * @author narobins
  * @author yz38
  * @author ktsakas
@@ -25,19 +23,19 @@ public final class Main {
 
   private static final int DEFAULT_SOCKET_PORT = 8888;
 
-  private static final Path DEFAULT_DIRECTORY =
-      Paths.get("projects/test_0.sqlite3");
-
   private Main() {
-    throw new UnsupportedOperationException("This class cannot have instances.");
+    String message = "This class cannot have instances.";
+    throw new UnsupportedOperationException(message);
   }
 
-  private static void exit(String message) {
-    System.err.println("ERROR: " + message);
-    System.exit(1);
-  }
-
-  public static void main(String[] args) throws IOException {
+  /**
+   * Entry point into the program. Starts a GUI server, and a Multiplayer
+   * server.
+   *
+   * @param args
+   *          String array, can be used to set custom ports for both servers.
+   */
+  public static void main(String[] args) {
 
     OptionParser parser = new OptionParser();
 
@@ -53,23 +51,15 @@ public final class Main {
     if (options.has(sparkSpec)) {
       sparkPort = options.valueOf(sparkSpec);
     }
-    // try {
-    // Project testProj = new Project(DEFAULT_DIRECTORY);
-    GUI.start(sparkPort);
-    // } catch (ClassNotFoundException | SQLException e1) {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // }
 
-    try {
-      int socketPort = DEFAULT_SOCKET_PORT;
-      if (options.has(socketSpec)) {
-        socketPort = options.valueOf(socketSpec);
-      }
-      Multiplayer server = new Multiplayer(socketPort);
-      server.start();
-    } catch (UnknownHostException e) {
-      exit("could not start the multiplayer server: " + e.getMessage());
+    GUI.start(sparkPort);
+
+    int socketPort = DEFAULT_SOCKET_PORT;
+    if (options.has(socketSpec)) {
+      socketPort = options.valueOf(socketSpec);
     }
+    Multiplayer server = new Multiplayer(socketPort);
+    server.start();
+
   }
 }

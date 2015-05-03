@@ -58,11 +58,12 @@ public class SqlQueryer implements AutoCloseable {
   public <T> List<T> query(String query, ResultConverter<T> converter) {
     try (PreparedStatement prep = conn.prepareStatement(query)) {
       List<T> results = new ArrayList<T>();
-      ResultSet rs = prep.executeQuery();
-      while (rs.next()) {
-        results.add(converter.convert(rs));
+      try (ResultSet rs = prep.executeQuery()) {
+        while (rs.next()) {
+          results.add(converter.convert(rs));
+        }
+        return results;
       }
-      return results;
     } catch (SQLException e) {
       e.printStackTrace();
       return null;
@@ -80,13 +81,16 @@ public class SqlQueryer implements AutoCloseable {
    *          desired object.
    * @param <T>
    *          the type of object to be returned.
-   * @return The object created by 'converter' from the single ResultSet row.
+   * @return The object created by 'converter' from the single ResultSet row, or
+   *         null if the query returns no elements, or an error occurs while
+   *         querying the database.
    */
   public <T> T queryOne(String query, ResultConverter<T> converter) {
     try (PreparedStatement prep = conn.prepareStatement(query)) {
-      ResultSet rs = prep.executeQuery();
-      if (rs.next()) {
-        return converter.convert(rs);
+      try (ResultSet rs = prep.executeQuery()) {
+        if (rs.next()) {
+          return converter.convert(rs);
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -133,7 +137,8 @@ public class SqlQueryer implements AutoCloseable {
 
   /**
    * @see java.lang.AutoCloseable#close()
-   * @Throws Exception - if this resource cannot be closed
+   * @throws Exception
+   *           if this resource cannot be closed
    */
   @Override
   public void close() throws Exception {

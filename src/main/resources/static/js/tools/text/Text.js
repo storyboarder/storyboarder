@@ -2,13 +2,13 @@
 
 define(["../../CanvasState"], function(canvasState) {
 
-  var fontFamily;
-  var fontSize;
-  var padding = 3;
+	var fontFamily;
+	var fontSize;
+	var padding = 3;
 
 	fabric.Rectext = fabric.util.createClass(fabric.IText, {
 
-    type: "rectext",
+		type: "rectext",
 
 	initialize: function(text, options) {
 	    options || (options = { });
@@ -52,9 +52,9 @@ define(["../../CanvasState"], function(canvasState) {
 	    });
 	  },
 
-	  _render: function(ctx) {
-	    this.callSuper('_render', ctx);
-	  }
+		_render: function(ctx) {
+			this.callSuper('_render', ctx);
+		}
 	});
 
 	/*
@@ -83,6 +83,7 @@ define(["../../CanvasState"], function(canvasState) {
 
 	var activate = function() {
 		console.log("text activate");
+		canvas = canvasState.getCanvas();
 
 		// nothing should be moving
 		canvasState.mapElements(
@@ -124,13 +125,13 @@ define(["../../CanvasState"], function(canvasState) {
 
 		}); // mouse:down
 
-		canvas.on('mouse:up', function(coor){
+		canvas.on('mouse:up', function(coor) {
 			finalPos = {
 				x: coor.e.offsetX,
 				y: coor.e.offsetY
 			};
 
-			if(typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
+			if (typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
 				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
 				    typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
 		            var newText = new fabric.Rectext('Text', {
@@ -178,20 +179,16 @@ define(["../../CanvasState"], function(canvasState) {
 
 	var deactivate = function() {
 		console.log("text deactivate");
-		canvas.__eventListeners["mouse:up"] = [];
-		canvas.__eventListeners["mouse:down"] = [];
-		canvas.__eventListeners["object:moving"] = [];
-		canvas.__eventListeners["object:scaling"] = [];
-		canvas.__eventListeners["text:changed"] = [];
+		canvas.off("mouse:up");
+		canvas.off("mouse:down");
+		canvas.off("object:moving");
+		canvas.off("object:scaling");
+		canvas.off("text:changed");
 	};
 
 
 	return {
 		name: "Text",
-		init: function() {
-			console.log("init text");
-			canvas = canvasState.getCanvas();
-		},
 		activate: activate,
 		deactivate: deactivate
 	};

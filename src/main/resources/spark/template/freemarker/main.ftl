@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="css/semantic.css" />
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.4.0/less.min.js"></script>
-  <script data-main="js/main.js" src="js/require.js"></script>
+	<script data-main="js/main.js" src="js/require.js"></script>
 
 </head>
 <body>

@@ -23,7 +23,7 @@ class Page {
    * Constructs a StoryboarderPage with the given page number, json string, and
    * thumbnail string.
    *
-   * @param num
+   * @param pageNum
    *          The page number of this page.
    * @param json
    *          The json string containing all of the data for this page.
@@ -52,19 +52,27 @@ class Page {
   }
 
   /**
-   * @return The result of canvas.toDataURL, which can be turned into a
+   * @return The result of canvas.toDataURL(), which can be turned into a
    *         thumbnail.
    */
   String getThumbnail() {
     return thumbnail;
   }
 
+  /**
+   * @see java.lang.Object#toString()
+   * @return a string representation of this object.
+   */
   @Override
   public String toString() {
     return "{num: " + pageNum + ", json: " + json + ", thumbnail: " + thumbnail
         + "}";
   }
 
+  /**
+   * @see java.lang.Object#hashCode()
+   * @return a hash code value for this object.
+   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -75,6 +83,13 @@ class Page {
     return result;
   }
 
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   * @param obj
+   *          the reference object with which to compare.
+   * @return true if this object is the same as the obj argument; false
+   *         otherwise.
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -91,12 +106,28 @@ class Page {
         && thumbnail.equals(o.getThumbnail());
   }
 
+  /**
+   * The {@link ResultConverter} for this Page.
+   *
+   * @author narobins
+   * @author yz38
+   * @author ktsakas
+   * @author fbystric
+   */
   static class Converter implements ResultConverter<Page> {
 
     private static final int NUM = 1;
     private static final int JSON = 2;
     private static final int THUMBNAIL = 3;
 
+    /**
+     * Converts one row of an SQL ResultSet to a Page object.
+     *
+     * @param rs
+     *          The ResultSet containing pages.
+     * @return The page at the row of the ResultSet currently being pointed to
+     *         by the cursor.
+     */
     @Override
     public Page convert(ResultSet rs) throws SQLException {
       return new Page(rs.getInt(NUM), rs.getString(JSON),

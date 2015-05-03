@@ -1,193 +1,201 @@
 define(["../../CanvasState", "../../SnapUtil"], function(canvasState, Snap) {
 	var previewDivideLine;
 	var canvas;
-	var helperCanvas;
 	var threshold = 2;
 	var snap = Snap.snap;
 
-	/* previews horizontal split */
-	var previewDivideY = function(obj, y) {
-		if (obj && obj.edges) {
+	// Preview line to split panels
+	var previewDivide = function(direction, panelEdges, pos) {
+		if (direction == "horizontal") {
 			var coords = {
-				x1: obj.edges.left + canvasState.getPanelMargin(),
-				y1: y,
-				x2: obj.edges.right - canvasState.getPanelMargin(),
-				y2: y
+				x1: panelEdges.left + canvasState.getPanelMargin(),
+				y1: pos,
+				x2: panelEdges.right - canvasState.getPanelMargin(),
+				y2: pos
 			};
-			previewDivideLine.set(coords);
-			helperCanvas.renderAll();
+		} else if (direction == "vertical") {
+			var coords = {
+				x1: pos,
+				y1: panelEdges.top + canvasState.getPanelMargin(),
+				x2: pos,
+				y2: panelEdges.bottom - canvasState.getPanelMargin()
+			};
 		}
+
+		// Set preview line coordinates and paint to canvas
+		previewDivideLine.set(coords);
+		canvas.renderAll();
 	};
 
-	/* previews vertical split */
-	var previewDivideX = function(obj, x) {
-		if (obj && obj.edges) {
-			var coords = {
-				x1: x,
-				y1: obj.edges.top + canvasState.getPanelMargin(),
-				x2: x,
-				y2: obj.edges.bottom - canvasState.getPanelMargin()
-			};
-			previewDivideLine.set(coords);
-			helperCanvas.renderAll();
-		}
-	};
 
-	/* creates horizontal split */
-	var divideY = function(obj, y) {
-		if (!(obj.edges.top < y && y < obj.edges.bottom)) {
-			throw "Illegal argument: " + y;
+	// Create split
+	var divide = function(direction, obj, pos) {
+		var panelEdges = obj.edges;
+		var newDimensions, newPanelCoords;
+
+		// Horizontal split
+		if (direction == "horizontal") {
+			if (!(panelEdges.top < pos && pos < panelEdges.bottom)) {
+				throw "Split position " + pos + " is out of the target panel.";
+			}
+			// New height of the old panel
+			newDimensions = {
+				height: pos - panelEdges.top - 2 * canvasState.getPanelMargin()
+			};
+			// Coordinates of the new panel
+			newPanelCoords = $.extend({}, panelEdges, {
+				top: pos
+			});
+			// Update the edges of the old panel
+			obj.edges.bottom = pos;
+
+		// Vertical split
+		} else if (direction == "vertical") {
+			if (!(panelEdges.left < pos && pos < panelEdges.right)) {
+				throw "Split position " + pos + " is out of the target panel.";
+			}
+			// New width of the old panel
+			newDimensions = {
+				width: pos - panelEdges.left - 2 * canvasState.getPanelMargin()
+			};
+			// Coordinates of the new panel
+			newPanelCoords = $.extend({}, panelEdges, {
+				left: pos
+			});
+			// Update the edges of the old panel
+			obj.edges.right = pos;
 		}
-		
-		var old = obj.edges.bottom;
-		obj.edges.bottom = y;
-		obj.set({
-			height: obj.edges.bottom - obj.edges.top - 2 * canvasState.getPanelMargin()
-		});
+
+		// Resize the old panel
+		obj.set(newDimensions);
 		canvasState.setControls(obj);
-		
-		var newPanel = canvasState.addPanel({
-			left: obj.edges.left,
-			top: y,
-			right: obj.edges.right,
-			bottom: old,
-		}, obj.fill);
-		console.log("new", newPanel);
+		// Add another panel
+		canvasState.addPanel(newPanelCoords, obj.fill);
 		obj.setCoords();
 	};
 
-	/* creates vertical split */
-	var divideX = function(obj, x) {
-		if (!(obj.edges.left < x && x < obj.edges.right)) {
-			throw "Illegal argument: " + x;
-		}
-		
-		var old = obj.edges.right;
-		obj.edges.right = x;
-		obj.set({
-			width: obj.edges.right - obj.edges.left - 2 * canvasState.getPanelMargin()
-		});
-		canvasState.setControls(obj);
-		var newPanel = canvasState.addPanel({
-			left: obj.edges.right,
-			top: obj.edges.top,
-			right: old,
-			bottom: obj.edges.bottom,
-		}, obj.fill);
 
-		console.log("new", newPanel);
-		obj.setCoords();
-	};
-
-	var initPreviewLine = function(y) {
-		console.log(canvas);
-		var coords = [0, y, canvas.getWidth(), y];
-
-		previewDivideLine = new fabric.Line(coords, {
-			fill: 'black',
+	// Intializes the preview line
+	var initPreviewLine = function() {
+		// Create the preview line
+		// invisible on canvas
+		previewDivideLine = new fabric.Line([0, 0, 0, 0], {
 			stroke: 'red',
 			strokeWidth: 1,
-			selectable: false
+			selectable: false,
+			helper: true
 		});
-		helperCanvas.add(previewDivideLine); /* do not add to elements array */
-		previewDivideLine.bringToFront();
+
+		// Add preview line to helper canvas
+		canvas.add(previewDivideLine);
 	};
 
-	/* activate returns this (the tool) */
+	// Split activate function
 	var activate = function() {
-		console.log("split activated");
-		//canvasState.setSelectable("panel", true);
-		canvasState.mapElements(
-			function(e) { // map
-				if (e.elmType == "panel") {
-					e.set({
-						selectable: true
-					});
-				}
-			}
-		);
+		// Get canvas
+		canvas = canvasState.getCanvas();
 
-		initPreviewLine(-1); /* init line outside canvas */
+		// Make all panels selectable
+		canvasState.mapElements(function(e) {
+			if (e.elmType == "panel") {
+				e.set({ selectable: true });
+			}
+		});
+
+		// Initialize preview line
+		// outside of canvas
+		initPreviewLine();
 
 		canvas.deactivateAll();
 
-		var vertical = true;
+		// Split direction
+		var direction = "vertical";
 		canvas.on("mouse:move", function(options) {
+			// Continue only if the item has edges and there is a target
+			if (!options.target || !options.target.edges) return;
+
 			canvas.deactivateAll();
-			pt = canvasState.snapPoint({
+
+			// Find point to snap to
+			var point = canvasState.snapPoint({
 				x: options.e.offsetX,
 				y: options.e.offsetY
 			});
-			var x = pt.x;
-			var y = pt.y;
+
+			// Store the position of the line
+			// (it can be x or y depeding on the direction of movement)
+			var pos;
+			// Change to horizontal preview line
 			if (Math.abs(options.e.movementY) - Math.abs(options.e.movementX) > threshold) {
-				previewDivideY(options.target, y);
-				vertical = false;
+				pos = point.y;
+				direction = "horizontal";
+			// Change to vertical preview line
 			} else if (Math.abs(options.e.movementX) - Math.abs(options.e.movementY) > threshold) {
-				previewDivideX(options.target, x);
-				vertical = true;
+				pos = point.x;
+				direction = "vertical";
+			// Preview line in the same direction
 			} else {
-				if (vertical) {
-					previewDivideX(options.target, x);
-				} else {
-					previewDivideY(options.target, y);
-				}
+				pos = (direction == "vertical") ? point.x : point.y;				
 			}
+			
+			// Show preview line
+			previewDivide(direction, options.target.edges, pos);
 		});
 
 		canvas.on("object:selected", function(options) {
-			var obj = options.target;
-			pt = canvasState.snapPoint({
+			// Continue only if the item has edges and there is a target
+			if (!options.target || !options.target.edges) return;
+			// Edges of target panel
+			var panelEdges = options.target.edges;
+
+			// Find point to snap to
+			var point = canvasState.snapPoint({
 				x: options.e.offsetX,
 				y: options.e.offsetY
 			});
-			var x = pt.x;
-			var y = pt.y;
+			var x = point.x;
+			var y = point.y;
 
-			if (obj && obj.edges) {
-				if (!vertical &&
-					obj.edges.bottom - y > 3 * canvasState.getPanelMargin() &&
-					y - obj.edges.top > 3 * canvasState.getPanelMargin()) {
-					divideY(obj, y);
-					canvas.trigger("change");
-				} else if (vertical &&
-					obj.edges.right - x > 3 * canvasState.getPanelMargin() &&
-					x - obj.edges.left > 3 * canvasState.getPanelMargin()) {
-					divideX(obj, x);
-					canvas.trigger("change");
-				}
+			// Store the position of the line
+			// (it can be x or y depeding on the direction of movement)
+			var pos;
+
+			// Makes sure the panel is not too small as well
+			if (direction == "horizontal" &&
+				panelEdges.bottom - y > 3 * canvasState.getPanelMargin() &&
+				y - panelEdges.top > 3 * canvasState.getPanelMargin()) {
+				pos = y;
+			} else if (direction == "vertical" &&
+				panelEdges.right - x > 3 * canvasState.getPanelMargin() &&
+				x - panelEdges.left > 3 * canvasState.getPanelMargin()) {
+				pos = x;
 			}
+
+			// Divide panels and trigger chagne event
+			divide(direction, options.target, pos);
 			canvas.deactivateAll();
+			canvas.trigger("change");
 		});
-		//		console.log(canvas.__eventListeners);
 
 		return this;
 	};
 
 
+	// Deactivate split tool
 	var deactivate = function() {
-		console.log("split deactivated");
-		helperCanvas.remove(previewDivideLine);
-		canvas.__eventListeners["mouse:move"] = [];
-		canvas.__eventListeners["object:selected"] = [];
+		// Remove preview line
+		canvas.remove(previewDivideLine);
+		// Deactivate event listeners
+		canvas.off("mouse:move");
+		canvas.off("object:selected");
 	};
 
-	/* the following code should probably be the same for all tools */
+
+	// Public api for Split tools
+	// (its the same for all tools)
 	return {
 		name: "Split",
-		init: function() {
-			canvas = canvasState.getCanvas();
-			helperCanvas = canvasState.getHelperCanvas();
-			console.log(canvas);
-		},
 		activate: activate,
-		deactivate: deactivate,
-		test: function() {
-			console.log(canvas._objects[1]);
-			divideX(canvas._objects[1], 300);
-			divideY(canvas._objects[1], 200);
-			//			divideY(canvas._objects[1], 150);
-			//			divideX(canvas._objects[1], 100);
-		}
+		deactivate: deactivate
 	};
 });
