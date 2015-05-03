@@ -19,11 +19,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	// Array of deltas in history
-	var history = [];
+	var history;
 	// Index indicating the current delta
-	var historyIdx = -1;
+	var historyIdx;
 	// Previous state of the canvas (in json)
-	var previousState = null;
+	var previousState;
 
 	//fiddle for copypaste http://jsfiddle.net/tkfGs/287/
 	var clipboard = {
@@ -292,11 +292,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			bottom: canvas.getHeight() - pageMargin
 		};
 		addPanel($.extend({}, pageEdges));
-		previousState = CanvasState.getState();
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		var circle = new fabric.Circle({
+		/*var circle = new fabric.Circle({
 			radius: 100,
 			fill: '#eef',
 			scaleY: 0.5,
@@ -315,7 +314,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			borderColor: 'green',
 			borderScaleFactor: 2
 		});
-		canvas.add(text);
+		canvas.add(text);*/
+
+		CanvasState.initHistory();
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -336,6 +337,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
+		initHistory: function () {
+			history = [];
+			historyIdx = -1;
+			previousState = CanvasState.getState();
+		},
 		storeState: function() {
 			var state = this.getState();
 			console.log("storing a new state...", state);
