@@ -45,7 +45,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"GetPage": function(item) {
 			this.SetCurrentPage(item);
-			var idx = parseInt(item.attr("data-num"));
+			var idx = parseInt(item.parent().attr("id"));
 			this.SetHeading({currentPage: idx});
 			console.log("menu getting page" + idx);
 			//TODO save current page
@@ -53,7 +53,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"RemovePage": function(item) {
 			console.log("menu REMOVE PAGE");
-			var idx = item.attr("data-num");
+			var idx = parseInt(item.parent().attr("id"));
 			var that = this;
 			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
 				that.UpdatePages(curr, num);
@@ -156,6 +156,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	  "MovePage": function(start, end) {
 	    console.log("reordering pages: " + start + " to " + end);
 	    editor.action("MovePage", {pageNum: start, newSpot: end});
+	    getNthPageThumb(start).attr("id", start);
+	    getNthPageThumb(end).attr("id", end);
 	  },
 	};
 
@@ -165,8 +167,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		}
 		i++;
 		return '<li class="page-thumb" id="' + i + '">' +
-			'<a class="page-thumb view" id="GetPage" href="#" data-num="' + i + '">' + i + '</a>' +
-			'<a href="#" class="remove-page view" id="RemovePage" data-num="' + i + '"><i class="fa fa-x fa-remove"></i></a></li>';
+			'<a class="page-thumb view" id="GetPage" href="#">' + i + '</a>' +
+			'<a href="#" class="remove-page view" id="RemovePage"><i class="fa fa-x fa-remove"></i></a></li>';
+	};
+
+	/* 1-indexed */
+	var getNthPageThumb = function(n) {
+		return $("#page-thumbs").children().eq(n - 1);
 	};
 
 	var init_project = function() {
