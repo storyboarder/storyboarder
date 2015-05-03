@@ -1,4 +1,8 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
+	$(document).on('keydown', function(event) {
+		console.log("key pressed: ", event);
+		copyPasteHandler(event);
+	});
 	// Main canvas
 	var canvas;
 	var canvasId = "canvas";
@@ -62,7 +66,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			callback && callback(img);
 		});
 	};*/
-	
+
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
 	var addElement = function(e, elmType) {
@@ -314,9 +318,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
-		console.log("foo");
-		$("#" + canvasId).keydown(copyPasteHandler);
-
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
@@ -340,6 +341,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
+		canvas.add(new fabric.Circle({
+			radius: 100,
+			fill: '#eef',
+			scaleY: 0.5,
+			originX: 'center',
+			originY: 'center'
+		}));
 	};
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
 	var init_project = function(w, h, panelM, pageM, createProjCallback) {
@@ -503,8 +511,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 						function(found) {
 							if (found.elmType === "rectext") {
 								console.log("objects", canvas._objects);
-								var result = canvas._objects.filter(function( obj ) {
-								  return (obj.id === found.id && obj.elmType === "textBorder");
+								var result = canvas._objects.filter(function(obj) {
+									return (obj.id === found.id && obj.elmType === "textBorder");
 								});
 
 								console.log("results", result);
