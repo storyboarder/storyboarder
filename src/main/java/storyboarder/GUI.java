@@ -89,13 +89,22 @@ final class GUI {
    *         project' if the number of pages is zero.
    */
   private static Object stringifyProject() {
-    int numPages = project.getPageCount();
+    List<Page> pages = project.getAllPages();
+
     Map<String, Object> data = new HashMap<String, Object>();
-    data.put("numPages", numPages);
+
     data.put("name", project.name());
     data.put("page", "empty project");
-    if (numPages > 0) {
-      data.put("page", project.getPage(1));
+
+    String[] thumbnails = new String[pages.size()];
+    for (int i = 0; i < pages.size(); i++) {
+      thumbnails[i] = pages.get(i).getThumbnail();
+    }
+    data.put("thumbnails", thumbnails);
+
+    data.put("numPages", pages.size());
+    if (pages.size() > 0) {
+      data.put("page", pages.get(0));
     }
     System.out.println("current project: " + project + ", data: " + data);
     return GSON.toJson(data);

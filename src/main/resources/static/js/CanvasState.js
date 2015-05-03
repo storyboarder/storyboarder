@@ -22,6 +22,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Previous state of the canvas (in json)
 	var previousState = null;
 
+	//fiddle for copypaste http://jsfiddle.net/tkfGs/287/
+	var clipboard = {
+		type: "empty",
+		content: "empty"
+	}; //for copy paste
+
 
 
 	// Adds and element to the canvas
@@ -29,6 +35,80 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var addElement = function(e, elmType) {
 		e.elmType = elmType;
 		canvas.add(e);
+	};
+
+	//construct a clipboard
+	var makeClipboard = function(type, content) {
+		return {
+			type: type,
+			content: content
+		};
+	};
+
+	//Event handler for copy paste (callback for document.onkeydown)
+	var copyPasteHandler = function(event) {
+		var key;
+		if (window.event) {
+			key = window.event.keyCode;
+		} else {
+			key = event.keyCode;
+		}
+
+		switch (key) {
+			case 67: // Ctrl+C
+				if (event.ctrlKey || event.metaKey) {
+					event.preventDefault();
+					copy();
+				}
+				break;
+			case 86: // Ctrl+V
+				if (event.ctrlKey || event.metaKey) {
+					event.preventDefault();
+					paste();
+				}
+		}
+	}
+
+	//copy object to clipboard
+	var copy = function(params) {
+		if (canvas.getActiveGroup()) {
+			clipboard = makeClipboard("group", canvas.getActiveGroup());
+		} else if (canvas.getActiveObject()) {
+			clipboard = makeClipboard("single", canvas.getActiveObject());
+		}
+		console.log("copy called, clipboard: ", clipboard);
+	}
+
+	//paste object from cliboard
+	var paste = function(params) {
+		console.log("paste called, clipboard: ", clipboard);
+		if (clipboard.type == "group") {
+			var clonedObjects = [];
+			var groupObjects = clipboard.content.objects;
+			for (var i in groupObjects) {
+				var newObj = groupObjects[i].clone();
+				clonedObjects[i] = newObj;
+			}
+			var clonedGroup = new fabric.Group(clonedObjects, {
+				left: clipboard.content.left + 20,
+				top: clipboard.content.top + 20
+			});
+			//clipboard = makeClipboard("group", clonedGroup);
+			var destroyedGroup = clonedGroup.destroy();
+			var items = destroyedGroup.getObjects();
+			items.forEach(function(item) {
+				canvas.add(item);
+			});
+		} else if (clipboard.type == "single") {
+			var clonedObj = clipboard.content.clone();
+			clonedObj.set({
+				left: clonedObj.left + 5,
+				top: clonedObj.top + 5
+			});
+			clipboard = makeClipboard("single", clonedObj);
+			canvas.add(clonedObj);
+		}
+		canvas.renderAll();
 	};
 
 	// Add image to canvas
@@ -130,7 +210,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			"right": "left"
 		};
 
-		if ( edgeDir in opposites ) {
+		if (edgeDir in opposites) {
 			return opposites[edgeDir];
 		} else {
 			throw "Invalid edge direction " + edgeDir;
@@ -281,7 +361,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			});
 
 			// Remove helper objects from canvas
-			state.objects = state.objects.filter(function (obj) {
+			state.objects = state.objects.filter(function(obj) {
 				return !obj.helper;
 			});
 
@@ -343,7 +423,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
-                console.log("canvas", canvas);
+				console.log("canvas", canvas);
 
 				canvas.loadFromJSON(json, function() {
 					console.log(canvas);
