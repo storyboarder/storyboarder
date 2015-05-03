@@ -26,7 +26,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var previousState = null;
 
 
-
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
 	var addElement = function(e, elmType) {
@@ -294,7 +293,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		getState: function() {
 			var canvasState = $.extend(this.getCanvas().toJSON([
-				"helper", "elmType", "edges", "lockMovementX", "lockMovementY"
+				"helper", "elmType", "edges", "lockMovementX", "lockMovementY", "id"
 			]), {
 				width: width,
 				height: height,
@@ -372,6 +371,25 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					console.log(canvas);
 					console.log("done loading");
 					canvas.renderAll.bind(canvas);
+
+					console.log("should be loaded......", canvas);
+					that.mapElements(
+						function(found) {
+							if (found.elmType === "rectext") {
+								console.log("objects", canvas._objects);
+								var result = canvas._objects.filter(function( obj ) {
+								  return (obj.id === found.id && obj.elmType === "textBorder");
+								});
+
+								console.log("results", result);
+								found.border = result[0];
+								that.deleteElement(result[0]);
+								that.addElement(this.border, "textBorder");
+							}
+						}
+					);
+
+
 					console.log(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {

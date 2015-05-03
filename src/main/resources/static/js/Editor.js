@@ -137,7 +137,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset"], function(jsPDF, canvasStat
 
 					checkPage(responseObject);
 					currentPage = responseObject.pageNum; // TODO check for errors(?)
-					canvasState.load_page("canvas", JSON.parse(responseObject.json));
+					canvasState.load_page("canvas", JSON.parse(responseObject.json, function() {
+						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
+					}));
 					return responseObject;
 					// }
 				});

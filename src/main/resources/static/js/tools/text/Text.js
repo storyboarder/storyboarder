@@ -12,9 +12,12 @@ define(["../../CanvasState"], function(canvasState) {
 
 	initialize: function(text, options) {
 	    options || (options = { });
+	   	var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+		var id = randLetter + Date.now();
 
 	    this.callSuper('initialize', text, options);
 	    this.set({
+	    	id: id,
 	    	elmType: "rectext",
 	    	transparentCorners : true,
 	    	lockRotation : true,
@@ -38,7 +41,8 @@ define(["../../CanvasState"], function(canvasState) {
 	        stroke: "black",
 	        strokeWeight: 2,
 	        hasRotatingPoint: false,
-	        textbox : this
+	        textbox : this,
+	        id : id
 	 	});
 
       	canvasState.addElement(this.border, "textBorder");
@@ -48,7 +52,8 @@ define(["../../CanvasState"], function(canvasState) {
 	  toObject: function() {
 	    return fabric.util.object.extend(this.callSuper('toObject'), {
 	      border: this.border.toObject(),
-	      elmType : "rectext"
+	      elmType : "rectext",
+	      id: this.get("id")
 	    });
 	  },
 
