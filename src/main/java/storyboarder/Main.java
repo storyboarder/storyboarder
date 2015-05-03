@@ -40,10 +40,10 @@ public final class Main {
     OptionParser parser = new OptionParser();
 
     OptionSpec<Integer> sparkSpec = parser.accepts(SPARK_PORT_FLAG)
-        .withRequiredArg().ofType(Integer.class);
+            .withRequiredArg().ofType(Integer.class);
 
     OptionSpec<Integer> socketSpec = parser.accepts(SOCKET_PORT_FLAG)
-        .withRequiredArg().ofType(Integer.class);
+            .withRequiredArg().ofType(Integer.class);
 
     OptionSet options = parser.parse(args);
 
@@ -54,12 +54,12 @@ public final class Main {
 
     GUI.start(sparkPort);
 
-	int socketPort = DEFAULT_SOCKET_PORT;
-	if (options.has(socketSpec)) {
-		socketPort = options.valueOf(socketSpec);
-	}
-	Multiplayer server = new Multiplayer(socketPort);
-	server.start();
+    int socketPort = DEFAULT_SOCKET_PORT;
+    if (options.has(socketSpec)) {
+      socketPort = options.valueOf(socketSpec);
+    }
+    Multiplayer server = new Multiplayer(socketPort);
+    server.start();
 
   }
 }

@@ -68,15 +68,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
-		console.log(canvasState);
-		snapPoint = canvasState.snapPoint;
+		snapPoint = snap.snapPoint;
 
 		console.log("select activated");
-		//		console.log("SELECT", canvas);
-		console.log(canvasState);
-		//		console.log(canvas.getObjects());
-		//canvas.getObjects()[1].selectable = true;
-		//		console.log("SELECT", canvas);
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -89,39 +83,44 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true,
 				editable: false
 			},
-			"draw": {
-				// there's no draw, gotta check if path or stroke something exists
+			"path": {
 				selectable: true
 			},
 			"image": {
 				selectable: true
+			},
+			"circle": {
+				selectable: true
 			}
+
 		}
 
 		canvasState.mapElements(function(found) { // map
 			console.log(found);
-
+			var options = {};
 			if (selectable.hasOwnProperty(found.elmType)) {
-				var options = selectable[found.elmType];
-				//				console.log(options);
-				for (property in options) {
-					found.set(property, options[property]);
-				}
+				options = selectable[found.elmType];
+				// console.log(options);
+			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
+				options = selectable[found.type];
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
 					selectable: false
 				});
 			}
+
+			for (property in options) {
+				found.set(property, options[property]);
+			}
+
 		});
 
 		canvas.on('object:moving', function(options) {
 			target = options.target;
-			console.log("target", target);
-			console.log("canvas", canvas);
 			if (snap.isSnapActive() && options.target.elmType != "panel") {
 				target = options.target;
-				var borders = canvasState.snapBorders({
+				var borders = snap.snapBorders({
 					left: target.left,
 					right: target.left + target.width,
 					top: target.top,
@@ -235,7 +234,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			} else {
 				if (snap.isSnapActive()) {
 					control = target.__corner;
-					var borders = canvasState.snapBorders({
+					var borders = snap.snapBorders({
 						left: target.left,
 						right: target.left + target.width,
 						top: target.top,
@@ -269,7 +268,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		};
 
-		console.log(canvas.__eventListeners);
 		return this;
 	};
 
@@ -279,9 +277,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.deactivateAll();
 		canvasState.mapElements(
 			function(found) { // map
-				found.set({
-					selectable: false
-				});
+				if (!found.active) {
+					found.set({
+						selectable: false
+					});
+				}
 			}
 		);
 

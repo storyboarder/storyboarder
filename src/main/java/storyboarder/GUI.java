@@ -1,6 +1,7 @@
 package storyboarder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -87,36 +88,25 @@ final class GUI {
   }
 
   private static class ImageUpload implements Route {
+    @Override
     public Object handle(Request request, Response response) {
-	  MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp");
-	  request.raw().setAttribute("org.eclipse.multipartConfig", multipartConfigElement);
-   
-	  try {
-		Part filePart = request.raw().getPart("file");
-		
-		InputStream sInputStream = filePart.getInputStream();
-	       //read imageInputStream
-	       filePart.write(filePart.getName());
-	       //Read Name, String Type 
-	       Part namePart = request.getPart("cad");
-	       if(namePart.getSize() > 20){
-	           //write name cannot exceed 20 chars
-	       }
-	       //use nameInputStream if required        
-	       InputStream nameInputStream = namePart.getInputStream();
-	       //name , String type can also obtained using Request parameter 
-	       String nameParameter = request.getParameter("name");
-	       //Similarly can read age properties
-	       Part agePart = request.getPart("age");
-	       int ageParameter = Integer.parseInt(request.getParameter("age"));
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (ServletException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} //file is name of the upload form
-   }
+      MultipartConfigElement multipartConfigElement = new MultipartConfigElement(
+          "/tmp");
+      request.raw().setAttribute("org.eclipse.multipartConfig",
+          multipartConfigElement);
+
+      try {
+        Part filePart = request.raw().getPart("file");
+
+        InputStream sInputStream = filePart.getInputStream();
+        filePart.write(filePart.getName());
+
+      } catch (IOException | ServletException e) {
+        e.printStackTrace();
+      }
+
+      return null;
+    }
   }
 
   /**
