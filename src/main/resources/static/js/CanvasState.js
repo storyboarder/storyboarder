@@ -195,7 +195,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 	};
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
-	var init_project = function(w, h, panelM, pageM, callback) {
+	var init_project = function(w, h, panelM, pageM, createProjCallback) {
 		console.log("INIT PROJECT");
 		if (typeof canvas === "undefined") {
 			init();
@@ -208,7 +208,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			width: w,
 			height: h
 		});
-		init_page();
+		init_page(createProjCallback);
 	};
 
 	var CanvasState = {
