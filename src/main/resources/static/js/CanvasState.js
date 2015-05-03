@@ -46,6 +46,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//Event handler for copy paste (callback for document.onkeydown)
 	var copyPasteHandler = function(event) {
+		console.log("key down: ", event);
 		var key;
 		if (window.event) {
 			key = window.event.keyCode;
@@ -99,7 +100,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.add(item);
 			});
 		} else if (clipboard.type == "single") {
+			console.log("copied object", clipboard.content);
 			var clonedObj = clipboard.content.clone();
+			console.log("cloned object", clonedObj);
 			clonedObj.set({
 				left: clonedObj.left + 5,
 				top: clonedObj.top + 5
@@ -247,14 +250,22 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
 	var init = function() {
+		// document.onkeydown = function(event) {
+		// 	console.log("key down");
+		// 	copyPasteHandler(event);
+		// };
 		$canvas = $("#" + canvasId);
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
+		console.log("foo");
+		$("#" + canvasId).keydown(copyPasteHandler);
+
 	};
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
 	var init_page = function(callback) {
+
 		console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
 			console.log("canvas is undefined. initing now...");
