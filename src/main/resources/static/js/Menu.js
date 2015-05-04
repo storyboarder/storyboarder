@@ -33,16 +33,14 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("new called");
 			$('.ui.modal.create-project').modal('show');
 		},
-		"AddPage": function() {
-			console.log("menu ADD PAGE");
+		"AddPage": function(params) {
 			var idx = $("#page-thumbs").children(".page-thumb").length;
 			var $html = $makePageThumb(idx);
 			$("#page-thumbs").append($html);
-			var that = this;
-			editor.action("AddPage", {callback: function(numPages) {
-				that.SetHeading({currentPage: numPages, numPages: numPages});
-				that.SetCurrentPage($html);
-			}});
+
+			console.log("results ", params);
+			this.SetHeading({currentPage: params.currentPage, numPages: params.numPages});
+			this.SetCurrentPage($html);
 		},
 		"GetPage": function(item) {
 			this.SetCurrentPage(item.parent());
@@ -55,24 +53,21 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				pageNum: idx
 			});
 		},
-		"RemovePage": function(item) {
+		"RemovePage": function(results) {
 			console.log("menu REMOVE PAGE");
-			var idx = parseInt(item.parent().attr("id"));
+			console.log($("#page-thumbs li:data(pageNum)"));
+			/*var idx = results.pageNum;
 			item.parent().remove();
 			adjustPageThumbID();
 			var that = this;
+
 			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
 				that.UpdatePages(curr, num);
 				if (num == 0) {
 //					console.log("can't have 0 pages. Adding page...");
 					that.AddPage();
 				}
-			}});
-		},
-		"SetPageDimensions": function(w, h) {
-			console.log("SET PAGE DIMENSIONS: ", w, h);
-			$('#page').width(w);
-			$('#page').height(h);
+			}});*/
 		},
 		"CreateProject": function(form) {
 			console.log("create project with name ", $("#project-name").val());
@@ -83,7 +78,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			this.SetPageDimensions(width, height);
 			$("#editor").css("visibility", "visible");
 			var that = this;
-			editor.action("CreateProj", {
+
+			console.log("calling create");
+			console.log(editor.action);
+			editor.action("CreateProject", {
 				canvas: $("#canvas"),
 				width: parseInt($("#page-width").val()),
 				height: parseInt($("#page-height").val()),
@@ -105,30 +103,20 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				}
 			});
 		},
-		"SetCurrentPage": function($currPg) {
+		"SetCurrentPage": function(pageNum) {
+			var $toActivate = $("#page-thumbs a.page-thumb").filter(function () {
+				return $(this).data("pageNum") == pageNum;
+			});
+			$toActivate.addClass("current");
+
 			if (typeof $currentPage != "undefined") {
 				$currentPage.removeClass("current");
 			}
-			$currPg.addClass("current");
-			$currentPage = $currPg;
-		},
-		/* Updates page index in heading, and current page, but not thumbnails */
-		"UpdatePages": function(curr, num) {
-			console.log("UPDATE PAGES", curr, num);
-			this.SetHeading({
-				currentPage: curr,
-				numPages: num
-			});
-
-			if ($("#page-thumbs").length > 0) {
-//				console.log($("#page-thumbs").children().first());
-//				console.log($("#page-thumbs").eq(curr - 1));
-				this.SetCurrentPage($("#page-thumbs").eq(curr - 1));
-//				this.SetCurrentPage($("#page-thumbs").children().first());
-//				console.log($currentPage);
-			}
+			$currentPage = $toActivate;
 		},
 		"SetHeading": function(params) {
+			console.log("set heading ", params);
+
 			if (params.title) {
 				$("#heading #title").html(params.title);
 			}
@@ -142,9 +130,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"LoadProject": function(item) {
 			var num = item.attr("id");
 			this.SetHeading({title: item[0].firstChild.textContent});
-			console.log("load project");
+			console.log("load project", item);
 			var that = this;
-			var result = editor.action("LoadProj", {
+			var result = editor.action("LoadProject", {
 				name: item[0].textContent,
 				callback: function(response) {
 					that.SetHeading({
@@ -160,10 +148,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			});
 			$("#editor").css("visibility", "visible");
 			$('.ui.modal.load-project').modal('hide');
-		},
-		"NewProject": function(item) {
-			console.log("new project");
-			$('.ui.modal.create-project').modal('show');
 		},
 		"MovePage": function(start, end) {
 			console.log("reordering pages: " + start + " to " + end);
@@ -207,22 +191,36 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			throw "IllegalType: " + i;
 		}
 		i++;
-		style = "";
-		var $th = $('<li class="page-thumb" id="' + i + '">' +
-			'<a class="page-thumb view" id="GetPage" href="#"><img /></a>' +
-			'<a href="#" class="remove-page view" id="RemovePage">' +
-			'<i class="fa fa-x fa-remove"></i></a></li>');
+
+		var $thumb = $("<li>").addClass("page-thumb");
+		// Link to click on thumbnail
+		var $link = $("<a>").attr("href", "#")
+			.addClass("page-thumb actionButton")
+			.data("pageNum", i)
+			.data("action", "GetPage")
+			.append("<img>")
+			.appendTo($thumb);
+		// Remove thumbnail link
+		var $removeLink = $("<a>").attr("href", "#")
+			.addClass("remove-page actionButton")
+			.data("pageNum", i)
+			.data("action", "RemovePage")
+			.appendTo($thumb);
+		var $removeIcon = $("<i>")
+			.addClass("fa fa-x fa-remove")
+			.appendTo($removeLink);
+
 		if (dataURL) {
-			$img = $th.children("a.page-thumb").children("img");
+			$img = $thumb.children("a.page-thumb").children("img");
 			$img.attr("src", dataURL);
 			if (typeof thumbnailDim == "undefined") {
 				thumbnailDim = {width: $img[0].width, height: $img[0].height};
 			}
 		}
 		if (typeof thumbnailDim != "undefined") {
-			$th.width(thumbnailDim.width).height(thumbnailDim.height);
+			$thumb.width(thumbnailDim.width).height(thumbnailDim.height);
 		}
-		return $th;
+		return $thumb;
 	};
 
 	var setPageThumb = function(num, dataURL) {
@@ -243,13 +241,17 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$('.ui.modal.load-project')
 			.modal('setting', 'closable', false)
 			.modal('show');
+
 		editor.action("GetChoices", function(choices) {
 			for (c in choices) {
-				$("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
+				var $loadLink = $("<a>").addClass("modalButton")
+					.data("projectName", choices[c])
+					.data("action", "LoadProject")
+					.html(choices[c]);
+
+				$("#project-choices").append(
+					$("<div>").addClass("item").append($loadLink));
 			}
-			$("#project-choices .item a").click(function() {
-				views["LoadProject"]($(this));
-			});
 		});
 	};
 
@@ -266,15 +268,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			id: item.attr("id"),
 			value: val
 		});
-	};
-
-	var view = function(item) {
-		var id = item.attr('id');
-		if (id in views) {
-			views[id](item);
-		} else {
-			throw "View not found: " + id;
-		}
 	};
 
 	var init = function() {
@@ -302,13 +295,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$current = $(this);
 		});
 
-		$("a.action").click(function() {
-			console.log("action called");
-			editor.action($(this).attr('id'), {
-				name: $(this).attr('name')
-			});
-		});
-
 		$("input[type='checkbox'].action").change(function() {
 			console.log("check action called");
 			editor.action($(this).attr('data-action'), {
@@ -321,8 +307,26 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			set_value($(this));
 		});
 
-		$(".view").click(function() {
-			view($(this));
+		$(document).on("click", ".actionButton", function() {
+			editor.action($(this).data('action'), $(this).data());
+		});
+
+		$(document).on("click", ".modalButton", function() {
+			var inputs = $(this).closest(".modal").find("input");
+			// Create object from input values
+			// in modal
+			var params = $(this).data();
+			inputs.each(function (input) {
+				var value = $(this).val();
+				value = $.isNumeric(value) ? parseFloat(value) : value;
+				params[$(this).attr("name")] = value;
+			});
+
+			// Pass the object to the editor action
+			editor.action($(this).data('action'), params);
+
+			// Close the modal
+			$(this).closest(".modal").modal('hide');
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {
@@ -426,6 +430,40 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		editor.setProperty("Fill", "fillColor", $("#fill-color").val());
 		$("#fill-color").on('input', function() {
 			editor.setProperty("Fill", "fillColor", $(this).val());
+		});
+
+		$(editor).on("addedPage", function (e, results, params) {
+			views.AddPage(results, params);
+		});
+		$(editor).on("removedPage", function (e, results, params) {
+			views.RemovePage(results, params)
+		});
+		$(editor).on("movedPage", function (e, results, params) {
+			views.MovePage(results, params)
+		});
+		$(editor).on("changedPage", function (e, results, params) {
+			views.SetCurrentPage(results.pageNum);
+		});
+		$(editor).on("loadedProject", function (e, results, params) {
+			console.log("load proj`ect", results);
+			views.SetHeading({
+				title: results.name,
+				currentPage: 1,
+				numPages: results.numPages
+			});
+
+			views.SetThumbnails(results.numPages, results.thumbnails);
+			views.SetCurrentPage(1);
+
+			$("#editor").css("visibility", "visible");
+		});
+		$(editor).on("createdProject", function (e, results) {
+			$("#editor").css("visibility", "visible");
+		});
+
+
+		$("#NewProject").click(function () {
+			$('.ui.modal.create-project').modal('show');
 		});
 
 		/* Update the page thumb when Editor sends a save thumbnail event. */

@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="ui button view" id="AddImageButton">
+    <div class="ui button modalButton" id="AddImageButton" data-action="AddImage">
       Add Image
     </div>
 

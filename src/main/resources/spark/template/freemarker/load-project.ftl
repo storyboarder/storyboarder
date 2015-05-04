@@ -10,7 +10,7 @@
       <div id="project-choices" class="ui divided list"></div>
     </div>
 
-    <div class="ui small button view" id="NewProject">
+    <div class="ui small button" id="NewProject">
       New Project
     </div>
   </div>

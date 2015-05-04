@@ -269,7 +269,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		// 	console.log("key down");
 		// 	copyPasteHandler(event);
 		// };
-		$canvas = $("#" + canvasId);
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
@@ -295,7 +294,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		/*var circle = new fabric.Circle({
+		var circle = new fabric.Circle({
 			radius: 100,
 			fill: '#eef',
 			scaleY: 0.5,
@@ -314,7 +313,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			borderColor: 'green',
 			borderScaleFactor: 2
 		});
-		canvas.add(text);*/
+		canvas.add(text);
 
 		CanvasState.initHistory();
 	};
