@@ -498,7 +498,11 @@ final class GUI {
      *         pages plus 1, or there is an error adding the page.
      */
     private Object add(Page page) {
-      if (project.addPage(page.getJson(), page.getThumbnail())) {
+      if (page.getNum() != project.getPageCount() + 1) {
+        return JsonMessages
+            .makeError("Page's number must be equal to the number of pages plus 1");
+      }
+      if (project.addPage(page)) {
         return JsonMessages.makeMessage("Successfully added page");
       } else {
         return JsonMessages.makeError("Failure adding page");
