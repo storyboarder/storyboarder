@@ -68,22 +68,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
-<<<<<<< HEAD
-
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
 		});
 
 		console.log(canvasState);
-		snapPoint = canvasState.snapPoint;
-
-		console.log("select activated");
-
-=======
 		snapPoint = snap.snapPoint;
 
 		console.log("select activated");
->>>>>>> d20a0ec9630e16fc2ac57a223e5eb9b87cb75057
+
 		canvas.selection = true; // enable group selection
 
 		var selectable = {

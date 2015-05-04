@@ -365,18 +365,16 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
-<<<<<<< HEAD
 		setActiveObj: function(obj) {
 			activeObj = obj;
 		},
 		getActiveObj: function() {
 			return activeObj;
-=======
+		},
 		initHistory: function() {
 			history = [];
 			historyIdx = -1;
 			previousState = CanvasState.getState();
->>>>>>> d20a0ec9630e16fc2ac57a223e5eb9b87cb75057
 		},
 		storeState: function() {
 			var state = this.getState();
