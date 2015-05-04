@@ -4,6 +4,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	var canvas;
 	var snapPoint;
+	var minDim;
 
 	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
 		var opposite = canvasState.getOppositeDirection(dir);
@@ -28,6 +29,33 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		);
 	};
 
+	var checkOneDirection = function(dir, obj, newEdges, isOpposite) {
+		var opposite = canvasState.getOppositeDirection(dir); // ex. if dir is left, opposite is right
+		var oldEdges = obj.edges;
+		canvasState.mapElements(
+			function(found) {
+				if (found.elmType == "panel" &&
+					found != obj &&
+					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
+					var e = found;
+					var size = canvasState.getDimension(dir); // either "width" or "height"
+					var tmpEdges = {};
+					tmpEdges[isOpposite ? opposite : dir] = newEdges[dir];
+//					e.edges[isOpposite ? opposite : dir] = newEdges[dir];
+//					e[isOpposite ? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();
+					if (dir == "bottom" || dir == "right") {
+//						e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
+					} else {
+//						e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
+					}
+					if (e.width < minDim || e.height < minDim) {
+						return false;
+					}
+				}
+			}
+		);
+	};
+
 	var resizePanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
@@ -37,6 +65,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		}
 	};
 
+	// Checks if resizing a panel is a valid operation
+	var checkPanels = function(obj, newEdges) {
+		for (var n in newEdges) {
+			if (canvasState.contains(n, newEdges[n])) {
+				resizeOneDirection(n, obj, newEdges, true);
+				resizeOneDirection(n, obj, newEdges, false);
+			}
+		}
+	};
 
 	var adjustBorder = function(obj) {
 		console.log("THIS IS BEING CALLLEDDD");
@@ -61,16 +98,23 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			scaleX: 1,
 			scaleY: 1
 		});
-		console.log("FINIHSED");
+		console.log("FINISHED");
 		canvas.renderAll();
 	}
 
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
+		canvas.on("mouse:down", function(options) {
+			canvasState.setActiveObj(options.target);
+		});
+
+		console.log(canvasState);
 		snapPoint = snap.snapPoint;
+		minDim = canvasState.getPanelMargin() * 3;
 
 		console.log("select activated");
+
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -84,7 +128,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				editable: false
 			},
 			"path": {
-				selectable: true
+				selectable: true,
+				hasRotatingPoint : false
 			},
 			"image": {
 				selectable: true
@@ -103,6 +148,14 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				// console.log(options);
 			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
 				options = selectable[found.type];
+				if(found.type === "path") {
+					found.setControlsVisibility({
+						mt: false,
+						mb: false,
+						ml: false,
+						mr: false
+					});
+				}
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
@@ -113,7 +166,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			for (property in options) {
 				found.set(property, options[property]);
 			}
-
 		});
 
 		canvas.on('object:moving', function(options) {
@@ -257,17 +309,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
-
-		document.onkeydown = function(e) { // remove elements when delete is pressed
-			var key = e.keyCode;
-			var selected = canvas.getActiveObject();
-			if (key === 8 && selected) {
-				if (selected.elmType === 'rectext' || selected.elmType === "image") {
-					canvas.remove(selected);
-				}
-			}
-		};
-
 		return this;
 	};
 
@@ -288,6 +329,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
 		canvas.off("text:changed");
+		canvas.off("mouse:down");
 	};
 
 	return {

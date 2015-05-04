@@ -54,7 +54,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		},
 		"SetCurrentPage": function(pageNum) {
 			$toActivate = this.GetPageByNum(pageNum).addClass("current");
-
 			if (typeof $currentPage != "undefined") {
 				$currentPage.removeClass("current");
 			}
@@ -94,9 +93,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			for (t in thumbs) {
 				$("#page-thumbs").append($makePageThumb(parseInt(t), thumbs[t]));
 			}
-			if (typeof thumbnailDim != "undefined") {
-				$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
-			}
 		},
 	};
 
@@ -106,6 +102,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$thumbs.each(function (idx) {
 			$(this).find(":data(pageNum)").data("pageNum", idx + 1);
 		});
+	};
+
+	var setThumbnailDimensions = function(obj) {
+		thumbnailDim = thumbnailDim || {};
+		thumbnailDim.width = obj.width;
+		thumbnailDim.height = obj.height;
+		$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
 	};
 
 	var $makePageThumb = function(i, dataURL) {
@@ -135,10 +138,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		if (dataURL) {
 			$img = $thumb.children("a.page-thumb").children("img");
 			$img.attr("src", dataURL);
-			if (typeof thumbnailDim == "undefined") {
-				thumbnailDim = {width: $img[0].width, height: $img[0].height};
-			}
 		}
+		console.log("thumbnailDim", thumbnailDim);
 		if (typeof thumbnailDim != "undefined") {
 			$thumb.width(thumbnailDim.width).height(thumbnailDim.height);
 		}
@@ -148,10 +149,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var setPageThumb = function(num, dataURL) {
 		var $thumb = getNthPageThumb(num);
 		var $img = $thumb.children("a.page-thumb").children("img");
+		console.log("$img", $img);
 		$img.attr("src", dataURL);
-		if (dataURL) {
-//			thumbnailDim = {width: $img.width(), height: $img.height()};
-		}
 	};
 
 	/* 1-indexed */
@@ -194,6 +193,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	var init = function() {
 		console.log("Menu initing");
+
 
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
@@ -317,7 +317,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if(active && active.elmType === "rectext") {
 				active.fontSize = $("#font-size").val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//active.adjustScale(active.left, active.top);
 			}
 		});
 
@@ -330,23 +331,25 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$("#font-family").change(function(e) {
+			console.log("from family", canvas);
 			var active = canvas.getActiveObject();
 			if(active && active.elmType === "rectext") {
 				active.fontFamily = $('#font-family :selected').val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//adjustScale(active.left, active.top);
 			}
 		});
 
-		$('#drawing-color').change(function () {
-	        console.log('color!');
-	        canvas.freeDrawingBrush.color = $('#drawing-color').val();
-      	});
+		$('#drawing-color').change(function() {
+			canvas.freeDrawingBrush.color = $('#drawing-color').val();
+		});
 
-	    $('#drawing-line-width').change(function () {
-		    console.log('width!');
-		    canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
-	    });
+		$('#drawing-line-width').change(function() {
+			console.log("from drawing", canvas);
+			canvas.freeDrawingBrush.width = parseInt($('#drawing-line-width').val());
+		});
+
 
 	    $( "#page-thumbs" ).disableSelection();
 

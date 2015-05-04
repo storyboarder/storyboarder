@@ -262,7 +262,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 						numPages: numPages
 					}, params]);
 				});
+				triggerThumbEvent({pageNum: currPageObj.pageNum, thumbnail: currPageObj.thumbnail});
 			});
+
 		},
 		"AddPageTest": function(page) {
 			checkPage(page);
@@ -348,6 +350,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			//			console.log("parsed to ", pgObj.json);
 		}
 		currPageObj = pgObj;
+	};
+
+	var triggerThumbEvent = function(params) {
+		checkParams(params, ["pageNum", "thumbnail"]);
+		console.log(params);
+		document.dispatchEvent(new CustomEvent("thumbnail", {detail: {pageNum: params.pageNum, thumbnail: params.thumbnail}}));
 	};
 
 	var getCurrentPageJSON = function() {
@@ -596,6 +604,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	var Editor = {
 		init: init,
 		activate: activate,
+		getThumbDimensions: function() {
+			return {
+				width: canvasState.getThumbWidth(),
+				height: canvasState.getThumbHeight()
+			}
+		},
 		action: action,
 		setProperty: setProperty,
 		test: test

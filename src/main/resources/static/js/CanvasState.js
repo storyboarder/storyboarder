@@ -1,15 +1,19 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	$(document).on('keydown', function(event) {
+		console.log("key pressed", event);
 		copyPasteHandler(event);
 	});
 	// Main canvas
 	var canvas;
+	var activeObj;
 	var canvasId = "canvas";
 	// Socket for multiplayer
 	var socket;
 
 	var width;
 	var height;
+	var thumb_width = 120;
+	var thumb_height;
 	var pageMargin;
 	var panelMargin;
 	// Edges of panel area (between pageMargin and panelMargin)
@@ -67,8 +71,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		} else {
 			key = event.keyCode;
 		}
-
 		switch (key) {
+			case 8:
+				event.preventDefault();
+				deleteActive();
 			case 67: // Ctrl+C
 				if (event.ctrlKey || event.metaKey) {
 					event.preventDefault();
@@ -96,36 +102,71 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//paste object from cliboard
 	var paste = function(params) {
+		var offset = 20;
 		console.log("paste called, clipboard: ", clipboard);
 		if (clipboard.type == "group") {
 			var clonedObjects = [];
 			var groupObjects = clipboard.content.objects;
 			for (var i in groupObjects) {
-				var newObj = groupObjects[i].clone();
+				var newObj = groupObjects[i].clone(function(callbackRes) {
+					callbackRes.set({
+						left: callbackRes.left + offset,
+						top: callbackRes.top + offset
+					});
+					canvas.add(callbackRes);
+				});
 				clonedObjects[i] = newObj;
 			}
 			var clonedGroup = new fabric.Group(clonedObjects, {
-				left: clipboard.content.left + 20,
-				top: clipboard.content.top + 20
+				left: clipboard.content.left + offset,
+				top: clipboard.content.top + offset
 			});
 			//clipboard = makeClipboard("group", clonedGroup);
 			var destroyedGroup = clonedGroup.destroy();
 			var items = destroyedGroup.getObjects();
 			items.forEach(function(item) {
-				canvas.add(item);
+				if (item !== undefined) {
+					canvas.add(item);
+				}
 			});
 		} else if (clipboard.type == "single") {
 			console.log("copied object", clipboard.content);
-			var clonedObj = clipboard.content.clone();
-			console.log("cloned object", clonedObj);
-			clonedObj.set({
-				left: clonedObj.left + 5,
-				top: clonedObj.top + 5
+			var clonedObj = clipboard.content.clone(function(callbackRes) {
+				callbackRes.set({
+					left: callbackRes.left + offset,
+					top: callbackRes.top + offset
+				});
+				canvas.add(callbackRes);
 			});
-			clipboard = makeClipboard("single", clonedObj);
-			canvas.add(clonedObj);
+			if (clonedObj !== undefined) {
+				console.log("cloned object", clonedObj);
+				clonedObj.set({
+					left: clonedObj.left + offset,
+					top: clonedObj.top + offset
+				});
+				clipboard = makeClipboard("single", clonedObj);
+				canvas.add(clonedObj);
+			}
 		}
 		canvas.renderAll();
+	};
+
+	var deleteActive = function(key) {
+		if (canvas.getActiveGroup()) {
+			remove(canvas.getActiveGroup());
+			canvas.getActiveGroup().forEachObject(remove);
+			canvas.discardActiveGroup();
+		} else if (canvas.getActiveObject()) {
+			remove(canvas.getActiveObject())
+		}
+		canvas.renderAll();
+		canvas.trigger("change");
+
+		function remove(obj) {
+			if (obj.elmType !== 'panel' && obj.helper === undefined) {
+				canvas.remove(obj);
+			}
+		}
 	};
 
 	// Add image to canvas
@@ -294,28 +335,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		/*var circle = new fabric.Circle({
-			radius: 100,
-			fill: '#eef',
-			scaleY: 0.5,
-			originX: 'center',
-			originY: 'center'
-		});
-		canvas.add(circle);
-
-		var text = new fabric.Text("hello!", {
-			fontSize: 30,
-			originX: 'left',
-			originY: 'top',
-			textAlign: 'center',
-			left: 100,
-			top: 100,
-			borderColor: 'green',
-			borderScaleFactor: 2
-		});
-		canvas.add(text);
-*/
-		CanvasState.initHistory();
+		
+		CanvasState.initHistory(); 
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -326,6 +347,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 		width = w;
 		height = h;
+		thumb_height = (thumb_width / width) * height;
 		pageMargin = pageM;
 		panelMargin = panelM;
 		canvas.setDimensions({
@@ -336,14 +358,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
-		initHistory: function () {
+		setActiveObj: function(obj) {
+			activeObj = obj;
+		},
+		getActiveObj: function() {
+			return activeObj;
+		},
+		initHistory: function() {
 			history = [];
 			historyIdx = -1;
 			previousState = CanvasState.getState();
 		},
 		storeState: function() {
 			var state = this.getState();
-			console.log("storing a new state...", state);
+			//console.log("storing a new state...", state);
 
 			var delta = jsondiffpatch.diff(state, previousState);
 			history[++historyIdx] = delta;
@@ -403,7 +431,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
 				"selectable", "id",
-				"_controlsVisibility"
+				"_controlsVisibility",
+				"hasRotatingPoint"
 			]), {
 				width: width,
 				height: height,
@@ -421,7 +450,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		getThumbnail: function() {
 			var thumb_width = 120;
 
-			return canvas.toDataURL({multiplier: thumb_width / width});
+			return canvas.toDataURL({
+				multiplier: thumb_width / width
+			});
 		},
 		applyDeltaToState: function(delta) {
 			this.unlistenCanvas();
@@ -439,6 +470,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		getHeight: function() {
 			return canvas.height;
+		},
+		getThumbWidth: function() {
+			return thumb_width;
+		},
+		getThumbHeight: function() {
+			return thumb_height;
 		},
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */
@@ -467,7 +504,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-//					console.log(canvas);
+					//					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}
@@ -478,7 +515,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
-				
+
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					/* for text: */
