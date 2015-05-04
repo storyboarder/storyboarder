@@ -39,17 +39,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
 					var e = found;
 					var size = canvasState.getDimension(dir); // either "width" or "height"
-					var tmpEdges = {};
-					tmpEdges[isOpposite ? opposite : dir] = newEdges[dir];
-//					e.edges[isOpposite ? opposite : dir] = newEdges[dir];
-//					e[isOpposite ? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();
-					if (dir == "bottom" || dir == "right") {
-//						e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
+					tmpEdge = newEdges[dir];
+					if (isOpposite) {
+						if (Math.abs(newEdges[dir] - found.edges[dir]) < minDim) {
+							return false;
+						}
 					} else {
-//						e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
-					}
-					if (e.width < minDim || e.height < minDim) {
-						return false;
+						if (Math.abs(newEdges[dir] - found.edges[opposite]) < minDim) {
+							return false;
+						}
 					}
 				}
 			}
@@ -67,12 +65,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	// Checks if resizing a panel is a valid operation
 	var checkPanels = function(obj, newEdges) {
+		var resizeOK = true;
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
-				resizeOneDirection(n, obj, newEdges, true);
-				resizeOneDirection(n, obj, newEdges, false);
+				resizeOK = resizeOK &&
+					resizeOneDirection(n, obj, newEdges, true) &&
+					resizeOneDirection(n, obj, newEdges, false);
 			}
 		}
+		return resizeOK;
 	};
 
 	/* activate returns this (the tool) */
@@ -184,7 +185,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		});
 
 		canvas.on('object:scaling', function(options) {
-
 			target = options.target;
 			if (target.elmType == "rectext") {
 				canvasState.adjustBorder(target);
@@ -259,6 +259,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 						newEdges.bottom = obj.height + obj.top + panelMargin;
 					}
 				}
+//				if (!checkPanels(target, newEdges)) {
+//					console.log("Do not resize.");
+//				}
 				resizePanels(obj, newEdges);
 				obj.edges = {
 					left: newEdges.left || obj.edges.left,

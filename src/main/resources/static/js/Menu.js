@@ -230,7 +230,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(document).on("click", ".actionButton", function() {
-			editor.action($(this).data('action'), $(this).data());
+			//editor.action($(this).data('action'), $(this).data());
+			if ($(this).data('action') in views) {
+				views[$(this).data('action')]($(this).data());
+			} else {
+				throw "TODO";
+			}
 		});
 
 		$(document).on("click", ".modalButton", function() {
