@@ -68,6 +68,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
+<<<<<<< HEAD
 
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
@@ -78,6 +79,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		console.log("select activated");
 
+=======
+		snapPoint = snap.snapPoint;
+
+		console.log("select activated");
+>>>>>>> d20a0ec9630e16fc2ac57a223e5eb9b87cb75057
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -96,6 +102,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			},
 			"image": {
 				selectable: true
+			},
+			"circle": {
+				selectable: true
 			}
 
 		}
@@ -103,10 +112,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvasState.mapElements(function(found) { // map
 			console.log(found);
 			var options = {};
-			if (selectable.hasOwnProperty(found.elmType)) { 
+			if (selectable.hasOwnProperty(found.elmType)) {
 				options = selectable[found.elmType];
 				// console.log(options);
-			} else if (selectable.hasOwnProperty(found.type)){ // just for paths
+			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
 				options = selectable[found.type];
 				if(found.type === "path") {
 					found.setControlsVisibility({
@@ -131,11 +140,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.on('object:moving', function(options) {
 			target = options.target;
-			console.log("target", target);
-			console.log("canvas", canvas);
 			if (snap.isSnapActive() && options.target.elmType != "panel") {
 				target = options.target;
-				var borders = canvasState.snapBorders({
+				var borders = snap.snapBorders({
 					left: target.left,
 					right: target.left + target.width,
 					top: target.top,
@@ -249,7 +256,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			} else {
 				if (snap.isSnapActive()) {
 					control = target.__corner;
-					var borders = canvasState.snapBorders({
+					var borders = snap.snapBorders({
 						left: target.left,
 						right: target.left + target.width,
 						top: target.top,
@@ -272,18 +279,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
-
-		document.onkeydown = function(e) { // remove elements when delete is pressed
-			var key = e.keyCode;
-			var selected = canvas.getActiveObject();
-			if (key === 8 && selected) {
-				if (selected.elmType === 'rectext' || selected.elmType === "image") {
-					canvas.remove(selected);
-				}
-			}
-		};
-
-		console.log(canvas.__eventListeners);
 		return this;
 	};
 
@@ -293,9 +288,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.deactivateAll();
 		canvasState.mapElements(
 			function(found) { // map
-				found.set({
-					selectable: false
-				});
+				if (!found.active) {
+					found.set({
+						selectable: false
+					});
+				}
 			}
 		);
 
