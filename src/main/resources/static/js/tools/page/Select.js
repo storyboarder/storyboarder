@@ -71,6 +71,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				resizeOK = resizeOK &&
 					resizeOneDirection(n, obj, newEdges, true) &&
 					resizeOneDirection(n, obj, newEdges, false);
+				console.log(n, resizeOK);
 			}
 		}
 		return resizeOK;
