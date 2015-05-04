@@ -69,22 +69,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 
-		console.log("HOHO", canvas.getActiveObject());
-		canvas.on("mouse:down", function() {
-			var obj = canvas.getActiveObject();
-			canvas.setActiveObject(obj);
-			console.log("HAHA canvas", canvas);
-			console.log("HOHO canvas", obj);
+		canvas.on("mouse:down", function(options) {
+			canvasState.setActiveObj(options.target);
 		});
 
 		console.log(canvasState);
 		snapPoint = canvasState.snapPoint;
 
 		console.log("select activated");
-		//		console.log("SELECT", canvas);
-		//		console.log(canvas.getObjects());
-		//canvas.getObjects()[1].selectable = true;
-		//		console.log("SELECT", canvas);
+
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -98,7 +91,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				editable: false
 			},
 			"path": {
-				selectable: true
+				selectable: true,
+				hasRotatingPoint : false
 			},
 			"image": {
 				selectable: true
@@ -114,6 +108,14 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				// console.log(options);
 			} else if (selectable.hasOwnProperty(found.type)){ // just for paths
 				options = selectable[found.type];
+				if(found.type === "path") {
+					found.setControlsVisibility({
+						mt: false,
+						mb: false,
+						ml: false,
+						mr: false
+					});
+				}
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
@@ -300,6 +302,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
 		canvas.off("text:changed");
+		canvas.off("mouse:down");
 	};
 
 	return {

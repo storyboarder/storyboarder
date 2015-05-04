@@ -1,6 +1,7 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	// Main canvas
 	var canvas;
+	var activeObj;
 	var canvasId = "canvas";
 	// Socket for multiplayer
 	var socket;
@@ -359,9 +360,15 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
+		setActiveObj: function(obj) {
+			activeObj = obj;
+		},
+		getActiveObj: function() {
+			return activeObj;
+		},
 		storeState: function() {
 			var state = this.getState();
-			console.log("storing a new state...", state);
+			//console.log("storing a new state...", state);
 
 			var delta = jsondiffpatch.diff(state, previousState);
 			history[++historyIdx] = delta;
@@ -420,7 +427,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"helper", "elmType", "edges",
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
-				"selectable", "id"
+				"selectable", "id",
+				"oCoords"
 
 			]), {
 				width: width,

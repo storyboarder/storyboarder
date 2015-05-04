@@ -360,7 +360,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			if (active && active.elmType === "rectext") {
 				active.fontSize = $("#font-size").val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//active.adjustScale(active.left, active.top);
 			}
 		});
 
@@ -374,22 +375,23 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 
 		$("#font-family").change(function(e) {
+			console.log("from family", canvas);
 			var active = canvas.getActiveObject();
 			if (active && active.elmType === "rectext") {
 				active.fontFamily = $('#font-family :selected').val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//adjustScale(active.left, active.top);
 			}
 		});
 
 		$('#drawing-color').change(function() {
-			console.log('color!');
 			canvas.freeDrawingBrush.color = $('#drawing-color').val();
 		});
 
 		$('#drawing-line-width').change(function() {
-			console.log('width!');
-			canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+			console.log("from drawing", canvas);
+			canvas.freeDrawingBrush.width = parseInt($('#drawing-line-width').val());
 		});
 
 		$("#page-thumbs").disableSelection();

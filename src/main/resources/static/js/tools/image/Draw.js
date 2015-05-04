@@ -142,24 +142,29 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas = canvasState.getCanvas();
 		//var active = canvas.getActiveObject();
 		console.log("canvas", canvas);
-		console.log("canvas active", canvas.getActiveObject());/*
-		if(active.elmType === "panel") {
-			console.log("I AM HERE HERE!");
-		}*/
-/*				canvas.clipTo = function(ctx) {                     
-    ctx.beginPath();
-    var rect = new fabric.Rect({
-            fill: 'red',
-            opacity: 0,
-            left: 0,
-            top: 0,
-            width: canvas.width,
-            height: canvas.height
-    });
-    ctx.strokeStyle = 'black';
-    rect.render(ctx);
-    ctx.stroke();
-}*/
+		var active = canvasState.getActiveObj();
+
+		if(active && active.elmType === "panel") {
+			canvas.on("mouse:up", function(options) {
+				var path = canvas._objects[canvas._objects.length - 1];
+				//path.setCoords();
+
+				path.clipTo = function(ctx) {
+					ctx.save();
+
+					ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+					ctx.rect(
+						active.left, active.top, // Just x, y position starting from top left corner of canvas
+						active.width, active.height // Width and height of clipping rect
+					);
+
+					ctx.restore();
+				};
+
+
+				canvas.renderAll();
+			});
+		}
 
 		//start = canvas.getObjects().length;
 		//console.log("start " + start);
@@ -170,7 +175,7 @@ define(["../../CanvasState"], function(canvasState) {
 		//fabric.Object.prototype.transparentCorners = false;
 
 		canvas.freeDrawingBrush.color = $('#drawing-color').val();
-		canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+		canvas.freeDrawingBrush.width = parseInt($('#drawing-line-width').val());
 
 		canvas.on("mouse:up", function() {
 			//times++;
