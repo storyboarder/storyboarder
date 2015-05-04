@@ -109,7 +109,7 @@
           <div class="text" style="display:none">  
              <select id="font-family">
                 <option value="arial">Arial</option>
-                <option value="comic sans">Comic Sans</option>
+                <option value="comic sans ms">Comic Sans</option>
                 <option value="courier">Courier</option>
                 <option value="georgia">Georgia</option>
                 <option value="helvetica">Helvetica</option>

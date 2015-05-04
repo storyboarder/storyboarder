@@ -382,49 +382,27 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			}
 		});
 
-		$("#font-size").change(function (e) {
-			$("#fsize").text($("#font-size").val());
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fontSize = $("#font-size").val();
-				canvas.renderAll();
-				//ADJUST BORDER NEEDED
-				//active.adjustScale(active.left, active.top);
-			}
-		});
+		$( "#page-thumbs" ).disableSelection();
 
-		$("#font-color").change(function (e) {
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fill = $("#font-color").val();
-				canvas.renderAll();
-			}
-		});
-
+		editor.setProperty("Text", "fontFamily", $("#font-family").val());
 		$("#font-family").change(function(e) {
-			console.log("from family", canvas);
-			var active = canvas.getActiveObject();
-			if(active && active.elmType === "rectext") {
-				active.fontFamily = $('#font-family :selected').val();
-				canvas.renderAll();
-				//ADJUST BORDER NEEDED
-				//adjustScale(active.left, active.top);
-			}
+			editor.setProperty("Text", "fontFamily", $(this).val());
 		});
 
-		$('#drawing-color').change(function() {
-			canvas.freeDrawingBrush.color = $('#drawing-color').val();
+		editor.setProperty("Text", "fill", $("#font-color").val());
+		$("#font-color").change(function () {
+			editor.setProperty("Text", "fill", $(this).val());
 		});
 
+		editor.setProperty("Draw", "color", $('#drawing-color').val());
+		$('#drawing-color').on('input', function() {
+			editor.setProperty("Draw", "color", $(this).val());
+		});
+
+		editor.setProperty("Draw", "width", parseInt($('#drawing-line-width').val()));
 		$('#drawing-line-width').change(function() {
-			console.log("from drawing", canvas);
-			canvas.freeDrawingBrush.width = parseInt($('#drawing-line-width').val());
+			editor.setProperty("Draw", "width", parseInt($(this).val()));
 		});
-
-
-	    $( "#page-thumbs" ).disableSelection();
-
-		init_project();
 
 		editor.setProperty("Fill", "fillColor", $("#fill-color").val());
 		$("#fill-color").on('input', function() {
@@ -435,6 +413,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		document.addEventListener("thumbnail", function(e) {
 			setPageThumb(e.detail.pageNum, e.detail.thumbnail);
 		});
+
+		init_project();
 	};
 
 	return {

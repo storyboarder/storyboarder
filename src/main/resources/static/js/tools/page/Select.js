@@ -37,39 +37,25 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		}
 	};
 
-
-	var adjustBorder = function(obj) {
-		console.log("THIS IS BEING CALLLEDDD");
-		console.log("border", obj.toObject());
-		console.log("border stuff", obj.border);
-		/*
-				var yes = canvas["getObjects()"][1];
-
-				if(yes) {
-					yes.set({
-					left: obj.left + 20,
-					top: obj.top + 20,
-				});
-				}*/
-
-
-		obj.border.set({
-			width: (obj.width * obj.scaleX) + (2 * obj.padding),
-			height: (obj.height * obj.scaleY) + (2 * obj.padding),
-			left: obj.left - obj.padding,
-			top: obj.top - obj.padding,
-			scaleX: 1,
-			scaleY: 1
-		});
-		console.log("FINIHSED");
-		canvas.renderAll();
-	}
-
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
+
+			if(options.target.elmType === "rectext") {
+				// testing
+				var reformat = JSON.stringify(options.target);
+				console.log("original", reformat);
+
+				reformat = reformat.replace(/(?:\\n)/g, '\\\n');
+				//var here = reformat.replace("\\n", "BYYYEE");
+				console.log("reformated", reformat);
+
+
+				// end texting
+			}
+
 		});
 
 		console.log(canvasState);
@@ -154,20 +140,16 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 					}
 				}
 			} else if (target.elmType === "rectext") {
-				adjustBorder(target);
+				canvasState.adjustBorder(target);
 				console.log("adjusting pos text");
 			}
-			/*else if (target.elmType === "textBorder") {
-				console.log("adjusting pos border");
-      	target.textbox.adjustPosition(target.left + target.padding, target.top + target.padding);
-      }*/
 		});
 
 		canvas.on('object:scaling', function(options) {
 
 			target = options.target;
 			if (target.elmType == "rectext") {
-				adjustBorder(target);
+				canvasState.adjustBorder(target);
 			}
 
 			if (target.elmType == "panel") {

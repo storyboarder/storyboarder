@@ -1,93 +1,15 @@
 //TODO check bug where sometimes text isn't editable (possibly b/c of above/below layers)
 
 define(["../../CanvasState"], function(canvasState) {
-
 	var fontFamily;
-	var fontSize;
-	var padding = 3;
-
-	fabric.Rectext = fabric.util.createClass(fabric.IText, {
-
-		type: "rectext",
-
-
-	initialize: function(text, options) {
-	    options || (options = { });
-	   	var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-		var id = randLetter + Date.now();
-
-	    this.callSuper('initialize', text, options);
-	    this.set({
-	    	id: id,
-	    	elmType: "rectext",
-	    	transparentCorners : true,
-	    	lockRotation : true,
-	    	hasRotatingPoint : false,
-	    	backgroundColor : "rgba(0, 0, 0, 0)"
-	    });
-
-	    this.setControlsVisibility({
-	    	mt: false,
-	    	mb: false,
-	    	mr: false,
-	    	ml: false
-	    })
-
-	    this.border = new fabric.Rect({
-	        left: options.left - options.padding,
-	        top: options.top - options.padding,
-	        width: options.width + (options.padding * options.scaleX * 2),
-	        height: options.height + (options.padding * options.scaleY * 2),
-	        fill: "rgba(0, 0, 0, 0)", // transparent
-	        stroke: "black",
-	        strokeWeight: 2,
-	        hasRotatingPoint: false,
-	        textbox : this,
-	        id : id
-	 	});
-
-      	canvasState.addElement(this.border, "textBorder");
-	  },
-
-
-	  toObject: function() {
-	    return fabric.util.object.extend(this.callSuper('toObject'), {
-	      border: this.border.toObject(),
-	      elmType : "rectext",
-	      id: this.get("id")
-	    });
-	  },
-
-		_render: function(ctx) {
-			this.callSuper('_render', ctx);
-		}
-	});
-
-	/*
-	 * Async loaded object
-	 */
-	fabric.Rectext.fromObject = function(object, callback) {
-		fabric.util.enlivenObjects(object.objects, function(enlivenedObjects) {
-			delete object.objects;
-			callback && callback(new fabric.Rectext(enlivenedObjects, object));
-		});
-	};
-	fabric.Rectext.async = true;
-
-	var adjustBorder = function(obj) {
-		obj.border.set({
-			width: (obj.width * obj.scaleX) + (2 * obj.padding),
-			height: (obj.height * obj.scaleY) + (2 * obj.padding),
-			left: obj.left - obj.padding,
-			top: obj.top - obj.padding,
-			scaleX: 1,
-			scaleY: 1
-		});
-
-		canvas.renderAll();
-	}
+	var fill;
+	var canvas;
 
 	var activate = function() {
+		var finalPos;
+		var selected;
+		var time;
+
 		console.log("text activate");
 		canvas = canvasState.getCanvas();
 
@@ -108,27 +30,8 @@ define(["../../CanvasState"], function(canvasState) {
 			}
 		);
 
-		var finalPos;
-		var selected;
-		var time;
-
 		canvas.on('mouse:down', function(coor) {
 			selected = coor.target;
-
-			if (selected) {
-				/*				if(coor.target.elmType === "textBorder") {
-									console.log("HREJKLRJE:KLFDS");
-									console.log("to obj", coor.target.toObject);
-									console.log("obj", coor.target);
-
-									var newText = coor.target.textbox;
-								    canvas.setActiveObject(newText);
-								    newText.selectAll();
-								    newText.enterEditing();
-								    newText.hiddenTextarea.focus();
-								}*/
-			}
-
 		}); // mouse:down
 
 		canvas.on('mouse:up', function(coor) {
@@ -140,22 +43,51 @@ define(["../../CanvasState"], function(canvasState) {
 			if (typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
 				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
 					typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
-					var newText = new fabric.Rectext('Text', {
-						fontFamily: $('#font-family :selected').val(),
+
+					var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+					var id = randLetter + Date.now();
+
+					var newText = new fabric.IText('Text', {
+						fontFamily: fontFamily,
 						fontSize: 12,
-						fill: $("#font-color").val(),
+						fill: fill,
 						left: finalPos.x,
 						top: finalPos.y,
 						padding: 3,
 						width: 5,
 						height: 5,
-						scaleX: 1,
-						scaleY: 1
+						id : id,
+						transparentCorners : true,
+				    	lockRotation : true,
+				    	hasRotatingPoint : false
 					});
 
+				    newText.setControlsVisibility({
+				    	mt: false,
+				    	mb: false,
+				    	mr: false,
+				    	ml: false
+				    });
+
+					var newBorder = new fabric.Rect({
+				        left: newText.left - newText.padding,
+				        top: newText.top - newText.padding,
+				        width: newText.width + (newText.padding * newText.scaleX * 2),
+				        height: newText.height + (newText.padding * newText.scaleY * 2),
+				        fill: "rgba(0, 0, 0, 0)", // transparent
+				        stroke: "black",
+				        strokeWeight: 2,
+				        hasRotatingPoint: false,
+				        id : id,
+				        hasControls : false,
+				        selectable : false
+				 	});
+
+				 	
+					canvasState.addElement(newBorder, "textBorder");
 					canvasState.addElement(newText, 'rectext');
-					adjustBorder(newText);
-					console.log("to object", newText.toObject());
+					canvasState.adjustBorder(newText);
+
 					canvas.trigger("change");
 				}
 
@@ -171,19 +103,22 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas.on("object:scaling", function(e) {
 			var selected = e.target;
 			if (selected.elmType === "rectext") {
-				adjustBorder(selected);
+				canvasState.adjustBorder(selected);
 			}
 		});
 
 		canvas.on("text:changed", function(e) {
-			adjustBorder(selected);
-			canvas.trigger("change");
+			canvasState.adjustBorder(selected);
 		});
+
+		canvas.on("text:editing:exited", function(e) {
+			canvas.trigger("change");
+		})
 
 		canvas.on("object:moving", function(e) {
 			var selected = e.target;
 			if (selected.elmType == "rectext") {
-				adjustBorder(selected);
+				canvasState.adjustBorder(selected);
 			}
 		});
 
@@ -197,17 +132,35 @@ define(["../../CanvasState"], function(canvasState) {
 		canvas.off("object:moving");
 		canvas.off("object:scaling");
 		canvas.off("text:changed");
+		canvas.off("text:editing:exited");
 	};
 
+	var change = function(property, value) {
+		var canvas = canvasState.getCanvas();
+		var active = canvas.getActiveObject();
+
+		if(property === "fill") {
+			fill = value;
+		} else if(property === "fontFamily") {
+			fontFamily = value;
+		}
+
+		if(active && active.elmType === "rectext") {
+			active[property] = value;
+			canvas.renderAll();
+			canvasState.adjustBorder(active);
+			// color creates too many changes, maybe just not have this triggered
+			// canvas.trigger("change");
+		}
+
+	};
 
 	return {
 		name: "Text",
 		activate: activate,
 		deactivate: deactivate,
 		set: function (property, value) {
-			if (property == "fontFamily") {
-				fontFamily = value;
-			}
+			change(property, value);
 		}
 	};
 

@@ -155,15 +155,25 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			canvas.getActiveGroup().forEachObject(remove);
 			canvas.discardActiveGroup();
 		} else if (canvas.getActiveObject()) {
-			remove(canvas.getActiveObject())
+			remove(canvas.getActiveObject());
 		}
 		canvas.renderAll();
 		canvas.trigger("change");
 
 		function remove(obj) {
-			if (obj.elmType !== 'panel' && obj.helper === undefined) {
+			if(obj.elmType === "rectext") {
+				var borderArr = canvas._objects.filter(function( found ) {
+  					return found.id === obj.id && found.elmType === "textBorder";
+				});
+
+				if(borderArr.length > 0) {
+					var border = borderArr[0];
+					canvas.remove(border);
+					canvas.remove(obj);
+				}
+			} else if (obj.elmType !== 'panel' && obj.helper === undefined) {
 				canvas.remove(obj);
-			}
+			} 
 		}
 	};
 
@@ -364,7 +374,33 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		init_page(createProjCallback);
 	};
 
+	// for text
+	var adjustBorder = function(obj) {
+		var borderArr = canvas._objects.filter(function( found ) {
+  			return found.id === obj.id && found.elmType === "textBorder";
+		});
+
+		if(borderArr.length > 0) {
+			var border = borderArr[0];
+			border.set({
+				width: (obj.width * obj.scaleX) + (2 * obj.padding),
+				height: (obj.height * obj.scaleY) + (2 * obj.padding),
+				left: obj.left - obj.padding,
+				top: obj.top - obj.padding,
+				scaleX: 1,
+				scaleY: 1
+			});
+
+			canvas.renderAll();
+			
+		}
+	}
+
+
 	var CanvasState = {
+		adjustBorder : function(obj) {
+			adjustBorder(obj);
+		},
 		setActiveObj: function(obj) {
 			activeObj = obj;
 		},
@@ -438,7 +474,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
 				"selectable", "id", "oCoords",
-				"_controlsVisibility"
+				"_controlsVisibility", "padding"
 
 			]), {
 				width: width,
@@ -452,7 +488,17 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				return !obj.helper;
 			});
 
-			return JSON.stringify(state);
+			// reformat is for text
+			var reformat = JSON.stringify(state);
+			console.log("PREVIOUS STATE", reformat);
+
+			reformat = reformat.replace(/(?:\\n)/g, function (match){
+    			return "\\" + match;
+			});
+
+			console.log("REFORMATED STATE", reformat);
+
+			return reformat;
 		},
 		getThumbnail: function() {
 			var thumb_width = 120;
@@ -519,24 +565,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
-					/* for text: */
-					that.mapElements(
-						function(found) {
-							if (found.elmType === "rectext") {
-								console.log("objects", canvas._objects);
-								var result = canvas._objects.filter(function(obj) {
-									return (obj.id === found.id && obj.elmType === "textBorder");
-								});
-
-								console.log("results", result);
-								found.border = result[0];
-								that.deleteElement(result[0]);
-								that.addElement(this.border, "textBorder");
-							}
-						}
-					);
-					/* / end for text */
-
 					canvas.renderAll();
 					if (typeof callback != "undefined") {
 						callback();
