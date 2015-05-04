@@ -93,19 +93,22 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			});
 		},
 		"SetPageDimensions": function(w, h) {
-			console.log("SET PAGE DIMENSIONS: ", w, h);
 			$('#page').width(w);
 			$('#page').height(h);
 		},
 		"CreateProject": function(form) {
 			console.log("create project with name ", $("#project-name").val());
-			this.UpdatePages(0, 0);
+			$("#page-thumbs").empty();
 			$('.ui.modal.create-project').modal('hide');
 			width = parseInt($("#page-width").val());
 			height = parseInt($("#page-height").val());
 			this.SetPageDimensions(width, height);
 			$("#editor").css("visibility", "visible");
+			$("#Select").click();
 			var that = this;
+			$currPg = $makePageThumb(0);
+			$("#page-thumbs").append($currPg);
+			this.SetCurrentPage($currPg);
 			editor.action("CreateProj", {
 				canvas: $("#canvas"),
 				width: parseInt($("#page-width").val()),
@@ -114,17 +117,17 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				panelMargin: parseInt($("#panel-margin").val()),
 				name: $("#project-name").val(),
 				callback: function(response) {
+					setThumbnailDimensions(editor.getThumbDimensions());
+					console.log("thumbnailDim", thumbnailDim);
 					$("input[type='text'].action").each(function(e) {
 						set_value($(this));
 					});
-					$currPg = $makePageThumb(0);
-					$("#page-thumbs").append($currPg);
-					that.SetCurrentPage($currPg);
 					that.SetHeading({
 						title: response.name,
 						currentPage: 1,
 						numPages: 1
 					});
+
 				}
 			});
 		},
@@ -162,6 +165,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			this.SetHeading({
 				title: item[0].firstChild.textContent
 			});
+			$("#Select").click();
 			console.log("load project");
 			var that = this;
 			var result = editor.action("LoadProj", {
@@ -172,9 +176,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 						currentPage: 1,
 						numPages: response.numPages
 					});
+					setThumbnailDimensions(editor.getThumbDimensions());
 					that.UpdatePages(1, response.numPages);
 					that.SetPageDimensions(response.page.json.width, response.page.json.height);
 					that.SetThumbnails(response.numPages, response.thumbnails);
+					console.log("thumbnailDim", thumbnailDim);
+
 				}
 			});
 			$("#editor").css("visibility", "visible");
@@ -207,9 +214,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			for (t in thumbs) {
 				$("#page-thumbs").append($makePageThumb(parseInt(t), thumbs[t]));
 			}
-			if (typeof thumbnailDim != "undefined") {
-				$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
-			}
 		},
 	};
 
@@ -219,6 +223,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		for (t = 0; t < $thumbs.length; t++) {
 			$thumbs.eq(t).attr("id", t + 1);
 		}
+	};
+
+	var setThumbnailDimensions = function(obj) {
+		thumbnailDim = thumbnailDim || {};
+		thumbnailDim.width = obj.width;
+		thumbnailDim.height = obj.height;
+		$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
 	};
 
 	var $makePageThumb = function(i, dataURL) {
@@ -234,10 +245,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		if (dataURL) {
 			$img = $th.children("a.page-thumb").children("img");
 			$img.attr("src", dataURL);
-			if (typeof thumbnailDim == "undefined") {
-				thumbnailDim = {width: $img[0].width, height: $img[0].height};
-			}
 		}
+		console.log("thumbnailDim", thumbnailDim);
 		if (typeof thumbnailDim != "undefined") {
 			$th.width(thumbnailDim.width).height(thumbnailDim.height);
 		}
@@ -247,10 +256,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var setPageThumb = function(num, dataURL) {
 		var $thumb = getNthPageThumb(num);
 		var $img = $thumb.children("a.page-thumb").children("img");
+		console.log("$img", $img);
 		$img.attr("src", dataURL);
-		if (dataURL) {
-//			thumbnailDim = {width: $img.width(), height: $img.height()};
-		}
 	};
 
 	/* 1-indexed */
@@ -299,6 +306,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var init = function() {
 		console.log("Menu initing");
 
+
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
@@ -321,8 +329,15 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$current = $(this);
 		});
 
+		var darken_link = function($obj) {
+			$obj.addClass("current");
+			setTimeout(function() {
+				$obj.removeClass("current")
+			}, 150);
+		};
+
 		$("a.action").click(function() {
-			console.log("action called");
+			darken_link($(this));
 			editor.action($(this).attr('id'), {
 				name: $(this).attr('name')
 			});
@@ -341,6 +356,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(".view").click(function() {
+			darken_link($(this));
 			view($(this));
 		});
 

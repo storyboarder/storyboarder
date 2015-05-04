@@ -168,7 +168,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
 			});
 
-			document.dispatchEvent(new CustomEvent("thumbnail", {detail: {pageNum: currPageObj.pageNum, thumbnail: currPageObj.thumbnail}}));
+			triggerThumbEvent({pageNum: currPageObj.pageNum, thumbnail: currPageObj.thumbnail});
 			console.log(canvasState.getCanvas().__eventListeners);
 
 		},
@@ -210,7 +210,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			console.log("ADD PAGE");
 			numPages++;
 			canvasState.init_page(function() {
-				setCurrentPage(makePage(numPages, canvasState.getState(), ""));
+				setCurrentPage(makePage(numPages, canvasState.getState(), canvasState.getThumbnail()));
 				console.log(currPageObj);
 				toolset.reactivate();
 				$.post("/pages/add", getCurrentPageJSON(), function(response) {
@@ -221,7 +221,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 						params.callback(numPages);
 					}
 				});
+				triggerThumbEvent({pageNum: currPageObj.pageNum, thumbnail: currPageObj.thumbnail});
 			});
+
 		},
 		"AddPageTest": function(page) {
 			checkPage(page);
@@ -307,6 +309,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 //			console.log("parsed to ", pgObj.json);
 		}
 		currPageObj = pgObj;
+	};
+
+	var triggerThumbEvent = function(params) {
+		checkParams(params, ["pageNum", "thumbnail"]);
+		console.log(params);
+		document.dispatchEvent(new CustomEvent("thumbnail", {detail: {pageNum: params.pageNum, thumbnail: params.thumbnail}}));
 	};
 
 	var getCurrentPageJSON = function() {
@@ -537,6 +545,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	return {
 		init: init,
 		activate: activate,
+		getThumbDimensions: function() {
+			return {
+				width: canvasState.getThumbWidth(),
+				height: canvasState.getThumbHeight()
+			}
+		},
 		action: action,
 		setProperty: setProperty,
 		test: test
