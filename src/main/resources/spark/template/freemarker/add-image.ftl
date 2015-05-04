@@ -12,7 +12,7 @@
       <div class="ui right labeled field">
         <label>Upload by URL</label>
         <div class="ui right labeled input">
-          <input type="text" id="image-url" placeholder="" value="http://">
+          <input type="text" id="image-url" name="url" placeholder="" value="http://">
         </div>
       </div>
       <div class="ui right labeled field">
@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="ui button modalButton" id="AddImageButton" data-action="AddImage">
+    <div class="ui button modalButton" id="AddImageButton" data-action="AddURL">
       Add Image
     </div>
 

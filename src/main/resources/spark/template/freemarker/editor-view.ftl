@@ -81,7 +81,7 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="actionButton" id="AddImage" data-action="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
+          <a href="#" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
 

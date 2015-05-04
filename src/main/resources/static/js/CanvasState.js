@@ -492,7 +492,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 								console.log("results", result);
 								found.border = result[0];
-								that.deleteElement(result[0]);
+								canvas.remove(result[0]);
 								that.addElement(this.border, "textBorder");
 							}
 						}

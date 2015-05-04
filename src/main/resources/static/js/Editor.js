@@ -1,6 +1,10 @@
 define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], function(jsPDF, canvasState, toolset, snapUtil) {
 	var projectName;
-	var currPageObj; // stores current page object {pageNum: <>, json: <>, thumbnail: <>}
+	var currPageObj = {
+		pageNum: 0,
+		json: null,
+		thumbnail: null
+	};
 	var numPages;
 	var socket;
 	var editorObj = this;
@@ -78,6 +82,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				console.log("LOAD PROJ, params: ", params);
 				console.log(responseObject);
 				throwErrorIfApplicable(params);
+				currPageObj = responseObject;
 
 				setCurrentPage(responseObject.page);
 				projectName = params.projectName;
@@ -123,7 +128,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"GetPage": function(params) {
-			checkParams(params, ["pageNum"])
+			checkParams(params, ["pageNum"]);
 
 			$.post("/pages/get", {
 					pageNum: params.pageNum
@@ -201,7 +206,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"RemovePage": function(params) {
 			checkParams(params, ["pageNum"]);
-			console.log("EDITOR REMOVE PAGE", params.pageNum);
+			console.log("EDITOR REMOVE PAGE", params);
 			var that = this;
 			$.post("/pages/delete", {
 				pageNum: params.pageNum
@@ -238,13 +243,16 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			console.log("ADD PAGE");
 			numPages++;
 			var that = this;
+
 			canvasState.init_page(function() {
 				toolset.reactivate();
-				$.post("/pages/add", getCurrentPageJSON(), function(response) {
+				currPageObj = makePage(numPages, canvasState.getState(), canvasState.getThumbnail());
+				console.log("new page json : ", currPageObj);
+				$.post("/pages/add", currPageObj, function(response) {
 					console.log("add page called with num: " + numPages + " in project " + projectName);
 					//					console.log("response: ", JSON.parse(response));
 					console.log("add response : " + response);
-
+					
 					that.GetPage({
 						pageNum: currPageObj.pageNum
 					});

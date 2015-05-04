@@ -33,6 +33,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("new called");
 			$('.ui.modal.create-project').modal('show');
 		},
+		"GetPageByNum": function (pageNum) {
+			return $("#page-thumbs a.page-thumb").filter(function () {
+				return $(this).data("pageNum") == pageNum;
+			});
+		},
 		"AddPage": function(params) {
 			var idx = $("#page-thumbs").children(".page-thumb").length;
 			var $html = $makePageThumb(idx);
@@ -43,24 +48,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"RemovePage": function(results) {
 			console.log("menu REMOVE PAGE");
 			console.log($("#page-thumbs li:data(pageNum)"));
-			/*var idx = results.pageNum;
-			item.parent().remove();
+			$page = this.GetPageByNum(results.pageNum);
+			$page.parent().remove();
 			adjustPageThumbID();
-			var that = this;
-
-			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
-				that.UpdatePages(curr, num);
-				if (num == 0) {
-//					console.log("can't have 0 pages. Adding page...");
-					that.AddPage();
-				}
-			}});*/
 		},
 		"SetCurrentPage": function(pageNum) {
-			var $toActivate = $("#page-thumbs a.page-thumb").filter(function () {
-				return $(this).data("pageNum") == pageNum;
-			});
-			$toActivate.addClass("current");
+			$toActivate = this.GetPageByNum(pageNum).addClass("current");
 
 			if (typeof $currentPage != "undefined") {
 				$currentPage.removeClass("current");
@@ -109,10 +102,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	/* Aligns IDs of page thumbs to be {1, 2, 3...} corresponding to place in DOM */
 	var adjustPageThumbID = function() {
-		$thumbs = $("#page-thumbs").children(".page-thumb");
-		for (t = 0; t < $thumbs.length; t++) {
-			$thumbs.eq(t).attr("id", t + 1);
-		}
+		$thumbs = $("#page-thumbs li");
+		$thumbs.each(function (idx) {
+			$(this).find(":data(pageNum)").data("pageNum", idx + 1);
+		});
 	};
 
 	var $makePageThumb = function(i, dataURL) {
@@ -248,9 +241,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			inputs.each(function (input) {
 				var value = $(this).val();
 				value = $.isNumeric(value) ? parseFloat(value) : value;
-				params[$(this).attr("name")] = value;
+				if ($(this).attr("name")) params[$(this).attr("name")] = value;
 			});
 
+			console.log("modal params : ", params);
 			// Pass the object to the editor action
 			editor.action($(this).data('action'), params);
 
@@ -271,6 +265,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$(".submenu").click(function() {
 			$("." + $(this).attr("id").toLowerCase()).slideToggle();
 		});
+
+
 
 		$('#filepath').change(function(e) {
 			var reader = new FileReader();
@@ -363,7 +359,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$(editor).on("addedPage", function (e, results, params) {
 			views.AddPage(results, params);
-			console.log("what", results.currentPage);
 		});
 		$(editor).on("removedPage", function (e, results, params) {
 			views.RemovePage(results, params)
@@ -372,11 +367,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			views.MovePage(results, params)
 		});
 		$(editor).on("changedPage", function (e, results, params) {
-			console.log("changed page");
 			views.SetCurrentPage(results.pageNum);
 		});
 		$(editor).on("loadedProject", function (e, results, params) {
-			console.log("loaded project");
 			views.SetHeading({
 				title: results.name,
 				currentPage: 1,
@@ -389,11 +382,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$("#editor").css("visibility", "visible");
 		});
 		$(editor).on("createdProject", function (e, results) {
-			console.log("created project");
 			views.SetCurrentPage(1);
 			$("#editor").css("visibility", "visible");
 		});
 
+		$("#AddImage").click(function () {
+			$('.ui.modal.add-image').modal('show');
+		});
 
 		$("#NewProject").click(function () {
 			$('.ui.modal.create-project').modal('show');
