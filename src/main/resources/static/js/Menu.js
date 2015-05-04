@@ -38,20 +38,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			var $html = $makePageThumb(idx);
 			$("#page-thumbs").append($html);
 
-			console.log("results ", params);
 			this.SetHeading({currentPage: params.currentPage, numPages: params.numPages});
-			this.SetCurrentPage($html);
-		},
-		"GetPage": function(item) {
-			this.SetCurrentPage(item.parent());
-			var idx = parseInt(item.parent().attr("id"));
-			this.SetHeading({
-				currentPage: idx
-			});
-			console.log("menu getting page" + idx);
-			editor.action("GetPage", {
-				pageNum: idx
-			});
 		},
 		"RemovePage": function(results) {
 			console.log("menu REMOVE PAGE");
@@ -68,40 +55,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 					that.AddPage();
 				}
 			}});*/
-		},
-		"CreateProject": function(form) {
-			console.log("create project with name ", $("#project-name").val());
-			this.UpdatePages(0, 0);
-			$('.ui.modal.create-project').modal('hide');
-			width = parseInt($("#page-width").val());
-			height = parseInt($("#page-height").val());
-			this.SetPageDimensions(width, height);
-			$("#editor").css("visibility", "visible");
-			var that = this;
-
-			console.log("calling create");
-			console.log(editor.action);
-			editor.action("CreateProject", {
-				canvas: $("#canvas"),
-				width: parseInt($("#page-width").val()),
-				height: parseInt($("#page-height").val()),
-				pageMargin: parseInt($("#page-margin").val()),
-				panelMargin: parseInt($("#panel-margin").val()),
-				name: $("#project-name").val(),
-				callback: function(response) {
-					$("input[type='text'].action").each(function(e) {
-						set_value($(this));
-					});
-					$currPg = $makePageThumb(0);
-					$("#page-thumbs").append($currPg);
-					that.SetCurrentPage($currPg);
-					that.SetHeading({
-						title: response.name,
-						currentPage: 1,
-						numPages: 1
-					});
-				}
-			});
 		},
 		"SetCurrentPage": function(pageNum) {
 			var $toActivate = $("#page-thumbs a.page-thumb").filter(function () {
@@ -127,28 +80,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				$("#heading #numPages").html(params.numPages);
 			}
 		},
-		"LoadProject": function(item) {
-			var num = item.attr("id");
-			this.SetHeading({title: item[0].firstChild.textContent});
-			console.log("load project", item);
-			var that = this;
-			var result = editor.action("LoadProject", {
-				name: item[0].textContent,
-				callback: function(response) {
-					that.SetHeading({
-						title: response.title,
-						currentPage: 1,
-						numPages: response.numPages
-					});
-
-					that.UpdatePages(1, response.numPages);
-					that.SetPageDimensions(response.page.json.width, response.page.json.height);
-					that.SetThumbnails(response.numPages, response.thumbnails);
-				}
-			});
-			$("#editor").css("visibility", "visible");
-			$('.ui.modal.load-project').modal('hide');
-		},
 		"MovePage": function(start, end) {
 			console.log("reordering pages: " + start + " to " + end);
 			editor.action("MovePage", {
@@ -156,8 +87,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				newSpot: end
 			});
 			adjustPageThumbID();
-//	    getNthPageThumb(start).attr("id", start);
-//	    getNthPageThumb(end).attr("id", end);
 		},
 		"UpdateThumbnails": function() {
 			console.log("UPDATE THUMBNAILS");
@@ -434,6 +363,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$(editor).on("addedPage", function (e, results, params) {
 			views.AddPage(results, params);
+			console.log("what", results.currentPage);
 		});
 		$(editor).on("removedPage", function (e, results, params) {
 			views.RemovePage(results, params)
@@ -442,10 +372,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			views.MovePage(results, params)
 		});
 		$(editor).on("changedPage", function (e, results, params) {
+			console.log("changed page");
 			views.SetCurrentPage(results.pageNum);
 		});
 		$(editor).on("loadedProject", function (e, results, params) {
-			console.log("load proj`ect", results);
+			console.log("loaded project");
 			views.SetHeading({
 				title: results.name,
 				currentPage: 1,
@@ -458,6 +389,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$("#editor").css("visibility", "visible");
 		});
 		$(editor).on("createdProject", function (e, results) {
+			console.log("created project");
+			views.SetCurrentPage(1);
 			$("#editor").css("visibility", "visible");
 		});
 

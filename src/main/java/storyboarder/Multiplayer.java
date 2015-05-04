@@ -50,8 +50,9 @@ class Multiplayer extends WebSocketServer {
    */
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
-    System.out.println(conn.getRemoteSocketAddress().getAddress()
-        .getHostAddress() + " entered the room!");
+    // System.out.println(conn.getRemoteSocketAddress().getAddress()
+    // .getHostAddress()
+    // + " entered the room!");
   }
 
   /**
@@ -68,7 +69,7 @@ class Multiplayer extends WebSocketServer {
    */
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-    System.out.println(conn + " has left the room!");
+    // System.out.println(conn + " has left the room!");
   }
 
   /**
@@ -82,7 +83,7 @@ class Multiplayer extends WebSocketServer {
   @Override
   public void onMessage(WebSocket conn, String message) {
     sendToOthers(conn, message);
-    System.out.println(conn + ": " + message);
+    // System.out.println(conn + ": " + message);
   }
 
   /**
@@ -112,8 +113,9 @@ class Multiplayer extends WebSocketServer {
       for (WebSocket c : con) {
         if (!conn.equals(c)) {
           c.send(text);
+          System.out.println("Other: " + c);
         } else {
-          System.out.println("Do not send to self!");
+          System.out.println("Do not send to self: " + c);
         }
       }
     }

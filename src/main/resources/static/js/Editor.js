@@ -106,18 +106,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					name: projectName
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
-					setCurrentPage({
-						pageNum: 0,
-						json: "",
-						thumbnail: ""
-					});
 
-					projectName = response.name;
-					that.AddPage();
+					that.AddPage(params);
 					activate("Select");
-					if (typeof params.callback != "undefined") {
-						params.callback(response);
-					}
 
 					$(Editor).trigger("createdProject", [response, params]);
 				});
@@ -133,19 +124,18 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"])
+
 			$.post("/pages/get", {
 					pageNum: params.pageNum
 				},
 				function(response) {
 					var responseObject = JSON.parse(response);
-					//					console.log("get page called with page ", params, " Response: ", responseObject);
-
+					
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
 					canvasState.load_page("canvas", currPageObj.json, function() {
 						toolset.reactivate();
-						//						console.log("LOOK HERE THIS DA CANVAS", canvasState.getCanvas());
 					});
 
 					$(Editor).trigger("changedPage", [responseObject, params]);
@@ -164,7 +154,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			$.post("/pages/getAll", {}, function(responseJSON) {
 				responseObject = JSON.parse(responseJSON);
 				console.log("get all pages called, response: ", responseObject);
-				if (typeof params.callback != "undefined") {
+
+				if (typeof params.callback == "function") {
 					params.callback(responseObject);
 				}
 			});
@@ -210,7 +201,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"RemovePage": function(params) {
 			checkParams(params, ["pageNum"]);
-			console.log("EDITOR REMOVE PAGE");
+			console.log("EDITOR REMOVE PAGE", params.pageNum);
 			var that = this;
 			$.post("/pages/delete", {
 				pageNum: params.pageNum
@@ -246,14 +237,17 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		"AddPage": function(params) {
 			console.log("ADD PAGE");
 			numPages++;
+			var that = this;
 			canvasState.init_page(function() {
-				setCurrentPage(makePage(numPages, canvasState.getState(), ""));
-				console.log(currPageObj);
 				toolset.reactivate();
 				$.post("/pages/add", getCurrentPageJSON(), function(response) {
 					console.log("add page called with num: " + numPages + " in project " + projectName);
 					//					console.log("response: ", JSON.parse(response));
-					console.log(currPageObj.pageNum + "/" + numPages);
+					console.log("add response : " + response);
+
+					that.GetPage({
+						pageNum: currPageObj.pageNum
+					});
 
 					$(Editor).trigger("addedPage", [{
 						currentPage: currPageObj.pageNum,
@@ -301,7 +295,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				height: height
 			});
 
-			actions.GetAllPages(function(response) {
+			actions.GetAllPages({ callback: function(response) {
 				console.log("All pages response: ", response);
 
 				for (var i = 0; i < response.length; i++) {
@@ -318,7 +312,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}
 
 				pdf.save("download.pdf");
-			});
+			}});
 		},
 		"AddImage": function(params) {
 			console.log("image to be added ", params.img);
@@ -393,19 +387,19 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		console.log("INIT EDITOR");
 		canvasState.init("canvas");
 
-		$(Editor).on("addedPage", function(results, params) {
+		$(Editor).on("addedPage", function(e, results, params) {
 			actions.SendMulti($.extend({
 				action: "AddPage"
 			}, params));
 		});
 
-		$(Editor).on("removedPage", function(results, params) {
+		$(Editor).on("removedPage", function(e, results, params) {
 			actions.SendMulti($.extend({
 				action: "RemovePage"
 			}, params));
 		});
 
-		$(Editor).on("movedPage", function(results, params) {
+		$(Editor).on("movedPage", function(e, results, params) {
 			actions.SendMulti($.extend({
 				action: "MovePage"
 			}, params));

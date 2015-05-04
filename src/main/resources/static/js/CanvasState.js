@@ -294,7 +294,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		var circle = new fabric.Circle({
+		/*var circle = new fabric.Circle({
 			radius: 100,
 			fill: '#eef',
 			scaleY: 0.5,
@@ -314,7 +314,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			borderScaleFactor: 2
 		});
 		canvas.add(text);
-
+*/
 		CanvasState.initHistory();
 	};
 
