@@ -14,6 +14,9 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -22,9 +25,6 @@ import spark.Route;
 import spark.Spark;
 import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 
 /**
  * Hosts a GUI spark server.
@@ -210,14 +210,14 @@ final class GUI {
       String name = qm.value("name");
 
       switch (req.params(PARAM)) {
-      case "create":
-        return create(name, projects);
-      case "load":
-        return load(name, projects);
-      case "delete":
-        return delete(name, projects);
-      default:
-        return INVALID_PARAM_JSON;
+        case "create":
+          return create(name, projects);
+        case "load":
+          return load(name, projects);
+        case "delete":
+          return delete(name, projects);
+        default:
+          return INVALID_PARAM_JSON;
 
       }
     }
@@ -347,59 +347,60 @@ final class GUI {
       QueryParamsMap qm = req.queryMap();
       // Check for params that don't need a QueryParamsMap
       switch (req.params(PARAM)) {
-      case "getAll":
-        return getAll();
-      case "add": {
-        // Add needs json and thumbnail
-        Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
-        if (dataCheck.isPresent()) {
-          System.err.println(dataCheck.get());
-          return JsonMessages.makeError(dataCheck.get());
-        }
-
-        Page page = new Page(-1, qm.value("json"), qm.value("thumbnail"));
-
-        return add(page);
-      }
-      default:
-        // All other params need a pageNum
-        Optional<String> numCheck = checkParams(qm, "pageNum");
-        if (numCheck.isPresent()) {
-          System.err.println(numCheck.get());
-          return JsonMessages.makeError(numCheck.get());
-        }
-        int pageNum = GSON.fromJson(qm.value("pageNum"), Integer.class);
-
-        switch (req.params(PARAM)) {
-        case "get":
-          return get(pageNum);
-        case "move":
-          Optional<String> check = checkParams(qm, "newSpot");
-          if (check.isPresent()) {
-            System.err.println(check.get());
-            return JsonMessages.makeError(check.get());
-          }
-          int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
-          return move(pageNum, newSpot);
-        case "delete":
-          return delete(pageNum);
-        default:
-          // All other params need the whole page
+        case "getAll":
+          return getAll();
+        case "add": {
+          // Add needs json and thumbnail
           Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
           if (dataCheck.isPresent()) {
             System.err.println(dataCheck.get());
             return JsonMessages.makeError(dataCheck.get());
           }
 
-          Page page = new Page(pageNum, qm.value("json"), qm.value("thumbnail"));
+          Page page = new Page(-1, qm.value("json"), qm.value("thumbnail"));
+
+          return add(page);
+        }
+        default:
+          // All other params need a pageNum
+          Optional<String> numCheck = checkParams(qm, "pageNum");
+          if (numCheck.isPresent()) {
+            System.err.println(numCheck.get());
+            return JsonMessages.makeError(numCheck.get());
+          }
+          int pageNum = GSON.fromJson(qm.value("pageNum"), Integer.class);
 
           switch (req.params(PARAM)) {
-          case "save":
-            return save(page);
-          default:
-            return INVALID_PARAM_JSON;
+            case "get":
+              return get(pageNum);
+            case "move":
+              Optional<String> check = checkParams(qm, "newSpot");
+              if (check.isPresent()) {
+                System.err.println(check.get());
+                return JsonMessages.makeError(check.get());
+              }
+              int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
+              return move(pageNum, newSpot);
+            case "delete":
+              return delete(pageNum);
+            default:
+              // All other params need the whole page
+              Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
+              if (dataCheck.isPresent()) {
+                System.err.println(dataCheck.get());
+                return JsonMessages.makeError(dataCheck.get());
+              }
+
+              Page page = new Page(pageNum, qm.value("json"),
+                  qm.value("thumbnail"));
+
+              switch (req.params(PARAM)) {
+                case "save":
+                  return save(page);
+                default:
+                  return INVALID_PARAM_JSON;
+              }
           }
-        }
       }
     }
 
@@ -497,7 +498,7 @@ final class GUI {
      *         pages plus 1, or there is an error adding the page.
      */
     private Object add(Page page) {
-      if (project.addPage(page)) {
+      if (project.addPage(page.getJson(), page.getThumbnail())) {
         return JsonMessages.makeMessage("Successfully added page");
       } else {
         return JsonMessages.makeError("Failure adding page");

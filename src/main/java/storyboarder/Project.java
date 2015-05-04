@@ -121,7 +121,10 @@ class Project implements AutoCloseable {
    *           plus 1.
    */
   boolean addPage(Page page) {
-    page.setNum(getPageCount() + 1);
+    if (page.getNum() != getPageCount() + 1) {
+      throw new IndexOutOfBoundsException(
+          "The page's number must equal the page count plus 1");
+    }
     return queryer.execute(Projects.addPageSql(page));
   }
 
