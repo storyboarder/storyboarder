@@ -15,9 +15,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
 
-			var group = {
-				url: $("#image-url").val()
-			};
+			var group = { url: $("#image-url").val() };
 			editor.action("AddURL", group);
 		},
 		"Save": function() {
@@ -28,21 +26,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.action("Export");
 		},
 		"Load": function() {
-			// console.log("load called");
-			// $('.ui.modal.load-project').modal('show');
-			$('.ui.modal.load-project')
-				.modal('setting', 'closable', true)
-				.modal('show');
-
-			$("#project-choices").empty();
-			editor.action("GetChoices", function(choices) {
-				for (c in choices) {
-					$("#project-choices").append('<div class="item"><a id="' + c + '">' + choices[c] + '</a></div>');
-				}
-				$("#project-choices .item a").click(function() {
-					views["LoadProject"]($(this));
-				});
-			});
+			console.log("load called");
+			$('.ui.modal.load-project').modal('show');
 		},
 		"New": function() {
 			console.log("new called");
@@ -54,15 +39,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			var $html = $makePageThumb(idx);
 			$("#page-thumbs").append($html);
 			var that = this;
-			editor.action("AddPage", {
-				callback: function(numPages) {
-					that.SetHeading({
-						currentPage: numPages,
-						numPages: numPages
-					});
-					that.SetCurrentPage($html);
-				}
-			});
+			editor.action("AddPage", {callback: function(numPages) {
+				that.SetHeading({currentPage: numPages, numPages: numPages});
+				that.SetCurrentPage($html);
+			}});
 		},
 		"GetPage": function(item) {
 			this.SetCurrentPage(item.parent());
@@ -81,16 +61,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			item.parent().remove();
 			adjustPageThumbID();
 			var that = this;
-			editor.action("RemovePage", {
-				pageNum: idx,
-				callback: function(curr, num) {
-					that.UpdatePages(curr, num);
-					if (num == 0) {
-						//					console.log("can't have 0 pages. Adding page...");
-						that.AddPage();
-					}
+			editor.action("RemovePage", {pageNum: idx, callback: function(curr, num) {
+				that.UpdatePages(curr, num);
+				if (num == 0) {
+//					console.log("can't have 0 pages. Adding page...");
+					that.AddPage();
 				}
-			});
+			}});
 		},
 		"SetPageDimensions": function(w, h) {
 			$('#page').width(w);
@@ -145,8 +122,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 				currentPage: curr,
 				numPages: num
 			});
+
 			if ($("#page-thumbs").length > 0) {
-				this.SetCurrentPage(getNthPageThumb(curr));
+//				console.log($("#page-thumbs").children().first());
+//				console.log($("#page-thumbs").eq(curr - 1));
+				this.SetCurrentPage($("#page-thumbs").eq(curr - 1));
+//				this.SetCurrentPage($("#page-thumbs").children().first());
+//				console.log($currentPage);
 			}
 		},
 		"SetHeading": function(params) {
@@ -377,15 +359,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$('#filepath').change(function(e) {
 			var reader = new FileReader();
 			reader.onload = function(event) {
-				var imgObj = new Image();
-				imgObj.src = event.target.result;
-				imgObj.onload = function() {
-					var image = new fabric.Image(imgObj);
-					var group = {
-						img: image
-					};
+				new fabric.Image.fromURL(reader.result, function (img) {
+					var group = { img: img };
 					editor.action("AddImage", group);
-				}
+				});
 			}
 			reader.readAsDataURL(e.target.files[0]);
 		});
@@ -422,44 +399,47 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			}
 		});
 
-		$("#font-size").change(function(e) {
+		$("#font-size").change(function (e) {
 			$("#fsize").text($("#font-size").val());
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fontSize = $("#font-size").val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//active.adjustScale(active.left, active.top);
 			}
 		});
 
-		$("#font-color").change(function(e) {
+		$("#font-color").change(function (e) {
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fill = $("#font-color").val();
 				canvas.renderAll();
 			}
 		});
 
 		$("#font-family").change(function(e) {
+			console.log("from family", canvas);
 			var active = canvas.getActiveObject();
-			if (active && active.elmType === "rectext") {
+			if(active && active.elmType === "rectext") {
 				active.fontFamily = $('#font-family :selected').val();
 				canvas.renderAll();
-				active.adjustScale(active.left, active.top);
+				//ADJUST BORDER NEEDED
+				//adjustScale(active.left, active.top);
 			}
 		});
 
 		$('#drawing-color').change(function() {
-			console.log('color!');
 			canvas.freeDrawingBrush.color = $('#drawing-color').val();
 		});
 
 		$('#drawing-line-width').change(function() {
-			console.log('width!');
-			canvas.freeDrawingBrush.width = $('#drawing-line-width').val();
+			console.log("from drawing", canvas);
+			canvas.freeDrawingBrush.width = parseInt($('#drawing-line-width').val());
 		});
 
-		$("#page-thumbs").disableSelection();
+
+	    $( "#page-thumbs" ).disableSelection();
 
 		init_project();
 
@@ -471,7 +451,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		/* Update the page thumb when Editor sends a save thumbnail event. */
 		document.addEventListener("thumbnail", function(e) {
 			setPageThumb(e.detail.pageNum, e.detail.thumbnail);
-		})
+		});
 	};
 
 	return {

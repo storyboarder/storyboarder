@@ -1,10 +1,11 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	$(document).on('keydown', function(event) {
-		console.log("key pressed: ", event);
+		console.log("key pressed", event);
 		copyPasteHandler(event);
 	});
 	// Main canvas
 	var canvas;
+	var activeObj;
 	var canvasId = "canvas";
 	// Socket for multiplayer
 	var socket;
@@ -22,11 +23,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	var edgeDirections = ["left", "top", "right", "bottom"];
 
 	// Array of deltas in history
-	var history = [];
+	var history;
 	// Index indicating the current delta
-	var historyIdx = -1;
+	var historyIdx;
 	// Previous state of the canvas (in json)
-	var previousState = null;
+	var previousState;
 
 	//fiddle for copypaste http://jsfiddle.net/tkfGs/287/
 	var clipboard = {
@@ -34,40 +35,18 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		content: "empty"
 	}; //for copy paste
 
-	/*fabric.ImageData = fabric.util.createClass(fabric.Image, {
-		type: "imageData",
-
-		initialize: function(element, options) {
-			console.log("initing image data");
-			this.callSuper('initialize', element, options);
-		},
-
-		toObject: function() {
-			var canvas = fabric.util.createCanvasElement();
-			canvas.width = this.width;
-			canvas.height = this.height;
-
-			// Copy the image contents to the canvas
-			var ctx = canvas.getContext("2d");
-			ctx.drawImage(img, 0, 0, this.width, this.height);
-
-			// Get the data-URL formatted image
-			// Firefox supports PNG and JPEG. You could check img.src to
-			// guess the original format, but be aware the using "image/jpg"
-			// will re-encode the image.
-			var dataURL = canvas.toDataURL("image/png");
-
-			return fabric.util.object.extend(this.callSuper('toObject'), {
-				src: dataURL
+	// Stupid fucking fix
+	// but if you override fromObject and pass 
+	// undefined to loadImage it will load images from a URL
+	fabric.Image.fromObject = function(object, callback) {
+		fabric.util.loadImage(object.src, function(img) {
+			fabric.Image.prototype._initFilters.call(object, object, function(filters) {
+				object.filters = filters || [];
+				var instance = new fabric.Image(img, object);
+				callback && callback(instance);
 			});
-		}
-	});*/
-
-	/*fabric.ImageData.fromObject = function (object, callback) {
-		fabric.Image.fromURL(object.dataURL, function(img) {
-			callback && callback(img);
-		});
-	};*/
+		}, null, undefined);
+	};
 
 	// Adds and element to the canvas
 	// elmType could be (eg. panel, image etc.)
@@ -86,15 +65,16 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//Event handler for copy paste (callback for document.onkeydown)
 	var copyPasteHandler = function(event) {
-		console.log("key down: ", event);
 		var key;
 		if (window.event) {
 			key = window.event.keyCode;
 		} else {
 			key = event.keyCode;
 		}
-
 		switch (key) {
+			case 8:
+				event.preventDefault();
+				deleteActive();
 			case 67: // Ctrl+C
 				if (event.ctrlKey || event.metaKey) {
 					event.preventDefault();
@@ -122,104 +102,118 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	//paste object from cliboard
 	var paste = function(params) {
+		var offset = 20;
 		console.log("paste called, clipboard: ", clipboard);
 		if (clipboard.type == "group") {
 			var clonedObjects = [];
 			var groupObjects = clipboard.content.objects;
 			for (var i in groupObjects) {
-				var newObj = groupObjects[i].clone();
+				var newObj = groupObjects[i].clone(function(callbackRes) {
+					callbackRes.set({
+						left: callbackRes.left + offset,
+						top: callbackRes.top + offset
+					});
+					canvas.add(callbackRes);
+				});
 				clonedObjects[i] = newObj;
 			}
 			var clonedGroup = new fabric.Group(clonedObjects, {
-				left: clipboard.content.left + 20,
-				top: clipboard.content.top + 20
+				left: clipboard.content.left + offset,
+				top: clipboard.content.top + offset
 			});
 			//clipboard = makeClipboard("group", clonedGroup);
 			var destroyedGroup = clonedGroup.destroy();
 			var items = destroyedGroup.getObjects();
 			items.forEach(function(item) {
-				canvas.add(item);
+				if (item !== undefined) {
+					canvas.add(item);
+				}
 			});
 		} else if (clipboard.type == "single") {
 			console.log("copied object", clipboard.content);
-			var clonedObj = clipboard.content.clone();
-			console.log("cloned object", clonedObj);
-			clonedObj.set({
-				left: clonedObj.left + 5,
-				top: clonedObj.top + 5
+			var clonedObj = clipboard.content.clone(function(callbackRes) {
+				callbackRes.set({
+					left: callbackRes.left + offset,
+					top: callbackRes.top + offset
+				});
+				canvas.add(callbackRes);
 			});
-			clipboard = makeClipboard("single", clonedObj);
-			canvas.add(clonedObj);
+			if (clonedObj !== undefined) {
+				console.log("cloned object", clonedObj);
+				clonedObj.set({
+					left: clonedObj.left + offset,
+					top: clonedObj.top + offset
+				});
+				clipboard = makeClipboard("single", clonedObj);
+				canvas.add(clonedObj);
+			}
 		}
 		canvas.renderAll();
 	};
 
-	// Add image to canvas
-	var addImage = function(src) {
-		var img = new Image();
-		console.log(src);
-		img.src = src;
-		img.onload = function() {
-			alert(this.width + 'x' + this.height);
-			var canvas = fabric.util.createCanvasElement();
-			canvas.width = this.width;
-			canvas.height = this.height;
-
-			// Copy the image contents to the canvas
-			var ctx = canvas.getContext("2d");
-			ctx.drawImage(this, 0, 0, this.width, this.height);
-
-			// Get the data-URL formatted image
-			// Firefox supports PNG and JPEG. You could check img.src to
-			// guess the original format, but be aware the using "image/jpg"
-			// will re-encode the image.
-			var dataURL = canvas.toDataURL("image/png");
-
-			console.log("img width: ", img.width, " height: ", img.height);
-
-			var active = canvas.getActiveObject();
-
-			// Set position and scale
-			img.set({
-				left: 100,
-				top: 100,
-				scaleX: 0.2,
-				scaleY: 0.2
-			});
-
-			// Disable controls on image
-			img.setControlsVisibility({
-				mt: false,
-				mb: false,
-				ml: false,
-				mr: false
-			});
-
-			if (active && active.elmType === "panel") {
-				var panel = active;
-
-				img.clipTo = function(ctx) {
-					ctx.save();
-
-					ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
-					ctx.rect(
-						panel.left, panel.top, // Just x, y position starting from top left corner of canvas
-						panel.width, panel.height // Width and height of clipping rect
-					);
-
-					ctx.restore();
-				};
-
-				img.set({
-					left: panel.left + 15,
-					top: panel.top + 15
-				});
-			}
-
-			// Add image element to canvas
-			addElement(img, "image");
-			canvas.renderAll();
+	var deleteActive = function(key) {
+		if (canvas.getActiveGroup()) {
+			remove(canvas.getActiveGroup());
+			canvas.getActiveGroup().forEachObject(remove);
+			canvas.discardActiveGroup();
+		} else if (canvas.getActiveObject()) {
+			remove(canvas.getActiveObject())
 		}
+		canvas.renderAll();
+		canvas.trigger("change");
+
+		function remove(obj) {
+			if (obj.elmType !== 'panel' && obj.helper === undefined) {
+				canvas.remove(obj);
+			}
+		}
+	};
+
+	// Add image to canvas
+	var addImage = function(img) {
+		var active = canvas.getActiveObject();
+
+		// Set position and scale
+		img.set({
+			left: 100,
+			top: 100,
+			scaleX: 0.2,
+			scaleY: 0.2
+		});
+
+		// Disable controls on image
+		img.setControlsVisibility({
+			mt: false,
+			mb: false,
+			ml: false,
+			mr: false
+		});
+
+		if (active && active.elmType === "panel") {
+			var panel = active;
+
+			img.clipTo = function(ctx) {
+				ctx.save();
+
+				ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+				ctx.rect(
+					panel.left, panel.top, // Just x, y position starting from top left corner of canvas
+					panel.width, panel.height // Width and height of clipping rect
+				);
+
+				ctx.restore();
+			};
+
+			img.set({
+				left: panel.left + 15,
+				top: panel.top + 15
+			});
+		}
+
+		// Add image element to canvas
+		addElement(img, "image");
+		canvas.renderAll();
+		canvas.trigger("change");
 	};
 
 	// ---
@@ -339,18 +333,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			bottom: canvas.getHeight() - pageMargin
 		};
 		addPanel($.extend({}, pageEdges));
-		previousState = CanvasState.getState();
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-//		var circle = new fabric.Circle({
-//			radius: 100,
-//			fill: '#eef',
-//			scaleY: 0.5,
-//			originX: 'center',
-//			originY: 'center'
-//		});
-//		canvas.add(circle);
+
+		CanvasState.initHistory(); 
+
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -372,9 +360,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	var CanvasState = {
+		setActiveObj: function(obj) {
+			activeObj = obj;
+		},
+		getActiveObj: function() {
+			return activeObj;
+		},
+		initHistory: function() {
+			history = [];
+			historyIdx = -1;
+			previousState = CanvasState.getState();
+		},
 		storeState: function() {
 			var state = this.getState();
-			console.log("storing a new state...", state);
+			//console.log("storing a new state...", state);
 
 			var delta = jsondiffpatch.diff(state, previousState);
 			history[++historyIdx] = delta;
@@ -448,14 +447,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				return !obj.helper;
 			});
 
-//			console.log(state);
-
 			return JSON.stringify(state);
 		},
 		getThumbnail: function() {
 			var thumb_width = 120;
 
-			return canvas.toDataURL({multiplier: thumb_width / width});
+			return canvas.toDataURL({
+				multiplier: thumb_width / width
+			});
 		},
 		applyDeltaToState: function(delta) {
 			this.unlistenCanvas();
@@ -507,7 +506,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-//					console.log(canvas);
+					//					console.log(canvas);
 					if (typeof callback != "undefined") {
 						callback();
 					}
@@ -518,6 +517,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				console.log("loading canvas from json...", json);
+
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					/* for text: */

@@ -14,9 +14,6 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -25,6 +22,9 @@ import spark.Route;
 import spark.Spark;
 import spark.TemplateViewRoute;
 import spark.template.freemarker.FreeMarkerEngine;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 
 /**
  * Hosts a GUI spark server.
@@ -47,22 +47,22 @@ final class GUI {
    * The JSON error message returned whenever a request is made that does not
    * contain one of the possible arguments.
    */
-  private static final Object INVALID_PARAM_JSON =
-      JsonMessages.makeError("Invalid parameter in post request string!");
+  private static final Object INVALID_PARAM_JSON = JsonMessages
+          .makeError("Invalid parameter in post request string!");
 
   /**
    * The JSON error message returned when a project request is made before a
    * project is created or loaded.
    */
-  private static final Object NULL_PROJ_JSON =
-      JsonMessages.makeError("Need to initialize the project!");
+  private static final Object NULL_PROJ_JSON = JsonMessages
+          .makeError("Need to initialize the project!");
 
   /**
    * The JSON error message returned whenever a request is made that would or
    * did result in an IndexOutOfBounds error.
    */
-  private static final Object OUT_OF_BOUNDS_JSON =
-      JsonMessages.makeError("Index out of bounds!");
+  private static final Object OUT_OF_BOUNDS_JSON = JsonMessages
+          .makeError("Index out of bounds!");
 
   private static Project project;
 
@@ -91,9 +91,9 @@ final class GUI {
     @Override
     public Object handle(Request request, Response response) {
       MultipartConfigElement multipartConfigElement = new MultipartConfigElement(
-          "/tmp");
+              "/tmp");
       request.raw().setAttribute("org.eclipse.multipartConfig",
-          multipartConfigElement);
+              multipartConfigElement);
 
       try {
         Part filePart = request.raw().getPart("file");
@@ -150,7 +150,7 @@ final class GUI {
    *         required parameters.
    */
   private static Optional<String> checkParams(QueryParamsMap qm,
-      String... requiredParams) {
+          String... requiredParams) {
     for (String param : requiredParams) {
       if (qm.value(param) == null) {
         return Optional.of("Need a field: '" + param + "'");
@@ -182,7 +182,7 @@ final class GUI {
     @Override
     public Object handle(Request req, Response res) {
       System.out.println("\nProject action: " + req.params(PARAM)
-          + ", current proj: " + project);
+              + ", current proj: " + project);
       Map<String, Path> projects = Projects.getProjects();
 
       if (req.params(PARAM).equals("choices")) {
@@ -210,14 +210,14 @@ final class GUI {
       String name = qm.value("name");
 
       switch (req.params(PARAM)) {
-        case "create":
-          return create(name, projects);
-        case "load":
-          return load(name, projects);
-        case "delete":
-          return delete(name, projects);
-        default:
-          return INVALID_PARAM_JSON;
+      case "create":
+        return create(name, projects);
+      case "load":
+        return load(name, projects);
+      case "delete":
+        return delete(name, projects);
+      default:
+        return INVALID_PARAM_JSON;
 
       }
     }
@@ -258,7 +258,7 @@ final class GUI {
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
         return JsonMessages.makeError("Could not create project: "
-            + e.getMessage());
+                + e.getMessage());
       }
       return stringifyProject();
 
@@ -286,7 +286,7 @@ final class GUI {
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
         return JsonMessages.makeError("Could not load project: "
-            + e.getMessage());
+                + e.getMessage());
       }
     }
 
@@ -338,7 +338,7 @@ final class GUI {
     @Override
     public Object handle(Request req, Response res) {
       System.out.println("\nPage action: " + req.params(PARAM)
-          + ", current proj: " + project);
+              + ", current proj: " + project);
 
       if (project == null) {
         return NULL_PROJ_JSON;
@@ -346,51 +346,50 @@ final class GUI {
 
       // Check for params that don't need a QueryParamsMap
       switch (req.params(PARAM)) {
-        case "getAll":
-          return getAll();
-        default:
-          QueryParamsMap qm = req.queryMap();
-          // All other params need a pageNum
-          Optional<String> numCheck = checkParams(qm, "pageNum");
-          if (numCheck.isPresent()) {
-            System.err.println(numCheck.get());
-            return JsonMessages.makeError(numCheck.get());
+      case "getAll":
+        return getAll();
+      default:
+        QueryParamsMap qm = req.queryMap();
+        // All other params need a pageNum
+        Optional<String> numCheck = checkParams(qm, "pageNum");
+        if (numCheck.isPresent()) {
+          System.err.println(numCheck.get());
+          return JsonMessages.makeError(numCheck.get());
+        }
+        int pageNum = GSON.fromJson(qm.value("pageNum"), Integer.class);
+
+        switch (req.params(PARAM)) {
+        case "get":
+          return get(pageNum);
+        case "move":
+          Optional<String> check = checkParams(qm, "newSpot");
+          if (check.isPresent()) {
+            System.err.println(check.get());
+            return JsonMessages.makeError(check.get());
           }
-          int pageNum = GSON.fromJson(qm.value("pageNum"), Integer.class);
+          int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
+          return move(pageNum, newSpot);
+        case "delete":
+          return delete(pageNum);
+        default:
+          // All other params need the whole page
+          Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
+          if (dataCheck.isPresent()) {
+            System.err.println(dataCheck.get());
+            return JsonMessages.makeError(dataCheck.get());
+          }
+
+          Page page = new Page(pageNum, qm.value("json"), qm.value("thumbnail"));
 
           switch (req.params(PARAM)) {
-            case "get":
-              return get(pageNum);
-            case "move":
-              Optional<String> check = checkParams(qm, "newSpot");
-              if (check.isPresent()) {
-                System.err.println(check.get());
-                return JsonMessages.makeError(check.get());
-              }
-              int newSpot = GSON.fromJson(qm.value("newSpot"), Integer.class);
-              return move(pageNum, newSpot);
-            case "delete":
-              return delete(pageNum);
-            default:
-              // All other params need the whole page
-              Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
-              if (dataCheck.isPresent()) {
-                System.err.println(dataCheck.get());
-                return JsonMessages.makeError(dataCheck.get());
-              }
-
-              Page page = new Page(pageNum, qm.value("json"),
-                  qm.value("thumbnail"));
-
-              switch (req.params(PARAM)) {
-                case "save":
-                  return save(page);
-                case "add":
-                  return add(page);
-                default:
-                  return INVALID_PARAM_JSON;
-              }
+          case "save":
+            return save(page);
+          case "add":
+            return add(page);
+          default:
+            return INVALID_PARAM_JSON;
           }
+        }
       }
     }
 
@@ -405,7 +404,7 @@ final class GUI {
       List<Page> pages = project.getAllPages();
       if (pages.isEmpty()) {
         return JsonMessages
-            .makeError("Failure getting pages, or project is empty.");
+                .makeError("Failure getting pages, or project is empty.");
       }
       return GSON.toJson(pages);
     }
@@ -447,7 +446,7 @@ final class GUI {
       }
       if (project.savePage(page)) {
         return JsonMessages.makeMessage("Successfully saved page "
-            + page.getNum());
+                + page.getNum());
       } else {
         return JsonMessages.makeError("Failure saving page " + page.getNum());
       }
@@ -471,10 +470,10 @@ final class GUI {
 
       if (project.movePage(pageNum, newSpot)) {
         return JsonMessages.makeMessage("Successfully moved page " + pageNum
-            + " to " + newSpot);
+                + " to " + newSpot);
       } else {
         return JsonMessages.makeError("Failure moving page " + pageNum + " to "
-            + newSpot);
+                + newSpot);
       }
     }
 

@@ -105,10 +105,16 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	/* activate returns this (the tool) */
 	var activate = function() {
 		canvas = canvasState.getCanvas();
+		canvas.on("mouse:down", function(options) {
+			canvasState.setActiveObj(options.target);
+		});
+
+		console.log(canvasState);
 		snapPoint = snap.snapPoint;
 		minDim = canvasState.getPanelMargin() * 3;
 
 		console.log("select activated");
+
 		canvas.selection = true; // enable group selection
 
 		var selectable = {
@@ -122,7 +128,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				editable: false
 			},
 			"path": {
-				selectable: true
+				selectable: true,
+				hasRotatingPoint : false
 			},
 			"image": {
 				selectable: true
@@ -141,6 +148,14 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				// console.log(options);
 			} else if (selectable.hasOwnProperty(found.type)) { // just for paths
 				options = selectable[found.type];
+				if(found.type === "path") {
+					found.setControlsVisibility({
+						mt: false,
+						mb: false,
+						ml: false,
+						mr: false
+					});
+				}
 			} else {
 				console.log("unexpected type: " + found.elmType);
 				found.set({
@@ -294,17 +309,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
-
-		document.onkeydown = function(e) { // remove elements when delete is pressed
-			var key = e.keyCode;
-			var selected = canvas.getActiveObject();
-			if (key === 8 && selected) {
-				if (selected.elmType === 'rectext' || selected.elmType === "image") {
-					canvas.remove(selected);
-				}
-			}
-		};
-
 		return this;
 	};
 
@@ -325,6 +329,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
 		canvas.off("text:changed");
+		canvas.off("mouse:down");
 	};
 
 	return {
