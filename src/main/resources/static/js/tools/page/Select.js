@@ -4,6 +4,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	var canvas;
 	var snapPoint;
+	var minDim;
 
 	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
 		var opposite = canvasState.getOppositeDirection(dir);
@@ -28,7 +29,44 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		);
 	};
 
+	var checkOneDirection = function(dir, obj, newEdges, isOpposite) {
+		var opposite = canvasState.getOppositeDirection(dir); // ex. if dir is left, opposite is right
+		var oldEdges = obj.edges;
+		canvasState.mapElements(
+			function(found) {
+				if (found.elmType == "panel" &&
+					found != obj &&
+					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
+					var e = found;
+					var size = canvasState.getDimension(dir); // either "width" or "height"
+					var tmpEdges = {};
+					tmpEdges[isOpposite ? opposite : dir] = newEdges[dir];
+//					e.edges[isOpposite ? opposite : dir] = newEdges[dir];
+//					e[isOpposite ? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();
+					if (dir == "bottom" || dir == "right") {
+//						e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
+					} else {
+//						e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
+					}
+					if (e.width < minDim || e.height < minDim) {
+						return false;
+					}
+				}
+			}
+		);
+	};
+
 	var resizePanels = function(obj, newEdges) {
+		for (var n in newEdges) {
+			if (canvasState.contains(n, newEdges[n])) {
+				resizeOneDirection(n, obj, newEdges, true);
+				resizeOneDirection(n, obj, newEdges, false);
+			}
+		}
+	};
+
+	// Checks if resizing a panel is a valid operation
+	var checkPanels = function(obj, newEdges) {
 		for (var n in newEdges) {
 			if (canvasState.contains(n, newEdges[n])) {
 				resizeOneDirection(n, obj, newEdges, true);
@@ -60,6 +98,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		console.log(canvasState);
 		snapPoint = snap.snapPoint;
+		minDim = canvasState.getPanelMargin() * 3;
 
 		console.log("select activated");
 
@@ -114,7 +153,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			for (property in options) {
 				found.set(property, options[property]);
 			}
-
 		});
 
 		canvas.on('object:moving', function(options) {

@@ -12,6 +12,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	var width;
 	var height;
+	var thumb_width = 120;
+	var thumb_height;
 	var pageMargin;
 	var panelMargin;
 	// Edges of panel area (between pageMargin and panelMargin)
@@ -318,7 +320,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		// 	console.log("key down");
 		// 	copyPasteHandler(event);
 		// };
-		$canvas = $("#" + canvasId);
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
@@ -344,17 +345,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		// var circle = new fabric.Circle({
-		// 	radius: 100,
-		// 	fill: '#eef',
-		// 	scaleY: 0.5,
-		// 	originX: 'center',
-		// 	originY: 'center'
-		// });
-		// canvas.add(circle);
-
+		
 		CanvasState.initHistory(); 
-
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -365,6 +357,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 		width = w;
 		height = h;
+		thumb_height = (thumb_width / width) * height;
 		pageMargin = pageM;
 		panelMargin = panelM;
 		canvas.setDimensions({
@@ -473,9 +466,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				"helper", "elmType", "edges",
 				"lockMovementX", "lockMovementY",
 				"lockScalingX", "lockScalingY",
-				"selectable", "id", "oCoords",
-				"_controlsVisibility", "padding"
-
+				"selectable", "id",
+				"_controlsVisibility",
+				"hasRotatingPoint", "padding"
 			]), {
 				width: width,
 				height: height,
@@ -523,6 +516,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		},
 		getHeight: function() {
 			return canvas.height;
+		},
+		getThumbWidth: function() {
+			return thumb_width;
+		},
+		getThumbHeight: function() {
+			return thumb_height;
 		},
 		/* f is a filter function (takes in type/element pair, returns boolean),
 			m is a map function (modifies type/element pair) */

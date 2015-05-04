@@ -15,7 +15,7 @@ import sqlutil.ResultConverter;
  * @author yz38 *
  */
 class Page {
-  private final int pageNum;
+  private int pageNum;
   private final String json;
   private final String thumbnail;
 
@@ -42,6 +42,10 @@ class Page {
    */
   int getNum() {
     return pageNum;
+  }
+
+  void setNum(int pageNum) {
+    this.pageNum = pageNum;
   }
 
   /**

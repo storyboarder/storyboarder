@@ -10,7 +10,7 @@
     <div class="ui right labeled field">
       <label>Project Name</label>
       <div class="ui input">
-        <input type="text" id="project-name" value="Untitled">
+        <input type="text" id="project-name" name="projectName" value="Untitled">
       </div>
     </div>
 
@@ -18,7 +18,7 @@
       <div class="ui right labeled field">
         <label>Page Width</label>
         <div class="ui right labeled input">
-          <input type="text" id="page-width" placeholder="" value="400">
+          <input type="text" id="page-width" name="width" placeholder="" value="400">
           <div class="ui label">
             px
           </div>
@@ -27,7 +27,7 @@
       <div class="ui right labeled field">
         <label>Page Height</label>
         <div class="ui right labeled input">
-          <input type="text" id="page-height" placeholder="" value="600">
+          <input type="text" id="page-height" name="height" placeholder="" value="600">
           <div class="ui label">
             px
           </div>
@@ -39,7 +39,7 @@
       <div class="ui right labeled field">
         <label>Page Margin</label>
         <div class="ui right labeled input">
-          <input type="text" id="page-margin" placeholder="" value="10">
+          <input type="text" id="page-margin" name="pageMargin" placeholder="" value="10">
           <div class="ui label">
             px
           </div>
@@ -48,7 +48,7 @@
       <div class="ui right labeled field">
         <label>Panel Margin</label>
         <div class="ui right labeled input">
-          <input type="text" id="panel-margin" placeholder="" value="5">
+          <input type="text" id="panel-margin" name="panelMargin" placeholder="" value="5">
           <div class="ui label">
             px
           </div>
@@ -57,7 +57,7 @@
     </div>
   </div>
 
-  <div class="ui button view" id="CreateProject">
+  <div class="ui button modalButton" data-action="CreateProject" id="CreateProject">
     Create
   </div>
 

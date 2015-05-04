@@ -19,8 +19,7 @@ import sqlutil.SqlQueryer;
  */
 class Project implements AutoCloseable {
 
-  private static final String OUT_OF_BOUNDS_MSG =
-      "pageNum must be >= 1 and <= to the number of pages.";
+  private static final String OUT_OF_BOUNDS_MSG = "pageNum must be >= 1 and <= to the number of pages.";
 
   private final Path path;
 
@@ -107,8 +106,7 @@ class Project implements AutoCloseable {
    * @return True if the page was successfully added, false otherwise.
    */
   boolean addPage(String json, String thumbnail) {
-    Page newPage = new Page(getPageCount() + 1, json,
-        thumbnail);
+    Page newPage = new Page(getPageCount() + 1, json, thumbnail);
     return queryer.execute(Projects.addPageSql(newPage));
   }
 
@@ -123,10 +121,7 @@ class Project implements AutoCloseable {
    *           plus 1.
    */
   boolean addPage(Page page) {
-    if (page.getNum() != getPageCount() + 1) {
-      throw new IndexOutOfBoundsException(
-          "When adding, index must be pageCount + 1");
-    }
+    page.setNum(getPageCount() + 1);
     return queryer.execute(Projects.addPageSql(page));
   }
 

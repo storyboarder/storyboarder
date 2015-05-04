@@ -5,7 +5,7 @@
 
         </ul>
         <li class="page-thumb">
-          <a href="#" class="new-page view" id="AddPage" href="#"><i class="fa fa-x fa-plus"></i></a>
+          <a href="#" class="new-page actionButton" id="AddPage" data-action="AddPage" href="#"><i class="fa fa-x fa-plus"></i></a>
         </li>
       <!--<a href="#" class="add-page-button"><i class="fa fa-x fa-plus"></i></a>/-->
       </div>
@@ -36,9 +36,9 @@
           <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
           <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
           <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
-          <a href="#" class="action" id="Undo" data-action="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
+          <a href="#" class="actionButton" id="Undo" data-action="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
           <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
-          <a href="#" class="action" id="Redo" data-action="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
+          <a href="#" class="actionButton" id="Redo" data-action="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
 
             <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
@@ -81,7 +81,7 @@
       <div class="toolset">
         <div class="title">Image</div>
         <div class="tools">
-          <a href="#" class="view" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
+          <a href="#" id="AddImage" data-content="Add Image"><i class="icon-drawing-image"></i></a>
 
           <a href="#" class="tool submenu" id="Draw" data-content="Paint Brush"><i class="fa fa-x fa-paint-brush"></i></a>
 
@@ -133,10 +133,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="view" id="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
-          <a href="#" class="view" id="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
-          <a href="#" class="view" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
-          <a href="#" class="view" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
+          <a href="#" class="actionButton" id="Save" data-action="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="actionButton" id="Export" data-action="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
+          <a href="#" class="actionButton" id="Load" data-action="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
+          <a href="#" class="actionButton" id="New" data-action="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
         </div>
       </div>
     </div>
