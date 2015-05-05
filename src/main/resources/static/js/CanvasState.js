@@ -367,7 +367,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		};
 		addPanel($.extend({}, pageEdges));
 
-//		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
+		//		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		if (typeof callback !== "undefined") {
 			callback();
 		}
