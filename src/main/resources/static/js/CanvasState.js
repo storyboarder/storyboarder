@@ -2,11 +2,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	var listenKeyboard = false;
 	$(document).on('keydown', function(event) {
-		console.log("key pressed:", event.keyCode, "Preventing defaults:", listenKeyboard);
+		console.log("key pressed:", event.keyCode, "Preventing defaults for special keys:", listenKeyboard);
 		if (listenKeyboard) {
 			copyPasteHandler(event);
 		}
 	});
+
+	$(document).on('focus', "input[type=text]", function () {
+		listenKeyboard = false;
+	});
+
+	$(document).on('blur', "input[type=text]", function () {
+		listenKeyboard = true;
+	});
+
 	// Main canvas
 	var canvas;
 	var activeObj;
@@ -81,26 +90,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				deleteActive();
 			case 67: // C
 				modifierEvent(copy);
-				// if (event.ctrlKey || event.metaKey) { //Ctrl or Cmnd
-				// 	event.preventDefault();
-				// 	copy();
-				// }
 				break;
 			case 86: // V
 				modifierEvent(paste);
-				// if (event.ctrlKey || event.metaKey) { //Ctrl or Cmnd
-				// 	event.preventDefault();
-				// 	paste();
-				// }
 				break;
 			case 83: //S
 				modifierEvent(function() {
 					canvas.trigger("change")
 				});
-				// if (event.ctrlKey || event.metaKey) { //Ctrl or Cmnd
-				// 	event.preventDefault();
-				// 	canvas.trigger("change");
-				// }
 				break;
 		}
 
