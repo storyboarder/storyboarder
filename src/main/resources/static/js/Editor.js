@@ -1,4 +1,5 @@
 define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], function(jsPDF, canvasState, toolset, snapUtil) {
+
 	// Project name
 	var projectName;
 	// Total number of pages
@@ -133,23 +134,24 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			checkParams(params, ["pageNum"]);
 			// console.log(params);
 
-			$.post("/pages/get", {pageNum: params.pageNum}, function(response) {
+			$.post("/pages/get", {
+				pageNum: params.pageNum
+			}, function(response) {
 
-					var responseObject = JSON.parse(response);
+				var responseObject = JSON.parse(response);
 
-					// console.log("get page called with:", params, "resonse:", responseObject);
-					throwErrorIfApplicable(responseObject);
+				// console.log("get page called with:", params, "resonse:", responseObject);
+				throwErrorIfApplicable(responseObject);
 
-					setCurrentPage(responseObject);
-//					console.log(currentPage.json);
-					canvasState.load_page("canvas", currentPage.json, function() {
-						toolset.reactivate();
-					});
+				setCurrentPage(responseObject);
+				//					console.log(currentPage.json);
+				canvasState.load_page("canvas", currentPage.json, function() {
+					toolset.reactivate();
+				});
 
-					$(Editor).trigger("changedPage", [responseObject, params]);
-					return responseObject;
-				}
-			);
+				$(Editor).trigger("changedPage", [responseObject, params]);
+				return responseObject;
+			});
 		},
 		"DeleteProj": function(params) {
 			checkParams(params, ["name"]);
@@ -293,20 +295,22 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				height: height
 			});
 
-			actions.GetAllPages({ callback: function(response) {
+			actions.GetAllPages({
+				callback: function(response) {
 
-				for (var i = 0; i < response.length; i++) {
-					var page = response[i].json;
-					dummyCanvas.loadFromJSON(JSON.parse(page), dummyCanvas.renderAll.bind(dummyCanvas));
-					var img = dummyCanvas.toDataURL('png');
+					for (var i = 0; i < response.length; i++) {
+						var page = response[i].json;
+						dummyCanvas.loadFromJSON(JSON.parse(page), dummyCanvas.renderAll.bind(dummyCanvas));
+						var img = dummyCanvas.toDataURL('png');
 
-					pdf.addImage(img, 'PNG', 0, 0);
+						pdf.addImage(img, 'PNG', 0, 0);
 
-					if (i + 1 < response.length) pdf.addPage();
+						if (i + 1 < response.length) pdf.addPage();
+					}
+
+					pdf.save("download.pdf");
 				}
-
-				pdf.save("download.pdf");
-			}});
+			});
 		},
 		"AddImage": function(params) {
 			canvasState.addImage(params.img);
@@ -334,7 +338,12 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 
 	var triggerThumbEvent = function(params) {
 		checkParams(params, ["pageNum", "thumbnail"]);
-		document.dispatchEvent(new CustomEvent("thumbnail", {detail: {pageNum: params.pageNum, thumbnail: params.thumbnail}}));
+		document.dispatchEvent(new CustomEvent("thumbnail", {
+			detail: {
+				pageNum: params.pageNum,
+				thumbnail: params.thumbnail
+			}
+		}));
 	};
 
 	var getCurrentPageJSON = function() {
@@ -378,6 +387,41 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			throw "Editor should not need to be initialized more than once.";
 		}
 		canvasState.init("canvas");
+
+		$(document).on('keydown', function(event) {
+			switch (event.keyCode) {
+				case 27: //esc
+					action("LoadProject", {
+						projectName: projectName
+					});
+					break;
+				case 90: //Z
+					modifierEvent(function() {
+						console.log("undo shortcut");
+						action("Undo", {
+							projectName: projectName,
+							currentPage: currentPage.pageNum
+						});
+					});
+					break;
+				case 82: //R
+					modifierEvent(function() {
+						console.log("redo shortcut");
+						action("Redo", {
+							projectName: projectName,
+							currentPage: currentPage.pageNum
+						});
+					})
+
+			}
+
+			function modifierEvent(callback) {
+				if (event.ctrlKey || event.metaKey) { //Ctrl or Cmnd
+					event.preventDefault();
+					callback();
+				}
+			}
+		});
 
 		$(Editor).on("addedPage", function(e, results, params) {
 			actions.SendMulti($.extend({
@@ -588,7 +632,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		action: action,
 		setProperty: setProperty,
-		get: function (prop) {
+		get: function(prop) {
 			switch (prop) {
 				case "projectName":
 					return projectName;
