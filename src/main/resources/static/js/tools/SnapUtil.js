@@ -140,7 +140,8 @@ define(["../CanvasState"], function(canvasState) {
 				var line = new fabric.Line(
 					[0, begin + h * i, width, begin + h * i], {
 						stroke: this.color,
-						selectable: false
+						selectable: false,
+						helper: true
 					}
 				);
 				canvas.add(line);
@@ -153,7 +154,8 @@ define(["../CanvasState"], function(canvasState) {
 				var line = new fabric.Line(
 					[begin + w * j, 0, begin + w * j, height], {
 						stroke: this.color,
-						selectable: false
+						selectable: false,
+						helper: true
 					}
 				);
 				canvas.add(line);
