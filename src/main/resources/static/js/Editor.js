@@ -317,10 +317,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			canvasState.addImage(params.img);
 		},
 		"AddURL": function(params) {
-			console.log("adding url");
 			if (params.url && params.url != "http://") {
 
 				fabric.Image.fromURL(params.url, function(img) {
+					console.log("adding url");
 					var group = {
 						img: img
 					};

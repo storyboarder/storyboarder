@@ -53,6 +53,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var removePage = function (pageNum) {
+		console.log("removing page ", pageNum);
 		$page = getPageByNum(pageNum);
 		$page.parent().remove();
 		updateThumbnailIDs();
@@ -83,6 +84,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var updateThumbnailIDs = function() {
 		$thumbs = $("#page-thumbs li");
 		$thumbs.each(function (idx) {
+			console.log( $(this).find(":data(pageNum)") );
 			$(this).find(":data(pageNum)").data("pageNum", idx + 1);
 		});
 	};
@@ -332,16 +334,17 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$("#page-thumbs").disableSelection();
 
 		$(".next-page").click(function() {
-			var nextItem = $("#page-thumbs .page-thumb.current").next(".page-thumb");
-			if (nextItem.length != 0) {
-				getPage(nextItem.children("a"));
+			var nextPageNum = editor.get("currentPage").pageNum + 1;
+			console.log("clicked next page", nextPageNum);
+			if (nextPageNum <= editor.get("numPages")) {
+				editor.action("GetPage", { pageNum: nextPageNum });
 			}
 		});
 
 		$(".previous-page").click(function() {
-			var prevItem = $("#page-thumbs .page-thumb.current").prev(".page-thumb");
-			if (prevItem.length != 0) {
-				getPage(prevItem.children("a"));
+			var prevPageNum = editor.get("currentPage").pageNum - 1;
+			if (prevPageNum > 0) {
+				editor.action("GetPage", { pageNum: prevPageNum });
 			}
 		});
 
