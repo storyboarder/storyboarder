@@ -95,7 +95,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	/* activate returns this (the tool) */
 	var activate = function() {
-		console.log("panelselect");
+		// console.log("panelselect");
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
@@ -109,7 +109,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvasState.mapElements(function(found) { // map
 			if (found.elmType == "panel") {
-				console.log(found);
+				// console.log(found);
 				found.set({
 					selectable: true,
 					lockScalingX: false,
@@ -222,7 +222,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	};
 
 	var deactivate = function() {
-		console.log("select deactivated");
+		// console.log("select deactivated");
 		canvas.selection = false; // disable group selection
 		canvas.deactivateAll();
 		canvasState.mapElements(

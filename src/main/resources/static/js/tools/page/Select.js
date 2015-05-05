@@ -89,6 +89,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
+		canvas.on('object:modified', function () {
+			canvas.trigger("change");
+		});
+
 		return this;
 	};
 
@@ -108,6 +112,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
+		canvas.off("object:modified");
 		canvas.off("text:changed");
 		canvas.off("mouse:down");
 	};

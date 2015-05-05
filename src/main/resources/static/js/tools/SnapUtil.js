@@ -300,21 +300,26 @@ define(["../CanvasState"], function(canvasState) {
 		},
 		snapObj: function(target) {
 			if (target.elmType != "panel") {
+				var padding = target.padding ? target.padding : 0;
+				var tmpDim = {
+						width: target.scaleX * target.width,
+						height: target.scaleY * target.height
+				};
 				var borders = this.snapBorders({
-					left: target.left,
-					right: target.left + target.width,
-					top: target.top,
-					bottom: target.top + target.height,
+					left: target.left - padding,
+					right: target.left + tmpDim.width + padding,
+					top: target.top - padding,
+					bottom: target.top + tmpDim.height + padding
 				});
 
 				for (b in borders) {
 					if (typeof borders[b] != "undefined") {
 						if (b in target) {
-							target[b] = borders[b];
+							target[b] = borders[b] + padding;
 						} else {
 							var dim = canvasState.getDimension(b);
 							var opposite = canvasState.getOppositeDirection(b);
-							target[opposite] = borders[b] - target[dim];
+							target[opposite] = borders[b] - tmpDim[dim] - padding;
 						}
 					}
 				}

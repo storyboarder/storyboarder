@@ -34,8 +34,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.on('mouse:down', function(coor) {
 			console.log("mouse down");
 			selected = coor.target;
-			canvasState.setActiveObj(selected);
 
+			if (selected && selected.active) {
+				canvasState.setActiveObj(selected);
+			}
+			
 		}); // mouse:down
 
 		canvas.on('mouse:up', function(coor) {

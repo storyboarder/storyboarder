@@ -1,0 +1,16 @@
+DEMO_DAY_PREP
+=============
+
+Let's all introduce ourselves
+
+Goals of the project
+	for storyboarding (planning out) comics
+	our aim was to make the storyboarding process quicker and more efficient
+
+Division of labor
+	Nellie - panel tools, snap to grid, project/page management in UI
+	Yidan - image and text tools
+	Kostas - undo/redo, multiuser, project/page management
+	Filip - backend (database interaction), clipboard
+
+
