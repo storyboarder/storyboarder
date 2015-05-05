@@ -228,23 +228,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		});
 
 		if (active && active.elmType === "panel") {
-			var panel = active;
-
-			img.clipTo = function(ctx) {
-				ctx.save();
-
-				ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
-				ctx.rect(
-					panel.left + 1, panel.top + 1, // Just x, y position starting from top left corner of canvas
-					panel.width - 1, panel.height - 1 // Width and height of clipping rect
-				);
-
-				ctx.restore();
-			};
-
+			
+			img.clipTo = clipTo(active);
 			img.set({
-				left: panel.left + 15,
-				top: panel.top + 15
+				left: active.left + 15,
+				top: active.top + 15,
+				id : active.id
 			});
 		}
 
@@ -288,7 +277,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			lockMovementY: true,
 			lockScalingX: true,
 			lockScalingY: true,
-			hasRotatingPoint: false //,
+			hasRotatingPoint: false,
+			id : newId()
 		});
 		panel.edges = edges;
 		setControls(panel);
@@ -419,8 +409,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 	}
 
+	var newId = function() {
+		var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+		var id = randLetter + Date.now();
+		return id;
+	}
+
+	var clipTo = function(panel) {
+		return function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(panel.left + 1, panel.top + 1, panel.width - 1, panel.height - 1);ctx.restore();};
+	}
+
 
 	var CanvasState = {
+		newId : newId,
+		clipTo : clipTo,
 		copyPasteHandler : function(event) {
 			copyPasteHandler(event);
 		},
@@ -434,7 +436,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					strokeWidth: 1,
 				});
 			}
-			
+
 			activeObj = obj;
 
 			if (obj && obj.elmType === "panel") {
@@ -537,8 +539,35 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			});
 
 			// reformat is for text
-			var reformat = JSON.stringify(state);
+			//var reformat = JSON.stringify(state);
 
+			// removing cliptTo for paths and images
+/*			var objectJson = JSON.parse(JSON.stringify(state));
+
+			console.log("OBJECT JSON", objectJson);
+
+			objectJson.objects.map(function(found) {
+				console.log("YEEEPP");
+				if(found.type === "path" || found.elmType === "image") {
+					console.log("HERE", found);
+					found.clipTo = null;
+					console.log("THERE", found);
+				}
+			});
+
+			console.log("JSON AGAIN", objectJson);
+
+/*			//remove property1 property
+			delete objectJson.property1;
+
+			console.log("OBJECT JSON", objectJson);
+			//add property2 property
+			delete objectJson.property2;*/
+
+			// stringify the object again*/
+			//var reformat = JSON.stringify(objectJson);
+
+			var reformat = JSON.stringify(state);
 			reformat = reformat.replace(/(?:\\n)/g, function(match) {
 				return "\\" + match;
 			});
@@ -602,6 +631,20 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			init_page(function() {
 //				console.log("loading from json: ", json);
 				canvas.loadFromJSON(json, function() {
+					var results = canvas.getObjects().filter(function(found) {
+						return found.type === "path" || found.elmType === "image";
+					});
+					
+					for(obj in results) {
+						that.mapElements(
+							function(found) {
+								if (found.elmType === "panel" && found.id === results[obj].id) {
+									results[obj].clipTo = that.clipTo(found);
+								}
+							}
+						);
+					}
+
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
 					//					console.log(canvas);

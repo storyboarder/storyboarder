@@ -51,8 +51,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder" && selected.elmType != "text") &&
 					typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
 
-					var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-					var id = randLetter + Date.now();
+					var id = canvasState.newId();
 
 					var newText = new fabric.IText('Text', {
 						fontFamily: fontFamily,
