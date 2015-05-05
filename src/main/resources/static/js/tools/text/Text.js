@@ -1,9 +1,10 @@
 //TODO check bug where sometimes text isn't editable (possibly b/c of above/below layers)
 
-define(["../../CanvasState"], function(canvasState) {
+define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var fontFamily;
 	var fill;
 	var canvas;
+	var border;
 
 	var activate = function() {
 		var finalPos;
@@ -16,7 +17,7 @@ define(["../../CanvasState"], function(canvasState) {
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) {
-				if (found.elmType === "rectext") {
+				if (found.elmType === "rectext" || found.elmType === "text") {
 					found.set({
 						selectable: true,
 						editable: true
@@ -70,24 +71,28 @@ define(["../../CanvasState"], function(canvasState) {
 						ml: false
 					});
 
-					var newBorder = new fabric.Rect({
-						left: newText.left - newText.padding,
-						top: newText.top - newText.padding,
-						width: newText.width + (newText.padding * newText.scaleX * 2),
-						height: newText.height + (newText.padding * newText.scaleY * 2),
-						fill: "rgba(0, 0, 0, 0)", // transparent
-						stroke: "black",
-						strokeWeight: 2,
-						hasRotatingPoint: false,
-						id: id,
-						hasControls: false,
-						selectable: false
-					});
+					if(border) {
+						console.log("IN BORDER");
+						var newBorder = new fabric.Rect({
+							left: newText.left - newText.padding,
+							top: newText.top - newText.padding,
+							width: newText.width + (newText.padding * newText.scaleX * 2),
+							height: newText.height + (newText.padding * newText.scaleY * 2),
+							fill: "rgba(0, 0, 0, 0)", // transparent
+							stroke: "black",
+							strokeWeight: 2,
+							hasRotatingPoint: false,
+							id: id,
+							hasControls: false,
+							selectable: false
+						});
 
-
-					canvasState.addElement(newBorder, "textBorder");
-					canvasState.addElement(newText, 'rectext');
-					canvasState.adjustBorder(newText);
+						canvasState.addElement(newBorder, "textBorder");
+						canvasState.addElement(newText, 'rectext');
+						canvasState.adjustBorder(newText);
+					} else {
+						canvasState.addElement(newText, "text");
+					}
 
 					canvas.trigger("change");
 				}
@@ -109,7 +114,9 @@ define(["../../CanvasState"], function(canvasState) {
 		});
 
 		canvas.on("text:changed", function(e) {
-			canvasState.adjustBorder(selected);
+			if (selected.elmType === "rectext") {
+				canvasState.adjustBorder(selected);
+			}
 		});
 
 		canvas.on("text:editing:entered", function() {
@@ -123,7 +130,9 @@ define(["../../CanvasState"], function(canvasState) {
 
 		canvas.on("object:moving", function(e) {
 			var selected = e.target;
-			if (selected.elmType == "rectext") {
+			if(snap.isSnapActive() && (selected.elmType === "rectext" || selected.elmType === "text")) {
+				snap.snapObj(selected);
+			} else if (selected.elmType == "rectext") {
 				canvasState.adjustBorder(selected);
 			}
 		});
@@ -143,20 +152,59 @@ define(["../../CanvasState"], function(canvasState) {
 
 	var change = function(property, value) {
 		var canvas = canvasState.getCanvas();
-		var active = canvas.getActiveObject();
+		var active = canvasState.getActiveObject();
 
 		if (property === "fill") {
 			fill = value;
 		} else if (property === "fontFamily") {
 			fontFamily = value;
+		} else if (property === "border") {
+			border = value;
+			console.log("HEREEEEE", border);
+			console.log("ACTIVE", active);
 		}
 
 		if (active && active.elmType === "rectext") {
-			active[property] = value;
-			canvas.renderAll();
-			canvasState.adjustBorder(active);
-			// color creates too many changes, maybe just not have this triggered
-			// canvas.trigger("change");
+			if(property != "border") {
+				active[property] = value;
+				canvas.renderAll();
+				canvasState.adjustBorder(active);
+			} else {
+				console.log("HELLO BORDER");
+				var borderArr = canvas._objects.filter(function(found) {
+					return found.id === active.id && found.elmType === "textBorder";
+				});
+
+				if(border && borderArr.length === 0) { // add border if not already
+
+					console.log("making border");
+					var newBorder = new fabric.Rect({
+						left: active.left - active.padding,
+						top: active.top - active.padding,
+						width: active.width + (active.padding * active.scaleX * 2),
+						height: active.height + (active.padding * active.scaleY * 2),
+						fill: "rgba(0, 0, 0, 0)",
+						stroke: "black",
+						strokeWeight: 2,
+						hasRotatingPoint: false,
+						id: active.id,
+						hasControls: false,
+						selectable: false
+					});
+
+					canvasState.deleteElement(active);
+					canvasState.addElement(newBorder, "textBorder");
+					canvasState.addElement(active, "rectext");
+
+				} else if(!border && borderArr.length > 0){ // delete border
+					canvasState.deleteElement(borderArr[0]);
+					canvasState.deleteElement(active);
+					canvasState.addElement(active, "text");
+				}
+				
+				canvas.renderAll();
+				canvas.trigger("change");
+			}
 		}
 
 	};

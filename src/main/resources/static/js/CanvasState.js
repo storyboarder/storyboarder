@@ -171,6 +171,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas.trigger("change");
 	};
 
+	var deleteElement = function(obj) {
+		canvas.remove(obj);
+	}
+
 	var deleteActive = function(key) {
 		if (canvas.getActiveGroup()) {
 			remove(canvas.getActiveGroup());
@@ -530,13 +534,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 			// reformat is for text
 			var reformat = JSON.stringify(state);
-/*			console.log("PREVIOUS STATE", reformat);
+			// console.log("PREVIOUS STATE", reformat);
 
 			reformat = reformat.replace(/(?:\\n)/g, function(match) {
 				return "\\" + match;
 			});
-*/
-//			console.log("REFORMATED STATE", reformat);
 
 			return reformat;
 		},
@@ -623,6 +625,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		init_page: init_page,
 		init_project: init_project,
 		addElement: addElement,
+		deleteElement: deleteElement,
 		setPageMargin: function(p) {
 			pageMargin = p;
 		},

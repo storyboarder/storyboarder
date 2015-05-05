@@ -74,7 +74,7 @@
           <a href="#" class="tool submenu" data-content="Fill" id="Fill"><i class="fa fa-x fa-bitbucket"></i></a>
           <div class="fill" style="display:none">
               <label for="fill-color">Fill color:</label>
-              <input type="color" value="#005E7A" id="fill-color"><br>
+              <input type="color" value="#005E7A" id="fill-color" style="margin: 10px 0px"><br>
           </div>  
         </div>
       </div>
@@ -91,7 +91,7 @@
               <label for="drawing-line-width">Line width:</label>
               <input type="range" value="10" min="1" max="150" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
-              <input type="color" value="#005E7A" id="drawing-color"><br>
+              <input type="color" value="#005E7A" id="drawing-color" style="margin-top: 5px; margin-bottom:10px"><br>
           </div>
             
         </div>
@@ -101,14 +101,9 @@
         <div class="title">Text</div>
         <div class="tools">
 		      <a href="#" class="tool submenu" id="Text" data-content="Add Text"><i class="icon-drawing-text-sans"></i></a>
-         
-          <!--<div id="None">No border</div>
-          <div id="Rectangle">Rectangle</div>
-          <div id="Ellipse">Ellipse</div>/-->
-
 
           <div class="text" style="display:none">  
-             <select id="font-family">
+             <select id="font-family" style="margin: 10px 0px">
                 <option value="arial">Arial</option>
                 <option value="comic sans ms">Comic Sans</option>
                 <option value="courier">Courier</option>
@@ -118,15 +113,12 @@
                 <option value="myriad pro">Myriad Pro</option>
                 <option value="times new roman" selected>Times New Roman</option>
                 <option value="verdana">Verdana</option>
-              </select><br>
-              
-              <!--<label for="font-size">Font size: </label><span id="fsize">10</span>
-              <input type="range" value="10" min="0" max="100" id="font-size"><br>/-->
-              <label for="font-color">Font color:</label>
-              <input type="color" value="#000000" id="font-color"><br>
-          </div>  
+              </select>
+              <br>
 
-          <!--<br>Borders: <input type="radio" name="text-borders" id="rectangle"/> rectangle <input type="radio" name="text-borders" id="none" checked="true"/> none/-->
+              <input type="color" value="#000000" id="font-color" style="margin-bottom: 10px; margin-top: 5px">
+              <input type="checkbox" id="border" style="margin: 0px 0px 8px 15px"><label for="border"> Border</label><br>
+          </div>  
 
         </div>
       </div>
