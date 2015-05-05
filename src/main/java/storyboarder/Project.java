@@ -19,7 +19,8 @@ import sqlutil.SqlQueryer;
  */
 class Project implements AutoCloseable {
 
-  private static final String OUT_OF_BOUNDS_MSG = "pageNum must be >= 1 and <= to the number of pages.";
+  private static final String OUT_OF_BOUNDS_MSG =
+      "pageNum must be >= 1 and <= to the number of pages.";
 
   private final Path path;
 
