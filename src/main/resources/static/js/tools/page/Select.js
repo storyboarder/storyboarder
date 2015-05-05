@@ -70,6 +70,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.on('object:moving', function(options) {
 			if(snap.isSnapActive()) {
 				snap.snapObj(options.target);
+			} else {
+				if(options.target.elmType === "rectext") {
+					canvasState.adjustBorder(options.target);
+				}
 			}
 		});
 
