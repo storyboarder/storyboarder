@@ -114,7 +114,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
 
-					console.log(response);
+					// console.log(response);
 					that.AddPage(params);
 					activate("Select");
 
@@ -132,13 +132,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"]);
-			console.log(params);
+			// console.log(params);
 
 			$.post("/pages/get", params, function(response) {
 
 					var responseObject = JSON.parse(response);
 
-					console.log("get page called with:", params, "resonse:", responseObject);
+					// console.log("get page called with:", params, "resonse:", responseObject);
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
@@ -310,6 +310,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			canvasState.addImage(params.img);
 		},
 		"AddURL": function(params) {
+			console.log("adding url");
 			if (params.url && params.url != "http://") {
 
 				fabric.Image.fromURL(params.url, function(img) {

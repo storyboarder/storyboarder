@@ -192,6 +192,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$(editor).on("createdProject", function (e, results) {
 			// Removes old thumbnails
+			// setPageDimensions($("#page-width").val(), $("#page-height").val());
+
 			setThumbnails([]);
 			setCurrentPage(1);
 			$("#editor").css("visibility", "visible");
@@ -215,10 +217,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		/* Toolbar init */
 		$(".tools a").popup({
 			padding: "4px",
-		});
-
-		$("#CreateProject").click(function() {
-			setPageDimensions($("#page-width").val(), $("#page-height").val());
 		});
 
 		$('.ui.checkbox').checkbox();

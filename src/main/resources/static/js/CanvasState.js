@@ -205,7 +205,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	// Add image to canvas
 	var addImage = function(img, active) {
-		console.log("HEREEEEEE", active);
 		// Set position and scale
 		img.set({
 			left: 100,
