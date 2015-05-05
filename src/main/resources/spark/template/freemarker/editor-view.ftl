@@ -43,7 +43,7 @@
 
             <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
             <label>Snap to grid</label><br>
-            
+
             <div class="gridsnap" style="display:none">
               <div class="ui mini input">
                     <label>Spacing</label><input type="text" class="action" data-action="SetSnap" id="gridSpacing" name="gridSnap" value="40">
@@ -65,6 +65,7 @@
       <div class="toolset">
         <div class="title">Panel</div>
         <div class="tools">
+          <a href="#" class="tool" id="PanelSelect" data-content="Panel Select"><i class="icon-drawing-appbarcursordefaultoutline"></i></a>
           <!--<a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>/-->
           <a href="#" class="tool" id="Split" data-content="Split"><i class="icon-drawing-tiles-plus"></i></a>
           <!--<a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>/-->
