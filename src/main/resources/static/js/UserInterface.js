@@ -52,6 +52,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var removePage = function (pageNum) {
+		console.log("removing page ", pageNum);
 		$page = getPageByNum(pageNum);
 		$page.parent().remove();
 		updateThumbnailIDs();
@@ -81,6 +82,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var updateThumbnailIDs = function() {
 		$thumbs = $("#page-thumbs li");
 		$thumbs.each(function (idx) {
+			console.log( $(this).find(":data(pageNum)") );
 			$(this).find(":data(pageNum)").data("pageNum", idx + 1);
 		});
 	};
