@@ -8,13 +8,13 @@
 
   <div class="ui form">
 
-    <div class="two fields">
+   <!-- <div class="two fields">
       <div class="ui right labeled field">
         <label>Upload by URL</label>
         <div class="ui right labeled input">
           <input type="text" id="image-url" name="url" placeholder="" value="http://">
         </div>
-      </div>
+      </div>/-->
       <div class="ui right labeled field">
         <label>Upload by file</label>
         <div class="ui right labeled input">
@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-
+	<br>
     <div class="ui button modalButton" id="AddImageButton" data-action="AddURL">
       Add Image
     </div>
