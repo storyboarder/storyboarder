@@ -199,7 +199,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var init = function() {
 		console.log("Menu initing");
 
-
 		$(document).keydown(function(e) {
 			if (e.keyCode == 8 && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
 				e.preventDefault();
@@ -235,11 +234,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(document).on("click", ".actionButton", function() {
-			//editor.action($(this).data('action'), $(this).data());
 			if ($(this).data('action') in views) {
 				views[$(this).data('action')]($(this).data());
 			} else {
-				throw "TODO";
+				editor.action($(this).data('action'), $(this).data());
+				//throw "TODO";
 			}
 		});
 

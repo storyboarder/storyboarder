@@ -16,7 +16,7 @@ define(["../../CanvasState"], function(canvasState) {
 		// nothing should be moving
 		canvasState.mapElements(
 			function(found) {
-				if (found.elmType === "rectext") { 
+				if (found.elmType === "rectext") {
 					found.set({
 						selectable: true,
 						editable: true
@@ -31,6 +31,7 @@ define(["../../CanvasState"], function(canvasState) {
 		);
 
 		canvas.on('mouse:down', function(coor) {
+			console.log("mouse down");
 			selected = coor.target;
 		}); // mouse:down
 
@@ -56,34 +57,34 @@ define(["../../CanvasState"], function(canvasState) {
 						padding: 3,
 						width: 5,
 						height: 5,
-						id : id,
-						transparentCorners : true,
-				    	lockRotation : true,
-				    	hasRotatingPoint : false
+						id: id,
+						transparentCorners: true,
+						lockRotation: true,
+						hasRotatingPoint: false
 					});
 
-				    newText.setControlsVisibility({
-				    	mt: false,
-				    	mb: false,
-				    	mr: false,
-				    	ml: false
-				    });
+					newText.setControlsVisibility({
+						mt: false,
+						mb: false,
+						mr: false,
+						ml: false
+					});
 
 					var newBorder = new fabric.Rect({
-				        left: newText.left - newText.padding,
-				        top: newText.top - newText.padding,
-				        width: newText.width + (newText.padding * newText.scaleX * 2),
-				        height: newText.height + (newText.padding * newText.scaleY * 2),
-				        fill: "rgba(0, 0, 0, 0)", // transparent
-				        stroke: "black",
-				        strokeWeight: 2,
-				        hasRotatingPoint: false,
-				        id : id,
-				        hasControls : false,
-				        selectable : false
-				 	});
+						left: newText.left - newText.padding,
+						top: newText.top - newText.padding,
+						width: newText.width + (newText.padding * newText.scaleX * 2),
+						height: newText.height + (newText.padding * newText.scaleY * 2),
+						fill: "rgba(0, 0, 0, 0)", // transparent
+						stroke: "black",
+						strokeWeight: 2,
+						hasRotatingPoint: false,
+						id: id,
+						hasControls: false,
+						selectable: false
+					});
 
-				 	
+
 					canvasState.addElement(newBorder, "textBorder");
 					canvasState.addElement(newText, 'rectext');
 					canvasState.adjustBorder(newText);
@@ -111,9 +112,14 @@ define(["../../CanvasState"], function(canvasState) {
 			canvasState.adjustBorder(selected);
 		});
 
+		canvas.on("text:editing:entered", function() {
+			canvasState.turnOffKeyListener();
+		});
+
 		canvas.on("text:editing:exited", function(e) {
+			canvasState.turnOnKeyListener();
 			canvas.trigger("change");
-		})
+		});
 
 		canvas.on("object:moving", function(e) {
 			var selected = e.target;
@@ -139,13 +145,13 @@ define(["../../CanvasState"], function(canvasState) {
 		var canvas = canvasState.getCanvas();
 		var active = canvas.getActiveObject();
 
-		if(property === "fill") {
+		if (property === "fill") {
 			fill = value;
-		} else if(property === "fontFamily") {
+		} else if (property === "fontFamily") {
 			fontFamily = value;
 		}
 
-		if(active && active.elmType === "rectext") {
+		if (active && active.elmType === "rectext") {
 			active[property] = value;
 			canvas.renderAll();
 			canvasState.adjustBorder(active);
@@ -159,7 +165,7 @@ define(["../../CanvasState"], function(canvasState) {
 		name: "Text",
 		activate: activate,
 		deactivate: deactivate,
-		set: function (property, value) {
+		set: function(property, value) {
 			change(property, value);
 		}
 	};
