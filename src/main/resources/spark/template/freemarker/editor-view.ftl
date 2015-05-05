@@ -86,7 +86,7 @@
           <!--<a href="#" class="tool" data-content="Eyedropper"><i class="fa fa-x fa-eyedropper"></i></a>/-->
           <div class="draw" style="display:none">
               <label for="drawing-line-width">Line width:</label>
-              <input type="range" value="10" min="1" max="150" id="drawing-line-width"><br>
+              <input type="range" value="10" min="1" max="50" id="drawing-line-width"><br>
               <label for="drawing-color">Line color:</label>
               <input type="color" value="#005E7A" id="drawing-color" style="margin-top: 5px; margin-bottom:10px"><br>
           </div>
