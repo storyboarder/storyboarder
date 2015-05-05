@@ -132,12 +132,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			checkParams(params, ["pageNum"]);
 			console.log(params);
 
-			$.post("/pages/get", {
-					pageNum: params.pageNum
-				},
-				function(response) {
+			$.post("/pages/get", params, function(response) {
+
 					var responseObject = JSON.parse(response);
 
+					console.log("get page called with:", params, "resonse:", responseObject);
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
@@ -250,7 +249,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				toolset.reactivate();
 				currPageObj = makePage(numPages, canvasState.getState(), canvasState.getThumbnail());
 				console.log("new page json : ", currPageObj);
-				$.post("/pages/add", currPageObj, function(response) {
+				$.post("/pages/add", getCurrentPageJSON(), function(response) {
 //					console.log("add page called with num: " + numPages + " in project " + projectName);
 					//					console.log("response: ", JSON.parse(response));
 					console.log("add response : " + response);

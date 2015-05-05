@@ -344,24 +344,13 @@ final class GUI {
         return NULL_PROJ_JSON;
       }
 
-      QueryParamsMap qm = req.queryMap();
       // Check for params that don't need a QueryParamsMap
       switch (req.params(PARAM)) {
         case "getAll":
           return getAll();
-        case "add": {
-          // Add needs json and thumbnail
-          Optional<String> dataCheck = checkParams(qm, "json", "thumbnail");
-          if (dataCheck.isPresent()) {
-            System.err.println(dataCheck.get());
-            return JsonMessages.makeError(dataCheck.get());
-          }
-
-          Page page = new Page(-1, qm.value("json"), qm.value("thumbnail"));
-
-          return add(page);
-        }
         default:
+          QueryParamsMap qm = req.queryMap();
+
           // All other params need a pageNum
           Optional<String> numCheck = checkParams(qm, "pageNum");
           if (numCheck.isPresent()) {
@@ -397,6 +386,8 @@ final class GUI {
               switch (req.params(PARAM)) {
                 case "save":
                   return save(page);
+                case "add":
+                  return add(page);
                 default:
                   return INVALID_PARAM_JSON;
               }
