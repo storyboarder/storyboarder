@@ -1,99 +1,7 @@
-//TODO: fix bug with resizing panels outside of valid page area
-
 define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	var canvas;
 	var snapPoint;
-	var minDim;
-
-	var resizeOneDirection = function(dir, obj, newEdges, isOpposite) {
-		var opposite = canvasState.getOppositeDirection(dir);
-		var oldEdges = obj.edges;
-		canvasState.mapElements(
-			function(found) {
-				if (found.elmType == "panel" &&
-					found != obj &&
-					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
-					var e = found;
-					var size = canvasState.getDimension(dir);
-					e.edges[isOpposite ? opposite : dir] = newEdges[dir];
-					e[isOpposite ? opposite : dir] = newEdges[dir] + canvasState.getPanelMargin();
-					if (dir == "bottom" || dir == "right") {
-						e[size] = e.edges[dir] - e.edges[opposite] - 2 * canvasState.getPanelMargin();
-					} else {
-						e[size] = e.edges[opposite] - e.edges[dir] - 2 * canvasState.getPanelMargin();
-					}
-					found.setCoords();
-				}
-			}
-		);
-	};
-
-	var checkOneDirection = function(dir, obj, newEdges, isOpposite) {
-		var opposite = canvasState.getOppositeDirection(dir); // ex. if dir is left, opposite is right
-		var oldEdges = obj.edges;
-		var checkOK = true;
-		canvasState.mapElements(
-			function(found) {
-				if (found.elmType == "panel" &&
-					found != obj &&
-					(found.edges[isOpposite ? opposite : dir] == oldEdges[dir]) && !!newEdges[dir]) {
-					var e = found;
-					var size = canvasState.getDimension(dir); // either "width" or "height"
-					tmpEdge = newEdges[dir];
-					if (isOpposite && Math.abs(newEdges[dir] - found.edges[dir]) < minDim) {
-						checkOK = false;
-					} else if (!isOpposite && Math.abs(newEdges[dir] - found.edges[opposite]) < minDim) {
-						checkOK = false;
-					}
-				}
-			}
-		);
-		return checkOK;
-	};
-
-	var resizePanels = function(obj, newEdges) {
-		for (var n in newEdges) {
-			if (canvasState.contains(n, newEdges[n])) {
-				resizeOneDirection(n, obj, newEdges, true);
-				resizeOneDirection(n, obj, newEdges, false);
-			}
-		}
-	};
-
-	// Checks if resizing a panel is a valid operation
-	var checkPanels = function(obj, newEdges) {
-		var resizeOK = true;
-		for (var n in newEdges) {
-			if (canvasState.contains(n, newEdges[n])) {
-				if (!checkOneDirection(n, obj, newEdges, true) ||
-					!checkOneDirection(n, obj, newEdges, false)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	};
-
-	var checkCurrentPanel = function(target) {
-		panelMargin = canvasState.getPanelMargin();
-		if (!target.active) {
-			target.scaleX = 1;
-			target.scaleY = 1;
-			target.left = target.edges.left + panelMargin;
-			target.top = target.edges.top + panelMargin;
-			return false;
-		}
-		if (!(target.left + minDim < target.left + target.scaleX * target.width)) {
-			target.scaleX = 1;
-			return false;
-		}
-		if (!(target.top + minDim < target.top + target.scaleY * target.height)) {
-			target.scaleY = 1;
-			return false;
-		}
-		return true;
-  }
 
 	/* activate returns this (the tool) */
 	var activate = function() {
@@ -117,7 +25,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		});
 
 		snapPoint = snap.snapPoint;
-		minDim = canvasState.getPanelMargin() * 4;
 
 		console.log("select activated");
 
@@ -125,9 +32,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		var selectable = {
 			"panel": {
-				selectable: true,
-				lockScalingX: false,
-				lockScalingY: false
+				selectable: false
 			},
 			"rectext": {
 				selectable: true,
@@ -205,98 +110,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			target = options.target;
 			if (target.elmType == "rectext") {
 				canvasState.adjustBorder(target);
-			}
-
-			if (target.elmType == "panel") {
-				var panelMargin = canvasState.getPanelMargin();
-
-				if (!checkCurrentPanel(target)) {
-					canvas.deactivateAll().renderAll();
-					return;
-				}
-				options.target.width *= options.target.scaleX;
-				options.target.scaleX = 1;
-				options.target.height *= options.target.scaleY;
-				options.target.scaleY = 1;
-
-				var corner = target.__corner;
-				var obj = target;
-				var newEdges = {};
-				if (snap.isSnapActive()) {
-					if (corner.indexOf('l') >= 0) {
-						newEdges.left = snap.snapPoint({
-							x: obj.left - panelMargin
-						}).x;
-						obj.left = newEdges.left + panelMargin;
-						obj.width = obj.edges.right - obj.left - panelMargin;
-					}
-					if (corner.indexOf('t') >= 0) {
-						newEdges.top = snap.snapPoint({
-							y: obj.top - panelMargin
-						}).y;
-						obj.top = newEdges.top + panelMargin;
-						obj.height = obj.edges.bottom - obj.top - panelMargin;
-					}
-					if (corner.indexOf('r') >= 0) {
-						newEdges.right = snap.snapPoint({
-							x: obj.width + obj.left + panelMargin
-						}).x;
-						obj.width = newEdges.right - obj.left - panelMargin;
-					}
-					if (corner.indexOf('b') >= 0) {
-						newEdges.bottom = snap.snapPoint({
-							y: obj.height + obj.top + panelMargin
-						}).y;
-						obj.height = newEdges.bottom - obj.top - panelMargin;
-					}
-				} else {
-					if (corner.indexOf('l') >= 0) {
-						newEdges.left = obj.left - panelMargin;
-					}
-					if (corner.indexOf('t') >= 0) {
-						newEdges.top = obj.top - panelMargin;
-					}
-					if (corner.indexOf('r') >= 0) {
-						newEdges.right = obj.width + obj.left + panelMargin;
-					}
-					if (corner.indexOf('b') >= 0) {
-						newEdges.bottom = obj.height + obj.top + panelMargin;
-					}
-				}
-				if (!checkPanels(target, newEdges)) {
-					canvas.deactivateAll();
-					return;
-				}
-				resizePanels(obj, newEdges);
-				obj.edges = {
-					left: newEdges.left || obj.edges.left,
-					top: newEdges.top || obj.edges.top,
-					right: newEdges.right || obj.edges.right,
-					bottom: newEdges.bottom || obj.edges.bottom,
-				};
-			} else {
-				if (snap.isSnapActive()) {
-					control = target.__corner;
-					var borders = snap.snapBorders({
-						left: target.left,
-						right: target.left + target.width,
-						top: target.top,
-						bottom: target.top + target.height,
-					}, control);
-					for (b in borders) {
-						if (typeof borders[b] != 'undefined' && (typeof control == 'undefined' || control.indexOf(b.charAt(0)) >= 0)) {
-							var dim = canvasState.getDimension(b);
-							var opposite = canvasState.getOppositeDirection(b);
-							if (b in target) {
-								target[dim] = target[b] + target[dim] - borders[b];
-								target[b] = borders[b];
-							} else {
-								target[dim] = borders[b] - target[opposite];
-								target[opposite] = borders[b] - target[dim];
-							}
-						}
-					}
-				}
 			}
 		});
 

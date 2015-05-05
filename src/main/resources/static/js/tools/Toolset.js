@@ -7,6 +7,7 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
+		"PanelSelect": require("./panel/PanelSelect"),
 		"Text": require("./text/Text"),
 		"Draw": require("./image/Draw"),
 		"Fill": require("./image/Fill")

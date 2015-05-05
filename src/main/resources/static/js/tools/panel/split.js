@@ -98,6 +98,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 		canvasState.mapElements(function(e) {
 			if (e.elmType == "panel") {
 				e.set({ selectable: true });
+			} else {
+				e.set({ selectable: false });
 			}
 		});
 
@@ -109,9 +111,21 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 
 		// Split direction
 		var direction = "vertical";
+		var target;
+
 		canvas.on("mouse:move", function(options) {
 			// Continue only if the item has edges and there is a target
-			if (!options.target || !options.target.edges) return;
+			console.log(options);
+			var pt = new fabric.Point(options.e.offsetX, options.e.offsetY);
+			console.log(pt);
+			canvasState.mapElements(function (e) {
+				if (e.elmType == "panel" && e.containsPoint(pt)) {
+					target = e;
+					console.log(target);
+				}
+			});
+			console.log(target);
+			if (!target || !target.edges) return;
 
 			canvas.deactivateAll();
 
@@ -138,14 +152,15 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 			}
 			
 			// Show preview line
-			previewDivide(direction, options.target.edges, pos);
+			previewDivide(direction, target.edges, pos);
 		});
 
-		canvas.on("object:selected", function(options) {
+		canvas.on("mouse:down", function(options) {
+			console.log(target);
 			// Continue only if the item has edges and there is a target
-			if (!options.target || !options.target.edges) return;
+			if (!target || !target.edges) return;
 			// Edges of target panel
-			var panelEdges = options.target.edges;
+			var panelEdges = target.edges;
 
 			// Find point to snap to
 			var point = snapUtil.snapPoint({
@@ -171,7 +186,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 			}
 
 			// Divide panels and trigger chagne event
-			divide(direction, options.target, pos);
+			divide(direction, target, pos);
 			canvas.deactivateAll();
 			canvas.trigger("change");
 		});
@@ -186,7 +201,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 		canvas.remove(previewDivideLine);
 		// Deactivate event listeners
 		canvas.off("mouse:move");
-		canvas.off("object:selected");
+		canvas.off("mouse:down");
 	};
 
 
