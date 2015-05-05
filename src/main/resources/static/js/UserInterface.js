@@ -3,7 +3,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var $current; //HTML element of current tool
 	var thumbnailDim; // {width: <number>, height: <number>}
 
-
 	var loadProject = function (closable) {
 		$('.ui.modal.load-project')
 			.modal('setting', 'closable', closable)
@@ -218,6 +217,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			padding: "4px",
 		});
 
+		$("#CreateProject").click(function() {
+			setPageDimensions($("#page-width").val(), $("#page-height").val());
+		});
+
 		$('.ui.checkbox').checkbox();
 
 		$("a.tool").click(function() {
@@ -260,6 +263,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 			// Close the modal
 			$(this).closest(".modal").modal('hide');
+			editor.action("EnableKeyListener", {});
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {
@@ -275,7 +279,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$(".submenu").click(function() {
 			$("." + $(this).attr("id").toLowerCase()).slideToggle();
 		});
-
 
 		$('#filepath').change(function(e) {
 			var reader = new FileReader();

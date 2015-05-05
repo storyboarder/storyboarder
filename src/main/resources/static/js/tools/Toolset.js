@@ -7,6 +7,7 @@ define(function(require) {
 		"Split": require("./panel/Split"),
 		"Join": require("./panel/Join"),
 		"Select": require("./page/Select"),
+		"PanelSelect": require("./panel/PanelSelect"),
 		"Text": require("./text/Text"),
 		"Draw": require("./image/Draw"),
 		"Fill": require("./image/Fill")
@@ -16,7 +17,10 @@ define(function(require) {
 	var activate = function(toolname) {
 		if (toolname in toolset) {
 			// Deactivate previously activated tool
-			if (currentTool) toolset[currentTool].deactivate();
+			if (currentTool) {
+				toolset[currentTool].deactivate();
+				$("." + currentTool.toLowerCase()).slideToggle();
+			}
 			
 			// Activate the tool with toolname
 			// and update current tool

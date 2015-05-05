@@ -6,7 +6,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	// Current page object
 	var currentPage = {
 		pageNum: 0,
-		json: null,
+		json: {},
 		thumbnail: null
 	};
 	// Socket for multiplayer
@@ -83,6 +83,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				// console.log("LOAD PROJ, params: ", params);
 				// console.log(responseObject);
 				throwErrorIfApplicable(params);
+
 				currentPage = responseObject;
 
 				setCurrentPage(responseObject.page);
@@ -113,6 +114,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
 
+					console.log(response);
 					that.AddPage(params);
 					activate("Select");
 
@@ -130,13 +132,13 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"]);
+			console.log(params);
 
-			$.post("/pages/get", {
-					pageNum: params.pageNum
-				},
-				function(response) {
+			$.post("/pages/get", params, function(response) {
+
 					var responseObject = JSON.parse(response);
-					
+
+					console.log("get page called with:", params, "resonse:", responseObject);
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
@@ -177,9 +179,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				thumbnail: canvasState.getThumbnail()
 			}); //TODO save thumbnail
 
-			$.post("/pages/save", getCurrentPageJSON(), function(response) {
-				// console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
-			});
+			$.post("/pages/save", getCurrentPageJSON(), function(response) {});
 
 			$(Editor).trigger("savedPage", [{
 				pageNum: currentPage.pageNum,
@@ -320,6 +320,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				});
 			}
 		},
+		"DisableKeyListener": function() {
+			$(document).off('keydown');
+		},
+		"EnableKeyListener" : function() {
+			$(document).on('keydown', function(event) {
+				console.log("key pressed", event);
+				canvasState.copyPasteHandler(event);
+			});
+		}
 	};
 
 	var setCurrentPage = function(pgObj) {
