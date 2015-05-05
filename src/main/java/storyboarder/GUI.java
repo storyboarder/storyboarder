@@ -134,7 +134,7 @@ final class GUI {
     if (pages.size() > 0) {
       data.put("page", pages.get(0));
     }
-    System.out.println("current project: " + project + ", data: " + data);
+    // System.out.println("current project: " + project + ", data: " + data);
     return GSON.toJson(data);
   }
 
@@ -181,8 +181,8 @@ final class GUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      System.out.println("\nProject action: " + req.params(PARAM)
-          + ", current proj: " + project);
+      // System.out.println("\nProject action: " + req.params(PARAM)
+      // + ", current proj: " + project);
       Map<String, Path> projects = Projects.getProjects();
 
       if (req.params(PARAM).equals("choices")) {
@@ -337,8 +337,8 @@ final class GUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      System.out.println("\nPage action: " + req.params(PARAM)
-          + ", current proj: " + project);
+      // System.out.println("\nPage action: " + req.params(PARAM)
+      // + ", current proj: " + project);
 
       if (project == null) {
         return NULL_PROJ_JSON;

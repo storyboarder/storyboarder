@@ -1,8 +1,9 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	$(document).on('keydown', function(event) {
-		console.log("key pressed", event);
+		// console.log("key pressed", event);
 		copyPasteHandler(event);
 	});
+	
 	// Main canvas
 	var canvas;
 	var activeObj;
@@ -97,13 +98,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		} else if (canvas.getActiveObject()) {
 			clipboard = makeClipboard("single", canvas.getActiveObject());
 		}
-		console.log("copy called, clipboard: ", clipboard);
+		// console.log("copy called, clipboard: ", clipboard);
 	}
 
 	//paste object from cliboard
 	var paste = function(params) {
 		var offset = 20;
-		console.log("paste called, clipboard: ", clipboard);
+		// console.log("paste called, clipboard: ", clipboard);
 		if (clipboard.type == "group") {
 			var clonedObjects = [];
 			var groupObjects = clipboard.content.objects;
@@ -130,7 +131,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				}
 			});
 		} else if (clipboard.type == "single") {
-			console.log("copied object", clipboard.content);
+			// console.log("copied object", clipboard.content);
 			var clonedObj = clipboard.content.clone(function(callbackRes) {
 				callbackRes.set({
 					left: callbackRes.left + offset,
@@ -139,7 +140,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.add(callbackRes);
 			});
 			if (clonedObj !== undefined) {
-				console.log("cloned object", clonedObj);
+				// console.log("cloned object", clonedObj);
 				clonedObj.set({
 					left: clonedObj.left + offset,
 					top: clonedObj.top + offset
@@ -329,9 +330,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	/* Should be called when a new page is loaded (project variables stay the same) */
 	var init_page = function(callback) {
 
-		console.log("INIT PAGE");
+		// console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
-			console.log("canvas is undefined. initing now...");
+			// console.log("canvas is undefined. initing now...");
 			init();
 		}
 		canvas.clear();
@@ -351,7 +352,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
 	var init_project = function(w, h, panelM, pageM, createProjCallback) {
-		console.log("INIT PROJECT");
 		if (typeof canvas === "undefined") {
 			init();
 		}
@@ -483,13 +483,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 			// reformat is for text
 			var reformat = JSON.stringify(state);
-			console.log("PREVIOUS STATE", reformat);
 
 			reformat = reformat.replace(/(?:\\n)/g, function (match){
     			return "\\" + match;
 			});
-
-			console.log("REFORMATED STATE", reformat);
 
 			return reformat;
 		},
@@ -560,7 +557,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_project: function(canvasId, json, callback) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
-				console.log("loading canvas from json...", json);
+				// console.log("loading canvas from json...", json);
 
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
@@ -570,7 +567,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					}
 				});
 			});
-			console.log("ENDING LOAD");
+			// console.log("ENDING LOAD");
 		},
 		init: init,
 		init_page: init_page,

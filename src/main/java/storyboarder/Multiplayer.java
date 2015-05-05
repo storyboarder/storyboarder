@@ -82,8 +82,8 @@ class Multiplayer extends WebSocketServer {
    */
   @Override
   public void onMessage(WebSocket conn, String message) {
+    System.out.println(conn + ": " + message);
     sendToOthers(conn, message);
-    // System.out.println(conn + ": " + message);
   }
 
   /**

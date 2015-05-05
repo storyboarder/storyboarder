@@ -133,10 +133,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="actionButton" id="Save" data-action="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="actionButton" id="Save" data-action="SavePage" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
           <a href="#" class="actionButton" id="Export" data-action="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
-          <a href="#" class="actionButton" id="Load" data-action="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
-          <a href="#" class="actionButton" id="New" data-action="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
+          <a href="#" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
+          <a href="#" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
         </div>
       </div>
     </div>

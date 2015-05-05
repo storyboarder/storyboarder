@@ -85,11 +85,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			if(options.target.elmType === "rectext") {
 				// testing
 				var reformat = JSON.stringify(options.target);
-				console.log("original", reformat);
+				// console.log("original", reformat);
 
 				reformat = reformat.replace(/(?:\\n)/g, '\\\n');
 				//var here = reformat.replace("\\n", "BYYYEE");
-				console.log("reformated", reformat);
+				// console.log("reformated", reformat);
 
 
 				// end texting
@@ -97,11 +97,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		});
 
-		console.log(canvasState);
+		// console.log(canvasState);
 		snapPoint = snap.snapPoint;
 		minDim = canvasState.getPanelMargin() * 3;
 
-		console.log("select activated");
+		// console.log("select activated");
 
 		canvas.selection = true; // enable group selection
 
@@ -129,7 +129,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		}
 
 		canvasState.mapElements(function(found) { // map
-			console.log(found);
+			// console.log(found);
 			var options = {};
 			if (selectable.hasOwnProperty(found.elmType)) {
 				options = selectable[found.elmType];
@@ -145,7 +145,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 					});
 				}
 			} else {
-				console.log("unexpected type: " + found.elmType);
+				// console.log("unexpected type: " + found.elmType);
 				found.set({
 					selectable: false
 				});
@@ -180,7 +180,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				}
 			} else if (target.elmType === "rectext") {
 				canvasState.adjustBorder(target);
-				console.log("adjusting pos text");
+				// console.log("adjusting pos text");
 			}
 		});
 
@@ -299,7 +299,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	};
 
 	var deactivate = function() {
-		console.log("select deactivated");
+		// console.log("select deactivated");
 		canvas.selection = false; // disable group selection
 		canvas.deactivateAll();
 		canvasState.mapElements(
