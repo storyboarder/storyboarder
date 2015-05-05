@@ -18,7 +18,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	// Main canvas
 	var canvas;
-	var activeObj;
+	var activePanel;
 	var canvasId = "canvas";
 	// Socket for multiplayer
 	var socket;
@@ -421,11 +421,24 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		adjustBorder : function(obj) {
 			adjustBorder(obj);
 		},
-		setActiveObj: function(obj) {
-			activeObj = obj;
+		setActivePanel: function(obj) {
+			if (typeof activePanel != "undefined") {
+				activePanel.set({
+					stroke: "black",
+					strokeWidth: 1,
+				});
+			}
+			activePanel = obj;
+			if (typeof obj != "undefined") {
+				obj.set({
+					stroke: "#009fda",
+					strokeWidth: 2,
+				});
+			}
+			canvas.renderAll();
 		},
-		getActiveObj: function() {
-			return activeObj;
+		getActivePanel: function() {
+			return activePanel;
 		},
 		initHistory: function() {
 			history = [];
@@ -522,7 +535,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				return "\\" + match;
 			});
 */
-			console.log("REFORMATED STATE", reformat);
+//			console.log("REFORMATED STATE", reformat);
 
 			return reformat;
 		},
@@ -579,7 +592,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_page: function(canvasId, json, callback) {
 			var that = this;
 			init_page(function() {
-				console.log("loading from json: ", json);
+//				console.log("loading from json: ", json);
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
@@ -593,7 +606,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_project: function(canvasId, json, callback) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
-				console.log("loading canvas from json...", json);
+//				console.log("loading canvas from json...", json);
 
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);

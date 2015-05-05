@@ -196,6 +196,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 	};
 
+	var setPageDimensions = function(w, h) {
+		$("#page").width(w).height(h);
+	};
+
 	var init = function() {
 		console.log("Menu initing");
 
@@ -208,6 +212,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		/* Toolbar init */
 		$(".tools a").popup({
 			padding: "4px",
+		});
+
+		$("#CreateProject").click(function() {
+			setPageDimensions($("#page-width").val(), $("#page-height").val());
 		});
 
 		$('.ui.checkbox').checkbox();

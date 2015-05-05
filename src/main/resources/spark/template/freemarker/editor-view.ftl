@@ -65,7 +65,7 @@
       <div class="toolset">
         <div class="title">Panel</div>
         <div class="tools">
-          <a href="#" class="tool" id="PanelSelect" data-content="PanelSelect"><i class="icon-drawing-appbarcursordefaultoutline"></i></a>
+          <a href="#" class="tool" id="PanelSelect" data-content="Panel Select"><i class="icon-drawing-appbarcursordefaultoutline"></i></a>
           <!--<a href="#" class="tool" id="Split" data-content="Split"><i class="fa fa-x fa-arrows-h"></i></a>/-->
           <a href="#" class="tool" id="Split" data-content="Split"><i class="icon-drawing-tiles-plus"></i></a>
           <!--<a href="#" class="tool" id="Join" data-content="Join"><i class="fa fa-x fa-sign-in"></i></a>/-->

@@ -112,6 +112,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
 
+					console.log(response);
 					that.AddPage(params);
 					activate("Select");
 
@@ -129,13 +130,14 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"]);
+			console.log(params);
 
 			$.post("/pages/get", {
 					pageNum: params.pageNum
 				},
 				function(response) {
 					var responseObject = JSON.parse(response);
-					
+
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
@@ -178,7 +180,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			}); //TODO save thumbnail
 
 			$.post("/pages/save", getCurrentPageJSON(), function(response) {
-				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
+//				console.log("Save called with: ", getCurrentPageJSON(), ", response: ", JSON.parse(response));
 			});
 
 			document.dispatchEvent(new CustomEvent("thumbnail", {
@@ -249,10 +251,10 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				currPageObj = makePage(numPages, canvasState.getState(), canvasState.getThumbnail());
 				console.log("new page json : ", currPageObj);
 				$.post("/pages/add", currPageObj, function(response) {
-					console.log("add page called with num: " + numPages + " in project " + projectName);
+//					console.log("add page called with num: " + numPages + " in project " + projectName);
 					//					console.log("response: ", JSON.parse(response));
 					console.log("add response : " + response);
-					
+
 					that.GetPage({
 						pageNum: currPageObj.pageNum
 					});
@@ -284,7 +286,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				newSpot: params.newSpot
 			}, function(response) {
 				var responseObject = JSON.parse(response);
-				console.log("response: ", responseObject);
+//				console.log("response: ", responseObject);
 
 				$(Editor).trigger("movedPage", [params, params]);
 			});
