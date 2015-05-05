@@ -341,9 +341,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.setProperty("Text", "fill", $(this).val());
 		});
 
-		editor.setProperty("Text", "border", $("#border").checked);
+		editor.setProperty("Text", "border", $("#border")[0].checked);
 		$("#border").change(function() {
-			editor.setProperty("Text", "border", $("#border").checked);
+			editor.setProperty("Text", "border", $("#border")[0].checked);
 		});
 
 		editor.setProperty("Draw", "color", $('#drawing-color').val());
