@@ -1,8 +1,21 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
+
+	var listenKeyboard = false;
 	$(document).on('keydown', function(event) {
-		console.log("key pressed", event);
-		copyPasteHandler(event);
+		console.log("key pressed:", event.keyCode, "Preventing defaults for special keys:", listenKeyboard);
+		if (listenKeyboard) {
+			copyPasteHandler(event);
+		}
 	});
+
+	$(document).on('focus', "input[type=text]", function () {
+		listenKeyboard = false;
+	});
+
+	$(document).on('blur', "input[type=text]", function () {
+		listenKeyboard = true;
+	});
+
 	// Main canvas
 	var canvas;
 	var activeObj;
@@ -72,21 +85,27 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			key = event.keyCode;
 		}
 		switch (key) {
-			case 8:
+			case 8: //delete
 				event.preventDefault();
 				deleteActive();
-			case 67: // Ctrl+C
-				if (event.ctrlKey || event.metaKey) {
-					event.preventDefault();
-					copy();
-				}
+			case 67: // C
+				modifierEvent(copy);
 				break;
-			case 86: // Ctrl+V
-				if (event.ctrlKey || event.metaKey) {
-					event.preventDefault();
-					paste();
-					canvas.trigger("change");
-				}
+			case 86: // V
+				modifierEvent(paste);
+				break;
+			case 83: //S
+				modifierEvent(function() {
+					canvas.trigger("change")
+				});
+				break;
+		}
+
+		function modifierEvent(callback) {
+			if (event.ctrlKey || event.metaKey) { //Ctrl or Cmnd
+				event.preventDefault();
+				callback();
+			}
 		}
 	}
 
@@ -149,6 +168,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			}
 		}
 		canvas.renderAll();
+		canvas.trigger("change");
 	};
 
 	var deleteActive = function(key) {
@@ -163,19 +183,19 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		canvas.trigger("change");
 
 		function remove(obj) {
-			if(obj.elmType === "rectext") {
-				var borderArr = canvas._objects.filter(function( found ) {
-  					return found.id === obj.id && found.elmType === "textBorder";
+			if (obj.elmType === "rectext") {
+				var borderArr = canvas._objects.filter(function(found) {
+					return found.id === obj.id && found.elmType === "textBorder";
 				});
 
-				if(borderArr.length > 0) {
+				if (borderArr.length > 0) {
 					var border = borderArr[0];
 					canvas.remove(border);
 					canvas.remove(obj);
 				}
 			} else if (obj.elmType !== 'panel' && obj.helper === undefined) {
 				canvas.remove(obj);
-			} 
+			}
 		}
 	};
 
@@ -345,8 +365,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (typeof callback !== "undefined") {
 			callback();
 		}
-		
-		CanvasState.initHistory(); 
+
+
+		listenKeyboard = true;
+
+		CanvasState.initHistory();
+
 	};
 
 	/* Should be called when a project is loaded or created (sets project variables, initializes first page) */
@@ -369,11 +393,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	// for text
 	var adjustBorder = function(obj) {
-		var borderArr = canvas._objects.filter(function( found ) {
-  			return found.id === obj.id && found.elmType === "textBorder";
+		var borderArr = canvas._objects.filter(function(found) {
+			return found.id === obj.id && found.elmType === "textBorder";
 		});
 
-		if(borderArr.length > 0) {
+		if (borderArr.length > 0) {
 			var border = borderArr[0];
 			border.set({
 				width: (obj.width * obj.scaleX) + (2 * obj.padding),
@@ -385,13 +409,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			});
 
 			canvas.renderAll();
-			
+
 		}
 	}
 
 
 	var CanvasState = {
-		adjustBorder : function(obj) {
+		adjustBorder: function(obj) {
 			adjustBorder(obj);
 		},
 		setActiveObj: function(obj) {
@@ -460,6 +484,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		unlistenCanvas: function() {
 			canvas.off('change', this.storeState.bind(this));
 		},
+		turnOnKeyListener: function() {
+			listenKeyboard = true;
+		},
+		turnOffKeyListener: function() {
+			listenKeyboard = false;
+		},
 		getState: function() {
 
 			var state = $.extend(this.getCanvas().toJSON([
@@ -485,8 +515,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var reformat = JSON.stringify(state);
 			console.log("PREVIOUS STATE", reformat);
 
-			reformat = reformat.replace(/(?:\\n)/g, function (match){
-    			return "\\" + match;
+			reformat = reformat.replace(/(?:\\n)/g, function(match) {
+				return "\\" + match;
 			});
 
 			console.log("REFORMATED STATE", reformat);
