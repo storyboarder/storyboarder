@@ -213,6 +213,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				pageNum: params.pageNum
 			}, function(responseJSON) {
 				response = JSON.parse(responseJSON);
+				console.log("delete page called with:", params, "response:", response);
 				if ("message" in response) {
 					numPages--;
 					if (currentPage.pageNum == params.pageNum) { // deleted the page you're on
