@@ -366,6 +366,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			bottom: canvas.getHeight() - pageMargin
 		};
 		addPanel($.extend({}, pageEdges));
+
 		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		if (typeof callback !== "undefined") {
 			callback();

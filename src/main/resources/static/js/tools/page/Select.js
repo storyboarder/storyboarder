@@ -80,6 +80,13 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
+		canvas.on('object:selected', function(options) {
+			if (options.target.elmType == "rectext") {
+//				console.log(options.target);
+//				options.target.set({cursorColor: "white"});
+			}
+		});
+
 		return this;
 	};
 
@@ -99,7 +106,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
-		canvas.off("text:changed");
+//		canvas.off("text:changed");
 		canvas.off("mouse:down");
 	};
 
