@@ -161,6 +161,22 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.setProperty("Fill", "fillColor", $(this).val());
 		});
 
+		editor.action("SetSnap", {name: "gridSnap", id: "gridSpacing", value: $("#gridSpacing").val()});
+		$("#gridSpacing").on('input', function() {
+			editor.action("SetSnap", {name: "gridSnap", id: "gridSpacing", value: $(this).val()});
+		});
+
+		editor.action("SetSnap", {name: "panelGridSnap", id: "panelRows", value: $("#panelRows").val()});
+		$("#panelRows").on('input', function() {
+			console.log($(this).val());
+			editor.action("SetSnap", {name: "panelGridSnap", id: "panelRows", value: $(this).val()});
+		});
+
+		editor.action("SetSnap", {name: "panelGridSnap", id: "panelColumns", value: $("#panelColumns").val()});
+		$("#panelColumns").on('input', function() {
+			console.log($(this).val());
+			editor.action("SetSnap", {name: "panelGridSnap", id: "panelColumns", value: $(this).val()});
+		});
 
 	};
 
@@ -258,9 +274,10 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			});
 		});
 
-		$("input[type='text'].action").change(function() {
-			set_value($(this));
-		});
+//		$("input[type='text'].action").change(function() {
+//			throw "this is still being used";
+//			set_value($(this));
+//		});
 
 		$(document).on("click", ".actionButton", function() {
 			editor.action($(this).data('action'), $(this).data());
