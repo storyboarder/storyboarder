@@ -19,7 +19,7 @@ define(function(require) {
 			// Deactivate previously activated tool
 			if (currentTool) {
 				toolset[currentTool].deactivate();
-				$("." + currentTool.toLowerCase()).slideToggle();
+				$("." + currentTool.toLowerCase()).slideUp();
 			}
 			
 			// Activate the tool with toolname

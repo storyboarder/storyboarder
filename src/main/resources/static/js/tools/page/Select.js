@@ -8,6 +8,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
+			console.log(options.target);
 		});
 
 		snapPoint = snap.snapPoint;
@@ -22,7 +23,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			},
 			"rectext": {
 				selectable: true,
-				editable: false
+				editable: false,
+				lockMovementX: false,
+				lockMovementY: false
 			},
 			"path": {
 				selectable: true,
@@ -35,7 +38,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true
 			},
 			"text" : {
-				selectable: true
+				selectable: true,
+				editable: false,
+				lockMovementX: false,
+				lockMovementY: false
 			}
 		}
 
