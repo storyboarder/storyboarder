@@ -2,7 +2,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	var projectName;
 	var currPageObj = {
 		pageNum: 0,
-		json: null,
+		json: {},
 		thumbnail: null
 	};
 	var numPages;
@@ -82,7 +82,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				console.log("LOAD PROJ, params: ", params);
 				console.log(responseObject);
 				throwErrorIfApplicable(params);
-				currPageObj = responseObject;
+				//currPageObj = responseObject;
 
 				setCurrentPage(responseObject.page);
 				projectName = params.projectName;
@@ -353,11 +353,11 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	};
 
 	var setCurrentPage = function(pgObj) {
-		//		console.log(pgObj);
+				console.log(pgObj);
 		if (pgObj.json && typeof pgObj.json == "string") {
-			//			console.log(pgObj.json, "is a string");
-			pgObj.json = JSON.parse(pgObj.json);
-			//			console.log("parsed to ", pgObj.json);
+				console.log(pgObj.json, "is a string");
+				pgObj.json = JSON.parse(pgObj.json);
+						console.log("parsed to ", pgObj.json);
 		}
 		currPageObj = pgObj;
 	};

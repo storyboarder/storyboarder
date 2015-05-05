@@ -9,13 +9,13 @@ define(["../../CanvasState"], function(canvasState) {
 	var activate = function() {
 		
 		canvas = canvasState.getCanvas();
-		var active = canvasState.getActivePanel();
+		var active = canvasState.getActiveObj();
 
 		if(active && active.elmType === "panel") {
 			canvas.on("mouse:up", function(options) {
 				var path = canvas._objects[canvas._objects.length - 1];
-				path.activePanel = active;
-				path.clipTo = function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(this.activePanel.left, this.activePanel.top, this.activePanel.width, this.activePanel.height);ctx.restore();};
+				path.activeObj = active;
+				path.clipTo = function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(this.activeObj.left, this.activeObj.top, this.activeObj.width, this.activeObj.height);ctx.restore();};
 				canvas.renderAll();
 			});
 		}

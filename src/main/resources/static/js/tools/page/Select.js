@@ -7,6 +7,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
+
 			canvasState.setActiveObj(options.target);
 		});
 
@@ -37,7 +38,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			"text" : {
 				selectable: true
 			}
-
 		}
 
 		canvasState.mapElements(function(found) { // map
