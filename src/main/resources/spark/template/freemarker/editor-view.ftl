@@ -33,15 +33,12 @@
       <div class="toolset">
         <div class="title">Main</div>
         <div class="tools">
-          <!--<a href="#" class="tool" id="Select" data-content="Select"><i class="fa fa-x fa-location-arrow"></i></a>/-->
           <a href="#" class="tool" id="Select" data-content="Select"><i class="icon-drawing-appbarcursordefault"></i></a>
-          <!--<a href="#" class="action" id="Undo" data-content="Undo"><i class="fa fa-x fa-undo"></i></a>/-->
           <a href="#" class="actionButton" id="Undo" data-action="Undo" data-content="Undo"><i class="icon-drawing-undo"></i></a>
-          <!--<a href="#" class="action" id="Redo" data-content="Redo"><i class="fa fa-x fa-repeat"></i></a>/-->
           <a href="#" class="actionButton" id="Redo" data-action="Redo" data-content="Redo"><i class="icon-drawing-redo"></i></a>
           <br>
 
-            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap">
+            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="gridSnap" name="gridSnap" style="margin: 5px 0px">
             <label>Snap to grid</label><br>
 
             <div class="gridsnap" style="display:none">
@@ -50,7 +47,7 @@
               </div>
             </div>
 
-            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap">
+            <input type="checkbox" class="action submenu" data-action="ToggleGrid" id="panelGridSnap" name="panelGridSnap" style="margin: 5px 0px">
             <label>Snap to panel grid</label>
 
             <div class="panelgridsnap" style="display:none">
@@ -126,10 +123,10 @@
       <div class="toolset">
         <div class="title">Save/Export</div>
         <div class="tools">
-          <a href="#" class="actionButton" id="Save" data-action="Save" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
+          <a href="#" class="actionButton" id="Save" data-action="SavePage" data-content="Save"><i class="fa fa-x fa-floppy-o"></i></a>
           <a href="#" class="actionButton" id="Export" data-action="Export" data-content="Export"><i class="icon-drawing-image-export"></i></a>
-          <a href="#" class="actionButton" id="Load" data-action="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
-          <a href="#" class="actionButton" id="New" data-action="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
+          <a href="#" id="Load" data-content="Load"><i class="fa fa-x fa-folder-open"></i></a>
+          <a href="#" id="New" data-content="New"><i class="fa fa-x fa-file-o"></i></a>
         </div>
       </div>
     </div>

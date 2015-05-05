@@ -31,12 +31,10 @@ require.config({
 		canvas.width = 400;
 		canvas.height = 600;
 
-		require(["Menu", "Editor"], function(menu, editor) {
+		require(["UserInterface", "Editor"], function(UI, editor) {
 			editor.init();
-			//        console.log(menu);
-			menu.init();
-			console.log("editor:");
-			console.log(editor);
+			UI.init();
+
 			// editor.test();
 		});
 

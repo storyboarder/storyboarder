@@ -7,13 +7,12 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
-
 			canvasState.setActiveObj(options.target);
 		});
 
 		snapPoint = snap.snapPoint;
 
-		console.log("select activated");
+		// console.log("select activated");
 
 		canvas.selection = true; // enable group selection
 
@@ -56,7 +55,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 					});
 				}
 			} else {
-				console.log("unexpected type: " + found.elmType);
+				// console.log("unexpected type: " + found.elmType);
 				found.set({
 					selectable: false
 				});
@@ -95,7 +94,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	};
 
 	var deactivate = function() {
-		console.log("select deactivated");
+		// console.log("select deactivated");
 		canvas.selection = false; // disable group selection
 		canvas.deactivateAll();
 		canvasState.mapElements(
