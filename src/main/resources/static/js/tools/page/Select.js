@@ -7,6 +7,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
+
 			canvasState.setActiveObj(options.target);
 
 			if(options.target.elmType === "rectext") {
@@ -48,7 +49,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			"circle": {
 				selectable: true
 			}
-
 		}
 
 		canvasState.mapElements(function(found) { // map

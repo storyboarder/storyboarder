@@ -98,7 +98,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		console.log("panelselect");
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
-			canvasState.setActivePanel(options.target);
+			canvasState.setActiveObj(options.target);
 
 		});
 

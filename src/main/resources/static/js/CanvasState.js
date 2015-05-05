@@ -18,7 +18,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	// Main canvas
 	var canvas;
-	var activePanel;
+	var activeObj;
 	var canvasId = "canvas";
 	// Socket for multiplayer
 	var socket;
@@ -422,15 +422,15 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		adjustBorder : function(obj) {
 			adjustBorder(obj);
 		},
-		setActivePanel: function(obj) {
-			if (typeof activePanel != "undefined") {
-				activePanel.set({
+		setActiveObj: function(obj) {
+			if (typeof activeObj != "undefined" && activeObj.elmType == "panel") {
+				activeObj.set({
 					stroke: "black",
 					strokeWidth: 1,
 				});
 			}
-			activePanel = obj;
-			if (typeof obj != "undefined") {
+			activeObj = obj;
+			if (typeof obj != "undefined" && obj.elmType == "panel") {
 				obj.set({
 					stroke: "#009fda",
 					strokeWidth: 2,
@@ -438,8 +438,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			}
 			canvas.renderAll();
 		},
-		getActivePanel: function() {
-			return activePanel;
+		getActiveObj: function() {
+			return activeObj;
 		},
 		initHistory: function() {
 			history = [];
