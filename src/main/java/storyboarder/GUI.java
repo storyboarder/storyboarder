@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.jetty.server.Server;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
@@ -73,6 +75,10 @@ final class GUI {
    *          The port at which to host the server.
    */
   static void start(int port) {
+    Server server = new Server(port);
+    server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize",
+        -1);
+
     Spark.setPort(port);
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.get("/home", new Setup(), new FreeMarkerEngine());
