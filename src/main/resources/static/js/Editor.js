@@ -89,7 +89,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				setCurrentPage(responseObject.page);
 				projectName = params.projectName;
 				numPages = responseObject.numPages;
-				canvasState.load_project("canvas", getCurrentPageJSON().json, params.editor.update);
+				canvasState.load_project("canvas", currentPage.json, params.editor.update);
 				activate("Select");
 
 				if (typeof params.callback != "undefined") {
@@ -114,7 +114,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
 
-					console.log(response);
+//					console.log(response);
 					that.AddPage(params);
 					activate("Select");
 
@@ -132,7 +132,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"]);
-			console.log(params);
+//			console.log(params);
 
 			$.post("/pages/get", {pageNum: params.pageNum}, function(response) {
 
@@ -142,7 +142,8 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
-					canvasState.load_page("canvas", getCurrentPageJSON().json, function() {
+//					console.log(currentPage.json);
+					canvasState.load_page("canvas", currentPage.json, function() {
 						toolset.reactivate();
 					});
 
@@ -262,6 +263,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"MovePage": function(params) {
+			throw "good";
 			checkParams(params, ["pageNum", "newSpot"]);
 			if (currentPage.pageNum == params.pageNum) {
 				currentPage.pageNum = params.newSpot;

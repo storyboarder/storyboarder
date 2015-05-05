@@ -62,6 +62,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$img.attr("src", dataURL);
 	};
 
+	var setPageDimensions = function(width, height) {
+		$("#page").width(width).height(height);
+		thumbnailDim = editor.getThumbDimensions(width, height);
+	};
+
 	var setThumbnails = function (thumbs) {
 		$("#page-thumbs").empty();
 		for (var pageNum= 1; pageNum <= thumbs.length; pageNum++) {
@@ -85,6 +90,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		}
 
 		var dims = editor.getThumbDimensions();
+		console.log(dims);
 		var $thumb = $("<li>")
 			.addClass("page-thumb");
 		// Link to click on thumbnail
@@ -103,6 +109,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		var $removeIcon = $("<i>")
 			.addClass("fa fa-x fa-remove")
 			.appendTo($removeLink);
+
+		$thumb.width(dims.width)
+			.height(dims.height);
 
 		if (dataURL) {
 			$img = $thumb.children("a.page-thumb").children("img");
@@ -263,7 +272,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 			// Close the modal
 			$(this).closest(".modal").modal('hide');
-			editor.action("EnableKeyListener", {});
+//			editor.action("EnableKeyListener", {});
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {

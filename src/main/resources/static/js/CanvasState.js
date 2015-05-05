@@ -364,7 +364,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		};
 		addPanel($.extend({}, pageEdges));
 
-		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
+//		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		if (typeof callback !== "undefined") {
 			callback();
 		}
@@ -598,8 +598,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-					//					console.log(canvas);
+										console.log(canvas);
 					if (typeof callback != "undefined") {
+						console.log(callback);
 						callback();
 					}
 				});
