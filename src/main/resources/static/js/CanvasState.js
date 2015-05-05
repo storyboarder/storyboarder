@@ -342,7 +342,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
 	var init_page = function(callback) {
-
+		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		// console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
 			// console.log("canvas is undefined. initing now...");
@@ -545,35 +545,27 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			//var reformat = JSON.stringify(state);
 
 			// removing cliptTo for paths and images
-/*			var objectJson = JSON.parse(JSON.stringify(state));
+			var objectJson = JSON.parse(JSON.stringify(state));
 
-			console.log("OBJECT JSON", objectJson);
-
+			console.log(objectJson);
 			objectJson.objects.map(function(found) {
-				console.log("YEEEPP");
+
 				if(found.type === "path" || found.elmType === "image") {
-					console.log("HERE", found);
+					// console.log("HERE", found);
 					found.clipTo = null;
-					console.log("THERE", found);
+					// console.log("THERE", found);
 				}
 			});
-
-			console.log("JSON AGAIN", objectJson);
-
-/*			//remove property1 property
-			delete objectJson.property1;
-
-			console.log("OBJECT JSON", objectJson);
-			//add property2 property
-			delete objectJson.property2;*/
 
 			// stringify the object again*/
 			//var reformat = JSON.stringify(objectJson);
 
-			var reformat = JSON.stringify(state);
+			var reformat = JSON.stringify(objectJson);
+
 			reformat = reformat.replace(/(?:\\n)/g, function(match) {
 				return "\\" + match;
 			});
+			console.log("done getting state");
 
 			return reformat;
 		},
@@ -632,7 +624,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_page: function(canvasId, json, callback) {
 			var that = this;
 			init_page(function() {
-				//				console.log("loading from json: ", json);
+
 				canvas.loadFromJSON(json, function() {
 					var results = canvas.getObjects().filter(function(found) {
 						return found.type === "path" || found.elmType === "image";
@@ -641,8 +633,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					for(obj in results) {
 						that.mapElements(
 							function(found) {
-								if (found.elmType === "panel" && found.id === results[obj].id) {
+								if (found.elmType === "panel") {
+									if (found.id === results[obj].id) {
 									results[obj].clipTo = that.clipTo(found);
+									}
 								}
 							}
 						);
@@ -662,6 +656,23 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var that = this;
 			init_project(json.width, json.height, json.panelMargin, json.pageMargin, function() {
 				canvas.loadFromJSON(json, function() {
+					var results = canvas.getObjects().filter(function(found) {
+						return found.type === "path" || found.elmType === "image";
+					});
+					
+					for(obj in results) {
+						that.mapElements(
+							function(found) {
+								if (found.elmType === "panel") {
+									if (found.id === results[obj].id) {
+									results[obj].clipTo = that.clipTo(found);
+									}
+								}
+							}
+						);
+					}
+
+
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
 					if (typeof callback != "undefined") {
