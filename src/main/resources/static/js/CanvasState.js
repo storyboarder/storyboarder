@@ -1,12 +1,12 @@
 define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	var listenKeyboard = false;
-	// $(document).on('keydown', function(event) {
-	// 	console.log("key pressed:", event.keyCode, "Preventing defaults for special keys:", listenKeyboard);
-	// 	if (listenKeyboard) {
-	// 		copyPasteHandler(event);
-	// 	}
-	// });
+	$(document).on('keydown', function(event) {
+		console.log("key pressed:", event.keyCode, "Preventing defaults for special keys:", listenKeyboard);
+		if (listenKeyboard) {
+			copyPasteHandler(event);
+		}
+	});	
 
 	$(document).on('focus', "input[type=text]", function () {
 		listenKeyboard = false;
