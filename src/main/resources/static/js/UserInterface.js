@@ -36,6 +36,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var setCurrentPage = function (pageNum) {
+		console.log("setting page to ", pageNum);
 		// Remove current from old thumb
 		$(".current").removeClass("current");
 		// Make given page the current thumb
@@ -291,17 +292,23 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$('.ui.radio.checkbox').checkbox();
 
-		var page_thumb_idx;
+		var startPageNum, endPageNum;
 
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
 			cancel: "a.remove-page",
 			distance: 10,
 			start: function(event, ui) {
-				page_thumb_idx = ui.item.index();
+				startPageNum = ui.item.index() + 1;
 			},
 			stop: function(event, ui) {
-				console.log("moved element " + (1 + page_thumb_idx) + " to " + (1 + ui.item.index()));
+				endPageNum = ui.item.index() + 1;
+				console.log("Moved thumb " + startPageNum + " to " + endPageNum);
+				editor.action("MovePage", {
+					pageNum: startPageNum,
+					newSpot: endPageNum
+				});
+
 				updateThumbnailIDs();
 			}
 		});
