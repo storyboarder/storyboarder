@@ -89,7 +89,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				setCurrentPage(responseObject.page);
 				projectName = params.projectName;
 				numPages = responseObject.numPages;
-				canvasState.load_project("canvas", currentPage.json, params.editor.update);
+				canvasState.load_project("canvas", getCurrentPageJSON().json, params.editor.update);
 				activate("Select");
 
 				if (typeof params.callback != "undefined") {
@@ -134,7 +134,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			checkParams(params, ["pageNum"]);
 			// console.log(params);
 
-			$.post("/pages/get", params, function(response) {
+			$.post("/pages/get", {pageNum: params.pageNum}, function(response) {
 
 					var responseObject = JSON.parse(response);
 
@@ -142,7 +142,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					throwErrorIfApplicable(responseObject);
 
 					setCurrentPage(responseObject);
-					canvasState.load_page("canvas", currentPage.json, function() {
+					canvasState.load_page("canvas", getCurrentPageJSON().json, function() {
 						toolset.reactivate();
 					});
 
@@ -321,15 +321,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				});
 			}
 		},
-		"DisableKeyListener": function() {
-			$(document).off('keydown');
-		},
-		"EnableKeyListener" : function() {
-			$(document).on('keydown', function(event) {
-				console.log("key pressed", event);
-				canvasState.copyPasteHandler(event);
-			});
-		}
+		// "DisableKeyListener": function() {
+		// 	$(document).off('keydown');
+		// },
+		// "EnableKeyListener" : function() {
+		// 	$(document).on('keydown', function(event) {
+		// 		console.log("key pressed", event.keyCode);
+		// 		canvasState.copyPasteHandler(event);
+		// 	});
+		// }
 	};
 
 	var setCurrentPage = function(pgObj) {

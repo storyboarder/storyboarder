@@ -6,7 +6,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (listenKeyboard) {
 			copyPasteHandler(event);
 		}
-	});
+	});	
 
 	$(document).on('focus', "input[type=text]", function () {
 		listenKeyboard = false;
@@ -134,15 +134,15 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					});
 					clonedObjects.push(callbackRes);
 				});
-				if (newObj !== undefined) {
-					clonedObjects.push(newObj);
-				}
+				// if (newObj !== undefined) {
+				// 	clonedObjects.push(newObj);
+				// }
 			}
 			var clonedGroup = new fabric.Group(clonedObjects, {
 				left: clipboard.content.left + offset,
 				top: clipboard.content.top + offset
 			});
-			//clipboard = makeClipboard("group", clonedGroup);
+			clipboard = makeClipboard("group", clonedGroup);
 			var destroyedGroup = clonedGroup.destroy();
 			var items = destroyedGroup.getObjects();
 			items.forEach(function(item) {
@@ -155,6 +155,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					left: callbackRes.left + offset,
 					top: callbackRes.top + offset
 				});
+				clipboard = makeClipboard("single", callbackRes);
+
 				canvas.add(callbackRes);
 			});
 			if (clonedObj !== undefined) {
@@ -338,10 +340,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called at the beginning of the entire client session (sets up fabricjs objects) */
 	var init = function() {
-		// document.onkeydown = function(event) {
-		// 	console.log("key down");
-		// 	copyPasteHandler(event);
-		// };
 		canvas = new fabric.Canvas(canvasId, {
 			selection: false
 		});
@@ -364,11 +362,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			bottom: canvas.getHeight() - pageMargin
 		};
 		addPanel($.extend({}, pageEdges));
+
 		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		if (typeof callback !== "undefined") {
 			callback();
 		}
 
+		activeObj = null;
 
 		listenKeyboard = true;
 
