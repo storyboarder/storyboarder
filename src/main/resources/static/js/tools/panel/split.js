@@ -42,6 +42,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 				height: pos - panelEdges.top - 2 * canvasState.getPanelMargin()
 			};
 			// Coordinates of the new panel
+			console.log(obj.fill);
 			newPanelCoords = $.extend({}, panelEdges, {
 				top: pos
 			});
