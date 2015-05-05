@@ -298,5 +298,31 @@ define(["../CanvasState"], function(canvasState) {
 			_deleteDuplicates(snapped, "left", "right");
 			return snapped;
 		},
+		snapObj: function(target) {
+			if (target.elmType != "panel") {
+				var borders = this.snapBorders({
+					left: target.left,
+					right: target.left + target.width,
+					top: target.top,
+					bottom: target.top + target.height,
+				});
+
+				for (b in borders) {
+					if (typeof borders[b] != "undefined") {
+						if (b in target) {
+							target[b] = borders[b];
+						} else {
+							var dim = canvasState.getDimension(b);
+							var opposite = canvasState.getOppositeDirection(b);
+							target[opposite] = borders[b] - target[dim];
+						}
+					}
+				}
+					canvasState.getCanvas().renderAll();
+				if (target.elmType === "rectext") {
+					canvasState.adjustBorder(target);
+				}
+			} 
+		}
 	}
 });

@@ -82,20 +82,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
-
-			if(options.target.elmType === "rectext") {
-				// testing
-				var reformat = JSON.stringify(options.target);
-				console.log("original", reformat);
-
-				reformat = reformat.replace(/(?:\\n)/g, '\\\n');
-				//var here = reformat.replace("\\n", "BYYYEE");
-				console.log("reformated", reformat);
-
-
-				// end texting
-			}
-
 		});
 
 		console.log(canvasState);
@@ -124,6 +110,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true
 			},
 			"circle": {
+				selectable: true
+			},
+			"text" : {
 				selectable: true
 			}
 
@@ -158,30 +147,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		});
 
 		canvas.on('object:moving', function(options) {
-			target = options.target;
-			if (snap.isSnapActive() && options.target.elmType != "panel") {
-				target = options.target;
-				var borders = snap.snapBorders({
-					left: target.left,
-					right: target.left + target.width,
-					top: target.top,
-					bottom: target.top + target.height,
-				});
-
-				for (b in borders) {
-					if (typeof borders[b] != "undefined") {
-						if (b in target) {
-							target[b] = borders[b];
-						} else {
-							var dim = canvasState.getDimension(b);
-							var opposite = canvasState.getOppositeDirection(b);
-							target[opposite] = borders[b] - target[dim];
-						}
-					}
-				}
-			} else if (target.elmType === "rectext") {
-				canvasState.adjustBorder(target);
-				console.log("adjusting pos text");
+			if(snap.isSnapActive()) {
+				snap.snapObj(options.target);
 			}
 		});
 

@@ -14,8 +14,18 @@ define(["../../CanvasState"], function(canvasState) {
 		if(active && active.elmType === "panel") {
 			canvas.on("mouse:up", function(options) {
 				var path = canvas._objects[canvas._objects.length - 1];
-				path.activeObj = active;
-				path.clipTo = function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(this.activeObj.left, this.activeObj.top, this.activeObj.width, this.activeObj.height);ctx.restore();};
+				path.clipTo = function(ctx) {
+					ctx.save();
+
+					ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
+					ctx.rect(
+						active.left, active.top, // Just x, y position starting from top left corner of canvas
+						active.width, active.height // Width and height of clipping rect
+					);
+
+					ctx.restore();
+				};
+
 				canvas.renderAll();
 			});
 		}

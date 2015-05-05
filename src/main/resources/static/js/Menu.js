@@ -333,6 +333,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.setProperty("Text", "fill", $(this).val());
 		});
 
+		editor.setProperty("Text", "border", $("#border")[0].checked);
+		$("#border").change(function() {
+			editor.setProperty("Text", "border", $("#border")[0].checked);
+		});
+
 		editor.setProperty("Draw", "color", $('#drawing-color').val());
 		$('#drawing-color').on('input', function() {
 			editor.setProperty("Draw", "color", $(this).val());
@@ -386,6 +391,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$('.ui.modal.create-project').modal('show');
 			editor.action("DisableKeyListener", {});
 		});
+
+
 
 		/* Update the page thumb when Editor sends a save thumbnail event. */
 		document.addEventListener("thumbnail", function(e) {
