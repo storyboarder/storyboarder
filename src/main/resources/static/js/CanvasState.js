@@ -132,9 +132,11 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 						left: callbackRes.left + offset,
 						top: callbackRes.top + offset
 					});
-					canvas.add(callbackRes);
+					clonedObjects.push(callbackRes);
 				});
-				clonedObjects[i] = newObj;
+				if (newObj !== undefined) {
+					clonedObjects.push(newObj);
+				}
 			}
 			var clonedGroup = new fabric.Group(clonedObjects, {
 				left: clipboard.content.left + offset,
@@ -144,9 +146,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			var destroyedGroup = clonedGroup.destroy();
 			var items = destroyedGroup.getObjects();
 			items.forEach(function(item) {
-				if (item !== undefined) {
-					canvas.add(item);
-				}
+				canvas.add(item);
 			});
 		} else if (clipboard.type == "single") {
 			// console.log("copied object", clipboard.content);
@@ -270,13 +270,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	/* edges should be an object with left, top, right, and bottom keys */
-	var addPanel = function(edges) {
+	var addPanel = function(edges, fill) {
 		var panel = new fabric.Rect({
 			left: edges.left + panelMargin,
 			top: edges.top + panelMargin,
 			width: edges.right - edges.left - 2 * panelMargin,
 			height: edges.bottom - edges.top - 2 * panelMargin,
-			fill: "rgba(0, 0, 0, 0)", // transparent
+			fill: fill || "rgba(0, 0, 0, 0)", // transparent
 			stroke: "black",
 			strokeWeight: 1,
 			lockMovementX: true,
