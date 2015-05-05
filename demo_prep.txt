@@ -3,14 +3,24 @@ DEMO_DAY_PREP
 
 Let's all introduce ourselves
 
+Show intro comic
+----------------
 Goals of the project
 	for storyboarding (planning out) comics
 	our aim was to make the storyboarding process quicker and more efficient
 
-Division of labor
-	Nellie - panel tools, snap to grid, project/page management in UI
-	Yidan - image and text tools
-	Kostas - undo/redo, multiuser, project/page management
-	Filip - backend (database interaction), clipboard
+Demo making a comic
+-------------------
+Create project
+Split / join / resize (snap to grid) panels
+Draw, text, image tools (do not clip)
+Undo, redo
+Clipping
+Pages: add, reorder, remove
 
+Load the project
+Export
+
+Multiuser demo!
+---------------
 

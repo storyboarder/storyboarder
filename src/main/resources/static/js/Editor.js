@@ -114,7 +114,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 					name: projectName
 				}, function(responseJSON) {
 					var response = JSON.parse(responseJSON);
-
+					projectName = response.name;
 					that.AddPage(params);
 					activate("Select");
 
