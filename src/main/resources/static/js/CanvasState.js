@@ -204,15 +204,14 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 	};
 
 	// Add image to canvas
-	var addImage = function(img) {
-		var active = canvas.getActiveObject();
-
+	var addImage = function(img, active) {
+		console.log("HEREEEEEE", active);
 		// Set position and scale
 		img.set({
 			left: 100,
 			top: 100,
-			scaleX: 0.2,
-			scaleY: 0.2
+			scaleX: 0.3,
+			scaleY: 0.3
 		});
 
 		// Disable controls on image
@@ -231,8 +230,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 				ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation to default for canvas
 				ctx.rect(
-					panel.left, panel.top, // Just x, y position starting from top left corner of canvas
-					panel.width, panel.height // Width and height of clipping rect
+					panel.left + 1, panel.top + 1, // Just x, y position starting from top left corner of canvas
+					panel.width - 1, panel.height - 1 // Width and height of clipping rect
 				);
 
 				ctx.restore();
@@ -585,7 +584,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		getDimension: getDimension,
 		contains: contains,
 		addPanel: addPanel,
-		addImage: addImage,
+		addImage: function(img){
+			addImage(img, this.getActiveObj());
+		},
 		setControls: setControls,
 		getPageEdge: function(c) {
 			return pageEdges[c];

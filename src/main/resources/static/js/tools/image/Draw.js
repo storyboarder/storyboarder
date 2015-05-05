@@ -15,7 +15,7 @@ define(["../../CanvasState"], function(canvasState) {
 			canvas.on("mouse:up", function(options) {
 				var path = canvas._objects[canvas._objects.length - 1];
 				path.activeObj = active;
-				path.clipTo = function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(this.activeObj.left, this.activeObj.top, this.activeObj.width, this.activeObj.height);ctx.restore();};
+				path.clipTo = function(ctx) {ctx.save();ctx.setTransform(1, 0, 0, 1, 0, 0);ctx.rect(this.activeObj.left + 1, this.activeObj.top + 1, this.activeObj.width - 1, this.activeObj.height - 1);ctx.restore();};
 				canvas.renderAll();
 			});
 		}

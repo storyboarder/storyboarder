@@ -17,7 +17,10 @@ define(function(require) {
 	var activate = function(toolname) {
 		if (toolname in toolset) {
 			// Deactivate previously activated tool
-			if (currentTool) toolset[currentTool].deactivate();
+			if (currentTool) {
+				toolset[currentTool].deactivate();
+				$("." + currentTool.toLowerCase()).slideToggle();
+			}
 			
 			// Activate the tool with toolname
 			// and update current tool

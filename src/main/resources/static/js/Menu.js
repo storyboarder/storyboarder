@@ -284,8 +284,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			$("." + $(this).attr("id").toLowerCase()).slideToggle();
 		});
 
-
-
 		$('#filepath').change(function(e) {
 			var reader = new FileReader();
 			reader.onload = function(event) {
