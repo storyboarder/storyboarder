@@ -9,6 +9,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			.modal('show');
 
 		editor.action("GetChoices", function(choices) {
+			$("#project-choices").empty();
 			for (c in choices) {
 				var $loadLink = $("<a>").addClass("modalButton")
 					.data("projectName", choices[c])

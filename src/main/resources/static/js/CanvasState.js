@@ -293,7 +293,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		panel.edges = edges;
 		setControls(panel);
 		addElement(panel, "panel");
-		canvas.sendToBack(panel);
+		canvas.bringToFront(panel);
 		return panel;
 	};
 

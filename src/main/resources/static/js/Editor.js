@@ -133,7 +133,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		"GetPage": function(params) {
 			checkParams(params, ["pageNum"]);
 			// console.log(params);
-
 			$.post("/pages/get", {
 				pageNum: params.pageNum
 			}, function(response) {
