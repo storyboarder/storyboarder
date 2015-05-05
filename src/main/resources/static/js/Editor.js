@@ -264,7 +264,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"MovePage": function(params) {
-			throw "good";
 			checkParams(params, ["pageNum", "newSpot"]);
 			if (currentPage.pageNum == params.pageNum) {
 				currentPage.pageNum = params.newSpot;
