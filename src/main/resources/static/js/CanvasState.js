@@ -342,7 +342,6 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 	/* Should be called when a new page is loaded (project variables stay the same) */
 	var init_page = function(callback) {
-		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		// console.log("INIT PAGE");
 		if (typeof canvas === "undefined") {
 			// console.log("canvas is undefined. initing now...");
@@ -430,7 +429,8 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			adjustBorder(obj);
 		},
 		setActiveObj: function(obj) {
-			if (!obj.active) {
+			console.log("Set active to ", obj);
+			if (obj && !obj.active) {
 				return;
 			}
 			if (activeObj && activeObj.elmType === "panel") {
@@ -547,13 +547,16 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			// removing cliptTo for paths and images
 			var objectJson = JSON.parse(JSON.stringify(state));
 
-			console.log(objectJson);
+//			console.log(objectJson);
 			objectJson.objects.map(function(found) {
 
 				if(found.type === "path" || found.elmType === "image") {
 					// console.log("HERE", found);
 					found.clipTo = null;
 					// console.log("THERE", found);
+				} else if (found.elmType === "panel") {
+					found.strokeWidth = 1;
+					found.stroke = "black";
 				}
 			});
 

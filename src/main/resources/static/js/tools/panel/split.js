@@ -42,7 +42,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 				height: pos - panelEdges.top - 2 * canvasState.getPanelMargin()
 			};
 			// Coordinates of the new panel
-			console.log(obj.fill);
+//			console.log(obj.fill);
 			newPanelCoords = $.extend({}, panelEdges, {
 				top: pos
 			});
@@ -122,7 +122,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 			canvasState.mapElements(function (e) {
 				if (e.elmType == "panel" && e.containsPoint(pt)) {
 					target = e;
-					console.log(target);
+//					console.log(target);
 				}
 			});
 
