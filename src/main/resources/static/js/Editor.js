@@ -355,7 +355,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 	var setCurrentPage = function(pgObj) {
 				console.log(pgObj);
 		if (pgObj.json && typeof pgObj.json == "string") {
-				console.log(pgObj.json, "is a string");
+				//console.log(pgObj.json, "is a string");
 				pgObj.json = JSON.parse(pgObj.json);
 						console.log("parsed to ", pgObj.json);
 		}
