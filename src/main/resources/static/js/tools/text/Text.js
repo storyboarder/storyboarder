@@ -34,6 +34,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.on('mouse:down', function(coor) {
 			console.log("mouse down");
 			selected = coor.target;
+			canvasState.setActiveObj(selected);
 		}); // mouse:down
 
 		canvas.on('mouse:up', function(coor) {
@@ -51,7 +52,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 					var newText = new fabric.IText('Text', {
 						fontFamily: fontFamily,
-						fontSize: 12,
+						fontSize: 20,
 						fill: fill,
 						left: finalPos.x,
 						top: finalPos.y,
@@ -164,7 +165,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			console.log("ACTIVE", active);
 		}
 
-		if (active && active.elmType === "rectext") {
+		if (active && (active.elmType === "rectext" || active.elmType === "text")) {
 			if(property != "border") {
 				active[property] = value;
 				canvas.renderAll();
@@ -195,6 +196,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 					canvasState.deleteElement(active);
 					canvasState.addElement(newBorder, "textBorder");
 					canvasState.addElement(active, "rectext");
+					canvasState.adjustBorder(active);
 
 				} else if(!border && borderArr.length > 0){ // delete border
 					canvasState.deleteElement(borderArr[0]);
