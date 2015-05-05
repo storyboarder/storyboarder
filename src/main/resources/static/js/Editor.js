@@ -340,6 +340,15 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				});
 			}
 		},
+		"DisableKeyListener": function() {
+			$(document).off('keydown');
+		},
+		"EnableKeyListener" : function() {
+			$(document).on('keydown', function(event) {
+				console.log("key pressed", event);
+				canvasState.copyPasteHandler(event);
+			});
+		}
 	};
 
 	var setCurrentPage = function(pgObj) {

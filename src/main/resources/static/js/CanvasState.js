@@ -391,6 +391,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 
 	var CanvasState = {
+		copyPasteHandler : function(event) {
+			copyPasteHandler(event);
+		},
 		adjustBorder : function(obj) {
 			adjustBorder(obj);
 		},
@@ -483,12 +486,12 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 			// reformat is for text
 			var reformat = JSON.stringify(state);
-			console.log("PREVIOUS STATE", reformat);
+/*			console.log("PREVIOUS STATE", reformat);
 
 			reformat = reformat.replace(/(?:\\n)/g, function (match){
     			return "\\" + match;
 			});
-
+*/
 			console.log("REFORMATED STATE", reformat);
 
 			return reformat;

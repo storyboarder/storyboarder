@@ -10,10 +10,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"AddImage": function() {
 			console.log("add image called");
 			$('.ui.modal.add-image').modal('setting', 'closable', true).modal('show');
+			editor.action("DisableKeyListener", {});
 		},
 		"AddImageButton": function() {
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
+			editor.action("EnableKeyListener", {});
 
 			var group = { url: $("#image-url").val() };
 			editor.action("AddURL", group);
@@ -32,6 +34,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"New": function() {
 			console.log("new called");
 			$('.ui.modal.create-project').modal('show');
+			editor.action("DisableKeyListener", {});
 		},
 		"GetPageByNum": function (pageNum) {
 			return $("#page-thumbs a.page-thumb").filter(function () {
@@ -163,6 +166,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			.modal('setting', 'closable', false)
 			.modal('show');
 
+		editor.action("DisableKeyListener", {});	
+
 		editor.action("GetChoices", function(choices) {
 			for (c in choices) {
 				var $loadLink = $("<a>").addClass("modalButton")
@@ -255,6 +260,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 			// Close the modal
 			$(this).closest(".modal").modal('hide');
+			editor.action("EnableKeyListener", {});
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {
@@ -374,10 +380,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$("#AddImage").click(function () {
 			$('.ui.modal.add-image').modal('show');
+			editor.action("DisableKeyListener", {});
 		});
 
 		$("#NewProject").click(function () {
 			$('.ui.modal.create-project').modal('show');
+			editor.action("DisableKeyListener", {});
 		});
 
 		/* Update the page thumb when Editor sends a save thumbnail event. */
