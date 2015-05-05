@@ -116,16 +116,16 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 
 		canvas.on("mouse:move", function(options) {
 			// Continue only if the item has edges and there is a target
-			console.log(options);
+
 			var pt = new fabric.Point(options.e.offsetX, options.e.offsetY);
-			console.log(pt);
+
 			canvasState.mapElements(function (e) {
 				if (e.elmType == "panel" && e.containsPoint(pt)) {
 					target = e;
 					console.log(target);
 				}
 			});
-			console.log(target);
+
 			if (!target || !target.edges) return;
 
 			canvas.deactivateAll();
@@ -157,7 +157,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snapUtil) {
 		});
 
 		canvas.on("mouse:down", function(options) {
-			console.log(target);
+
 			// Continue only if the item has edges and there is a target
 			if (!target || !target.edges) return;
 			// Edges of target panel

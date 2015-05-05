@@ -8,6 +8,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
 			canvasState.setActiveObj(options.target);
+			console.log(options.target);
 		});
 
 		snapPoint = snap.snapPoint;
@@ -22,7 +23,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			},
 			"rectext": {
 				selectable: true,
-				editable: false
+				editable: false,
+				lockMovementX: false,
+				lockMovementY: false
 			},
 			"path": {
 				selectable: true,
@@ -35,7 +38,10 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				selectable: true
 			},
 			"text" : {
-				selectable: true
+				selectable: true,
+				editable: false,
+				lockMovementX: false,
+				lockMovementY: false
 			}
 		}
 
@@ -83,11 +89,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			}
 		});
 
-		canvas.on('object:selected', function(options) {
-			if (options.target.elmType == "rectext") {
-//				console.log(options.target);
-//				options.target.set({cursorColor: "white"});
-			}
+		canvas.on('object:modified', function () {
+			canvas.trigger("change");
 		});
 
 		return this;
@@ -109,7 +112,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 		canvas.off("object:scaling");
 		canvas.off("object:moving");
-//		canvas.off("text:changed");
+		canvas.off("object:modified");
+		canvas.off("text:changed");
 		canvas.off("mouse:down");
 	};
 

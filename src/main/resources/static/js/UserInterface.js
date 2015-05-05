@@ -36,6 +36,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var setCurrentPage = function (pageNum) {
+		console.log("setting page to ", pageNum);
 		// Remove current from old thumb
 		$(".current").removeClass("current");
 		// Make given page the current thumb
@@ -125,6 +126,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	// Events for when a tool property is changed
 	var initPropertyChange = function () {
+
 		editor.setProperty("Text", "fontFamily", $("#font-family").val());
 		$("#font-family").change(function(e) {
 			editor.setProperty("Text", "fontFamily", $(this).val());
@@ -133,6 +135,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		editor.setProperty("Text", "fill", $("#font-color").val());
 		$("#font-color").change(function () {
 			editor.setProperty("Text", "fill", $(this).val());
+		});
+
+		editor.setProperty("Text", "border", $("#border")[0].checked);
+		$("#border").change(function() {
+			editor.setProperty("Text", "border", $("#border")[0].checked);
 		});
 
 		editor.setProperty("Draw", "color", $('#drawing-color').val());
@@ -145,11 +152,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.setProperty("Draw", "width", parseInt($(this).val()));
 		});
 
-		console.log($("#fill-color").val());
 		editor.setProperty("Fill", "fillColor", $("#fill-color").val());
 		$("#fill-color").on('input', function() {
 			editor.setProperty("Fill", "fillColor", $(this).val());
 		});
+
+
 	};
 
 	// Binds events to buttons that show modals
@@ -196,11 +204,13 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			setThumbnails(results.thumbnails);
 			setCurrentPage(1);
 
-			$("#editor").css("visibility", "visible");
+		$("#editor").css("visibility", "visible");
 		});
 
 		$(editor).on("createdProject", function (e, results) {
 			// Removes old thumbnails
+			// setPageDimensions($("#page-width").val(), $("#page-height").val());
+
 			setThumbnails([]);
 			setCurrentPage(1);
 			$("#editor").css("visibility", "visible");
@@ -224,10 +234,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		/* Toolbar init */
 		$(".tools a").popup({
 			padding: "4px",
-		});
-
-		$("#CreateProject").click(function() {
-			setPageDimensions($("#page-width").val(), $("#page-height").val());
 		});
 
 		$('.ui.checkbox').checkbox();
@@ -272,7 +278,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 			// Close the modal
 			$(this).closest(".modal").modal('hide');
-//			editor.action("EnableKeyListener", {});
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {
@@ -302,17 +307,23 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$('.ui.radio.checkbox').checkbox();
 
-		var page_thumb_idx;
+		var startPageNum, endPageNum;
 
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
 			cancel: "a.remove-page",
 			distance: 10,
 			start: function(event, ui) {
-				page_thumb_idx = ui.item.index();
+				startPageNum = ui.item.index() + 1;
 			},
 			stop: function(event, ui) {
-				console.log("moved element " + (1 + page_thumb_idx) + " to " + (1 + ui.item.index()));
+				endPageNum = ui.item.index() + 1;
+				console.log("Moved thumb " + startPageNum + " to " + endPageNum);
+				editor.action("MovePage", {
+					pageNum: startPageNum,
+					newSpot: endPageNum
+				});
+
 				updateThumbnailIDs();
 			}
 		});
