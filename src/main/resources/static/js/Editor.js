@@ -179,7 +179,9 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				thumbnail: canvasState.getThumbnail()
 			}); //TODO save thumbnail
 
-			$.post("/pages/save", getCurrentPageJSON(), function(response) {});
+			$.post("/pages/save", getCurrentPageJSON(), function(response) {
+				console.log("called save with:", getCurrentPageJSON(), "response:", JSON.parse(response));
+			});
 
 			$(Editor).trigger("savedPage", [{
 				pageNum: currentPage.pageNum,

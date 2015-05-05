@@ -86,17 +86,21 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		}
 		switch (key) {
 			case 8: //delete
+				console.log("delete shortcut");
 				event.preventDefault();
 				deleteActive();
 			case 67: // C
+				console.log("copy shortcut");
 				modifierEvent(copy);
 				break;
 			case 86: // V
+				console.log("paste shortcut");
 				modifierEvent(paste);
 				break;
 			case 83: //S
 				modifierEvent(function() {
-					canvas.trigger("change")
+					console.log("save shortcut");
+					canvas.trigger("change");
 				});
 				break;
 		}
