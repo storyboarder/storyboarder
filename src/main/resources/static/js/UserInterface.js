@@ -117,6 +117,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 	// Events for when a tool property is changed
 	var initPropertyChange = function () {
+
 		editor.setProperty("Text", "fontFamily", $("#font-family").val());
 		$("#font-family").change(function(e) {
 			editor.setProperty("Text", "fontFamily", $(this).val());
@@ -125,6 +126,11 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		editor.setProperty("Text", "fill", $("#font-color").val());
 		$("#font-color").change(function () {
 			editor.setProperty("Text", "fill", $(this).val());
+		});
+
+		editor.setProperty("Text", "border", $("#border")[0].checked);
+		$("#border").change(function() {
+			editor.setProperty("Text", "border", $("#border")[0].checked);
 		});
 
 		editor.setProperty("Draw", "color", $('#drawing-color').val());
@@ -137,11 +143,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			editor.setProperty("Draw", "width", parseInt($(this).val()));
 		});
 
-		console.log($("#fill-color").val());
 		editor.setProperty("Fill", "fillColor", $("#fill-color").val());
 		$("#fill-color").on('input', function() {
 			editor.setProperty("Fill", "fillColor", $(this).val());
 		});
+
+
 	};
 
 	// Binds events to buttons that show modals
@@ -188,7 +195,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 			setThumbnails(results.thumbnails);
 			setCurrentPage(1);
 
-			$("#editor").css("visibility", "visible");
+		$("#editor").css("visibility", "visible");
 		});
 
 		$(editor).on("createdProject", function (e, results) {
@@ -262,7 +269,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 			// Close the modal
 			$(this).closest(".modal").modal('hide');
-			editor.action("EnableKeyListener", {});
 		});
 
 		$("#page-thumbs").on("click", ".view", function() {

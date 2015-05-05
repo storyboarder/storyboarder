@@ -34,9 +34,11 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 		canvas.on('mouse:down', function(coor) {
 			console.log("mouse down");
 			selected = coor.target;
+
 			if (selected && selected.active) {
 				canvasState.setActiveObj(selected);
 			}
+			
 		}); // mouse:down
 
 		canvas.on('mouse:up', function(coor) {
@@ -45,8 +47,8 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 				y: coor.e.offsetY
 			};
 
-			if (typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder")) {
-				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder") &&
+			if (typeof selected == "undefined" || (selected.elmType != "rectext" && selected.elmType != "textBorder" && selected.elmType != "text")) {
+				if (typeof selected != "undefined" && (selected.elmType != "rectext" && selected.elmType != "textBorder" && selected.elmType != "text") &&
 					typeof time != "undefined" && Math.abs(time - coor.e.timeStamp) < 250) {
 
 					var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -163,8 +165,6 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 			fontFamily = value;
 		} else if (property === "border") {
 			border = value;
-			console.log("HEREEEEE", border);
-			console.log("ACTIVE", active);
 		}
 
 		if (active && (active.elmType === "rectext" || active.elmType === "text")) {
