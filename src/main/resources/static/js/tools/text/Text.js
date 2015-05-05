@@ -152,7 +152,7 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 
 	var change = function(property, value) {
 		var canvas = canvasState.getCanvas();
-		var active = canvasState.getActiveObject();
+		var active = canvas.getActiveObject(); // change later
 
 		if (property === "fill") {
 			fill = value;
