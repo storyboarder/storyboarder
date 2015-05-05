@@ -6,13 +6,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (listenKeyboard) {
 			copyPasteHandler(event);
 		}
-	});	
+	});
 
-	$(document).on('focus', "input[type=text]", function () {
+	$(document).on('focus', "input[type=text]", function() {
 		listenKeyboard = false;
 	});
 
-	$(document).on('blur', "input[type=text]", function () {
+	$(document).on('blur', "input[type=text]", function() {
 		listenKeyboard = true;
 	});
 
@@ -357,7 +357,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		};
 		addPanel($.extend({}, pageEdges));
 
-		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
+		//		console.log("CALLBACK WOOHOOOOFAFDAFA", callback);
 		if (typeof callback !== "undefined") {
 			callback();
 		}
@@ -426,10 +426,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		copyPasteHandler : function(event) {
 			copyPasteHandler(event);
 		},
-		adjustBorder : function(obj) {
+		adjustBorder: function(obj) {
 			adjustBorder(obj);
 		},
 		setActiveObj: function(obj) {
+			if (!obj.active) {
+				return;
+			}
 			if (activeObj && activeObj.elmType === "panel") {
 				activeObj.set({
 					stroke: "black",
@@ -616,7 +619,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		getDimension: getDimension,
 		contains: contains,
 		addPanel: addPanel,
-		addImage: function(img){
+		addImage: function(img) {
 			addImage(img, this.getActiveObj());
 		},
 		setControls: setControls,
@@ -629,7 +632,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_page: function(canvasId, json, callback) {
 			var that = this;
 			init_page(function() {
-//				console.log("loading from json: ", json);
+				//				console.log("loading from json: ", json);
 				canvas.loadFromJSON(json, function() {
 					var results = canvas.getObjects().filter(function(found) {
 						return found.type === "path" || found.elmType === "image";
@@ -647,8 +650,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-					//					console.log(canvas);
+//										console.log(canvas);
 					if (typeof callback != "undefined") {
+//						console.log(callback);
 						callback();
 					}
 				});

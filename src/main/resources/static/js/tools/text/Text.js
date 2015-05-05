@@ -1,5 +1,3 @@
-//TODO check bug where sometimes text isn't editable (possibly b/c of above/below layers)
-
 define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var fontFamily;
 	var fill;

@@ -36,6 +36,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var setCurrentPage = function (pageNum) {
+		console.log("setting page to ", pageNum);
 		// Remove current from old thumb
 		$(".current").removeClass("current");
 		// Make given page the current thumb
@@ -51,6 +52,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	};
 
 	var removePage = function (pageNum) {
+		console.log("removing page ", pageNum);
 		$page = getPageByNum(pageNum);
 		$page.parent().remove();
 		updateThumbnailIDs();
@@ -60,6 +62,12 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		var $img = getPageByNum(pageNum).find("img");
 
 		$img.attr("src", dataURL);
+	};
+
+	var setPageDimensions = function(width, height) {
+		$("#page").width(width).height(height);
+		thumbnailDim = editor.getThumbDimensions(width, height);
+		$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
 	};
 
 	var setThumbnails = function (thumbs) {
@@ -75,6 +83,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var updateThumbnailIDs = function() {
 		$thumbs = $("#page-thumbs li");
 		$thumbs.each(function (idx) {
+			console.log( $(this).find(":data(pageNum)") );
 			$(this).find(":data(pageNum)").data("pageNum", idx + 1);
 		});
 	};
@@ -85,6 +94,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		}
 
 		var dims = editor.getThumbDimensions();
+		console.log(dims);
 		var $thumb = $("<li>")
 			.addClass("page-thumb");
 		// Link to click on thumbnail
@@ -103,6 +113,9 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		var $removeIcon = $("<i>")
 			.addClass("fa fa-x fa-remove")
 			.appendTo($removeLink);
+
+		$thumb.width(dims.width)
+			.height(dims.height);
 
 		if (dataURL) {
 			$img = $thumb.children("a.page-thumb").children("img");
@@ -165,7 +178,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 	};
 
-
 	// Listen for changes to the editor and update the ui
 	// accordingly
 	var initEditorListeners = function () {
@@ -175,7 +187,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(editor).on("removedPage", function (e, results, params) {
-			removePage(results.pageNum);
+			removePage(results.removedPageNum);
 		});
 
 		$(editor).on("movedPage", function (e, results, params) {
@@ -193,13 +205,14 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$(editor).on("loadedProject", function (e, results, params) {
 			setThumbnails(results.thumbnails);
 			setCurrentPage(1);
+			setPageDimensions(results.page.json.width, results.page.json.height);
 
 		$("#editor").css("visibility", "visible");
 		});
 
 		$(editor).on("createdProject", function (e, results) {
 			// Removes old thumbnails
-			// setPageDimensions($("#page-width").val(), $("#page-height").val());
+			setPageDimensions($("#page-width").val(), $("#page-height").val());
 
 			setThumbnails([]);
 			setCurrentPage(1);
@@ -297,17 +310,23 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 
 		$('.ui.radio.checkbox').checkbox();
 
-		var page_thumb_idx;
+		var startPageNum, endPageNum;
 
 		$("#page-thumbs").sortable({
 			placeholder: "ui-state-placeholder",
 			cancel: "a.remove-page",
 			distance: 10,
 			start: function(event, ui) {
-				page_thumb_idx = ui.item.index();
+				startPageNum = ui.item.index() + 1;
 			},
 			stop: function(event, ui) {
-				console.log("moved element " + (1 + page_thumb_idx) + " to " + (1 + ui.item.index()));
+				endPageNum = ui.item.index() + 1;
+				console.log("Moved thumb " + startPageNum + " to " + endPageNum);
+				editor.action("MovePage", {
+					pageNum: startPageNum,
+					newSpot: endPageNum
+				});
+
 				updateThumbnailIDs();
 			}
 		});

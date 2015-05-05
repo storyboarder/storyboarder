@@ -7,7 +7,9 @@ define(["../../CanvasState", "../SnapUtil"], function(canvasState, snap) {
 	var activate = function() {
 		canvas = canvasState.getCanvas();
 		canvas.on("mouse:down", function(options) {
-			canvasState.setActiveObj(options.target);
+			if (options.target && options.target.active) {
+				canvasState.setActiveObj(options.target);
+			}
 			console.log(options.target);
 		});
 

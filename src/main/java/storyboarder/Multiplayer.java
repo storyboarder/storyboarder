@@ -26,8 +26,8 @@ class Multiplayer extends WebSocketServer {
    */
   Multiplayer(int port) {
     super(new InetSocketAddress(port));
-    System.out.println("Listening for multiplayer requests on port " + port
-        + "...");
+    // System.out.println("Listening for multiplayer requests on port " + port
+    // + "...");
   }
 
   /**
@@ -82,7 +82,7 @@ class Multiplayer extends WebSocketServer {
    */
   @Override
   public void onMessage(WebSocket conn, String message) {
-    System.out.println(conn + ": " + message);
+    // System.out.println(conn + ": " + message);
     sendToOthers(conn, message);
   }
 
@@ -113,9 +113,9 @@ class Multiplayer extends WebSocketServer {
       for (WebSocket c : con) {
         if (!conn.equals(c)) {
           c.send(text);
-          System.out.println("Other: " + c);
+          // System.out.println("Other: " + c);
         } else {
-          System.out.println("Do not send to self: " + c);
+          // System.out.println("Do not send to self: " + c);
         }
       }
     }

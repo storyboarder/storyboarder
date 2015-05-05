@@ -20,7 +20,7 @@ define(["../../CanvasState"], function(canvasState) {
 			});
 		}
 
-		console.log("draw activated");
+//		console.log("draw activated");
 
 		canvas.isDrawingMode = true;
 
@@ -32,7 +32,7 @@ define(["../../CanvasState"], function(canvasState) {
 	};
 
 	var deactivate = function() {
-		console.log("draw deactivate");
+//		console.log("draw deactivate");
 		canvas.isDrawingMode = false;
 		canvas.off("mouse:up");
 

@@ -309,8 +309,8 @@ final class GUI {
      */
     @Override
     public Object handle(Request req, Response res) {
-      // System.out.println("\nPage action: " + req.params(PARAM)
-      // + ", current proj: " + project);
+      System.out.println("\nPage action: " + req.params(PARAM)
+          + ", current proj: " + project);
 
       if (project == null) {
         return NULL_PROJ_JSON;
