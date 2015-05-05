@@ -325,7 +325,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 		},
 		"EnableKeyListener" : function() {
 			$(document).on('keydown', function(event) {
-				console.log("key pressed", event);
+				console.log("key pressed", event.keyCode);
 				canvasState.copyPasteHandler(event);
 			});
 		}
