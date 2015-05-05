@@ -14,9 +14,8 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		"AddImageButton": function() {
 			console.log("UPLOAD CLICKED");
 			$('.ui.modal.add-image').modal('hide');
-
-			var group = { url: $("#image-url").val() };
-			editor.action("AddURL", group);
+/*			var group = { url: $("#image-url").val() };
+			editor.action("AddURL", group);*/
 		},
 		"Save": function() {
 			console.log("save called");
