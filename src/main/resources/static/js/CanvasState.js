@@ -6,13 +6,13 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		if (listenKeyboard) {
 			copyPasteHandler(event);
 		}
-	});	
+	});
 
-	$(document).on('focus', "input[type=text]", function () {
+	$(document).on('focus', "input[type=text]", function() {
 		listenKeyboard = false;
 	});
 
-	$(document).on('blur', "input[type=text]", function () {
+	$(document).on('blur', "input[type=text]", function() {
 		listenKeyboard = true;
 	});
 
@@ -421,10 +421,10 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 
 
 	var CanvasState = {
-		copyPasteHandler : function(event) {
+		copyPasteHandler: function(event) {
 			copyPasteHandler(event);
 		},
-		adjustBorder : function(obj) {
+		adjustBorder: function(obj) {
 			adjustBorder(obj);
 		},
 		setActiveObj: function(obj) {
@@ -434,7 +434,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 					strokeWidth: 1,
 				});
 			}
-			
+
 			activeObj = obj;
 
 			if (obj && obj.elmType === "panel") {
@@ -587,7 +587,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		getDimension: getDimension,
 		contains: contains,
 		addPanel: addPanel,
-		addImage: function(img){
+		addImage: function(img) {
 			addImage(img, this.getActiveObj());
 		},
 		setControls: setControls,
@@ -600,7 +600,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 		load_page: function(canvasId, json, callback) {
 			var that = this;
 			init_page(function() {
-//				console.log("loading from json: ", json);
+				//				console.log("loading from json: ", json);
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
