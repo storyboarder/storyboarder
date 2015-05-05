@@ -63,6 +63,8 @@ final class GUI {
 
   private static Project project;
 
+  private static String firstHalf = "";
+
   private GUI() {
     String message = "This class cannot have instances.";
     throw new UnsupportedOperationException(message);
@@ -363,6 +365,14 @@ final class GUI {
 
               switch (req.params(PARAM)) {
                 case "save":
+                  return save(page);
+                case "saveLargeFirst":
+                  firstHalf = page.getJson();
+                  return JsonMessages.makeMessage("saved first half");
+                case "saveLargeSecond":
+                  String secondHalf = page.getJson();
+                  String fullJson = firstHalf + secondHalf;
+                  page = new Page(pageNum, fullJson, qm.value("thumbnail"));
                   return save(page);
                 case "add":
                   return add(page);
