@@ -371,6 +371,7 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			callback();
 		}
 
+		activeObj = null;
 
 		listenKeyboard = true;
 

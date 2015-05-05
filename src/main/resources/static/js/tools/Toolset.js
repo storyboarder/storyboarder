@@ -33,6 +33,7 @@ define(function(require) {
 
 	// Reactivates the current tool to account for updated canvas state
 	var reactivate = function() {
+		console.log(currentTool);
 		if (typeof currentTool != "undefined") {
 			activate(currentTool);
 		}
