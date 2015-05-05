@@ -428,6 +428,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 			adjustBorder(obj);
 		},
 		setActiveObj: function(obj) {
+			if (!obj.active) {
+				return;
+			}
 			if (activeObj && activeObj.elmType === "panel") {
 				activeObj.set({
 					stroke: "black",
@@ -604,9 +607,9 @@ define(["jquery", "jsondiffpatch", "fabricjs"], function($, jsondiffpatch) {
 				canvas.loadFromJSON(json, function() {
 					canvas.renderAll.bind(canvas);
 					canvas.renderAll();
-										console.log(canvas);
+//										console.log(canvas);
 					if (typeof callback != "undefined") {
-						console.log(callback);
+//						console.log(callback);
 						callback();
 					}
 				});

@@ -66,6 +66,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 	var setPageDimensions = function(width, height) {
 		$("#page").width(width).height(height);
 		thumbnailDim = editor.getThumbDimensions(width, height);
+		$(".page-thumb").width(thumbnailDim.width).height(thumbnailDim.height);
 	};
 
 	var setThumbnails = function (thumbs) {
@@ -175,7 +176,6 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 	};
 
-
 	// Listen for changes to the editor and update the ui
 	// accordingly
 	var initEditorListeners = function () {
@@ -185,7 +185,7 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		});
 
 		$(editor).on("removedPage", function (e, results, params) {
-			removePage(results.pageNum);
+			removePage(results.removedPageNum);
 		});
 
 		$(editor).on("movedPage", function (e, results, params) {
@@ -203,13 +203,14 @@ define(["jquery", "jqueryui", "semanticui", "./Editor"], function($, jqueryui, s
 		$(editor).on("loadedProject", function (e, results, params) {
 			setThumbnails(results.thumbnails);
 			setCurrentPage(1);
+			setPageDimensions(results.page.json.width, results.page.json.height);
 
 		$("#editor").css("visibility", "visible");
 		});
 
 		$(editor).on("createdProject", function (e, results) {
 			// Removes old thumbnails
-			// setPageDimensions($("#page-width").val(), $("#page-height").val());
+			setPageDimensions($("#page-width").val(), $("#page-height").val());
 
 			setThumbnails([]);
 			setCurrentPage(1);

@@ -231,6 +231,7 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 				}
 
 				$(Editor).trigger("removedPage", [{
+					removedPageNum: params.pageNum,
 					pageNum: currentPage.pageNum,
 					numPages: numPages
 				}, params]);
@@ -264,7 +265,6 @@ define(["jsPDF", "./CanvasState", "./tools/Toolset", "./tools/SnapUtil"], functi
 			});
 		},
 		"MovePage": function(params) {
-			throw "good";
 			checkParams(params, ["pageNum", "newSpot"]);
 			if (currentPage.pageNum == params.pageNum) {
 				currentPage.pageNum = params.newSpot;
